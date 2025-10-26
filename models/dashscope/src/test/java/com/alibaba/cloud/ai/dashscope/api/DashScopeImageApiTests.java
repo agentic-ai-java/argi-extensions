@@ -102,7 +102,7 @@ class DashScopeImageApiTests {
 	@Test
 	void testDefaultImageModel() {
 		// Test the default image model constant
-		assertEquals("wanx-v1", DashScopeImageApi.DEFAULT_IMAGE_MODEL, "Default image model should be 'wanx-v1'");
+		assertEquals("qwen-image", DashScopeImageApi.DEFAULT_IMAGE_MODEL, "Default image model should be 'qwen-image'");
 	}
 
 	@Test
