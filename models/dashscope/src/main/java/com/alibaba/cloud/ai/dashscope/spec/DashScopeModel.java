@@ -296,15 +296,17 @@ public class DashScopeModel {
 
         QWEN_IMAGE_PLUS("qwen-image-plus"),
 
+        QWEN_IMAGE("qwen-image"),
+
         QWEN_IMAGE_EDIT("qwen-image-edit"),
 
         QWEN_MT_IMAGE("qwen-mt-image"),
 
-        QWEN_IMAGE("qwen-plus"),
-
         WAN_2_2_T_2_I_PLUS("wan2.2-t2i-plus"),
 
-        WAN_2_1_IMAGEEDIT("wanx2.1-imageedit"),
+        WAN_2_2_T_2_I_FLASH("wan2.2-t2i-flash"),
+
+        WANX_2_1_IMAGEEDIT("wanx2.1-imageedit"),
 
         WAN_2_5_I_2_I_PREVIEW("wan2.2-t2i-preview");
 

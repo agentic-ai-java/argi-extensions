@@ -15,9 +15,10 @@
  */
 package com.alibaba.cloud.ai.dashscope.api;
 
-import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeAPISpec;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.SimpleApiKey;
 import org.springframework.ai.retry.RetryUtils;
@@ -27,9 +28,15 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 
-
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.ENABLED;
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.HEADER_ASYNC;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.QWEN_IMAGE;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.QWEN_IMAGE_EDIT;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.QWEN_MT_IMAGE;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.WANX_2_1_IMAGEEDIT;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.WAN_2_2_T_2_I_FLASH;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.WAN_2_2_T_2_I_PLUS;
+import static com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ImageModel.WAN_2_5_I_2_I_PREVIEW;
 
 /**
  * @author nuocheng.lxm
@@ -39,11 +46,13 @@ import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.HEADER
 
 public class DashScopeImageApi {
 
+    private static final Logger logger = LoggerFactory.getLogger(DashScopeImageApi.class);
+
 	private final String baseUrl;
 
 	private final ApiKey apiKey;
 
-	public static final String DEFAULT_IMAGE_MODEL = ImageModel.WANX_V1.getValue();
+	public static final String DEFAULT_IMAGE_MODEL = QWEN_IMAGE.getValue();
 
 	private final RestClient restClient;
 
@@ -80,14 +89,24 @@ public class DashScopeImageApi {
 
 	public ResponseEntity<DashScopeAPISpec.DashScopeImageAsyncResponse> submitImageGenTask(DashScopeAPISpec.DashScopeImageRequest request) {
 
-		String baseUrl = "/api/v1/services/aigc/";
 		String model = request.model();
-		String endpoint = model.equals(ImageModel.WANX2_1_IMAGE_EDIT.getValue())
-				|| model.equals(ImageModel.WANX_X_PAINTING.getValue())
-				|| model.equals(ImageModel.WANX_SKETCH_TO_IMAGE_LITE.getValue())
-				|| model.equals(ImageModel.IMAGE_OUT_PAINTING.getValue()) ? "image2image" : "text2image";
+        String url = "/api/v1/services/aigc/";
 
-		String url = baseUrl + endpoint + "/image-synthesis";
+        if (model.equals(DEFAULT_IMAGE_MODEL) || model.equals(QWEN_IMAGE.getValue()) || model.equals(QWEN_IMAGE_EDIT.value)) {
+            url += "multimodal-generation/generation";
+        } else if (model.equals(QWEN_MT_IMAGE.getValue()) || model.equals(WANX_2_1_IMAGEEDIT.getValue())) {
+            url += "image2image/image-synthesis";
+        } else if (model.equals(WAN_2_2_T_2_I_PLUS.getValue()) || model.equals(WAN_2_2_T_2_I_FLASH.getValue()) || model.equals(WAN_2_5_I_2_I_PREVIEW.getValue())) {
+            url += "text2image/image-synthesis";
+        } else {
+            logger.info("not match model, use default url");
+            if (model.contains("edit")) {
+                url += "image2image/image-synthesis";
+            } else {
+                url += "text2image/image-synthesis";
+            }
+            url += "";
+        }
 
 		return this.restClient.post()
 			.uri(url)
