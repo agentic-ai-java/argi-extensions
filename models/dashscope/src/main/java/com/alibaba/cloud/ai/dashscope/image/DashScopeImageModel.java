@@ -192,7 +192,7 @@ public class DashScopeImageModel implements ImageModel {
 			return null;
 		}
 
-		return submitResponse.getBody().output().taskId();`
+		return submitResponse.getBody().output().taskId();
 	}
 
 	/**
