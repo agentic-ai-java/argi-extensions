@@ -670,7 +670,8 @@ public class DashScopeChatModel implements ChatModel {
                 options.getMaxTokens(),
                 options.getMaxInputTokens(),
 
-                options.getAsrOptions()
+                options.getAsrOptions(),
+                options.getOutputFormat()
         );
         // formatter:off
     }

@@ -231,6 +231,14 @@ public class DashScopeChatOptions implements ToolCallingChatOptions {
     this.translationOptions = translationOptions;
   }
 
+  public String getOutputFormat() {
+    return outputFormat;
+  }
+
+  public void setOutputFormat(String outputFormat) {
+    this.outputFormat = outputFormat;
+  }
+
   public Integer getTopLogProbs() {
     return topLogProbs;
   }
