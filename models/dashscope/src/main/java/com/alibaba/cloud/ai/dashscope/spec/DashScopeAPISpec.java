@@ -634,7 +634,14 @@ public class DashScopeAPISpec {
 
             // This parameter is only available when calling the recording file recognition-Tongyi Qianwen function, and is only effective for the Tongyi Qianwen 3 ASR model.
             // It is used to specify whether certain functions are enabled.
-            @JsonProperty("asr_options") Object asrOptions
+            @JsonProperty("asr_options") Object asrOptions,
+
+            // The default value is "model_detailed_report"
+            // Only when the Qwen-Deep-Research model for in-depth research is invoked, is the format for specifying the output content determined.
+            // Optional values:
+            //   "model_detailed_report": Detailed Report, approximately 6,000 words
+            //   "model_summary_report": Summary Report, approximately 1500 - 2000 words
+            @JsonProperty("output_format") String outputFormat
     ) {
 
         /**
@@ -643,7 +650,7 @@ public class DashScopeAPISpec {
         public ChatCompletionRequestParameter() {
 
             this(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, null, null, null, null, null, null, null, null, null);
+                    null, null, null, null, null, null, null, null, null, null, null, null, null);
          }
 
         /**
