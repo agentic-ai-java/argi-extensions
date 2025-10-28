@@ -41,7 +41,6 @@ import java.util.Set;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DashScopeChatOptions implements ToolCallingChatOptions {
 
-	// @formatter:off
   /** ID of the model to use. */
   @JsonProperty("model")
   private String model;
@@ -165,7 +164,6 @@ public class DashScopeChatOptions implements ToolCallingChatOptions {
    */
   private @JsonProperty("vl_high_resolution_images") Boolean vlHighResolutionImages;
 
-
   /**
    * Whether to enable the thinking process of the model.
    */
@@ -218,30 +216,54 @@ public class DashScopeChatOptions implements ToolCallingChatOptions {
 
   private @JsonProperty("logprobs") Boolean logprobs;
 
-    private @JsonProperty("translation_options") DashScopeAPISpec.TranslationOptions translationOptions;
+  private @JsonProperty("translation_options") DashScopeAPISpec.TranslationOptions translationOptions;
 
+  private @JsonProperty("output_format") String outputFormat;
 
   @JsonIgnore
   private Map<String, Object> toolContext = new HashMap<>();;
 
   public DashScopeAPISpec.TranslationOptions getTranslationOptions() {
     return translationOptions;
-}public void setTranslationOptions(DashScopeAPISpec.TranslationOptions translationOptions) {
+  }
+
+  public void setTranslationOptions(DashScopeAPISpec.TranslationOptions translationOptions) {
     this.translationOptions = translationOptions;
-}public Integer getTopLogProbs() {
+  }
+
+  public String getOutputFormat() {
+    return outputFormat;
+  }
+
+  public void setOutputFormat(String outputFormat) {
+    this.outputFormat = outputFormat;
+  }
+
+  public Integer getTopLogProbs() {
     return topLogProbs;
-}public void setTopLogProbs(Integer topLogProbs) {
+  }
+
+  public void setTopLogProbs(Integer topLogProbs) {
     this.topLogProbs = topLogProbs;
-}public Boolean getLogprobs() {
+  }
+
+  public Boolean getLogprobs() {
     return logprobs;
-}public void setLogprobs(Boolean logprobs) {
+  }
+
+  public void setLogprobs(Boolean logprobs) {
     this.logprobs = logprobs;
-}public DashScopeAPISpec.OCROption getOcrOptions() {
+  }
+
+  public DashScopeAPISpec.OCROption getOcrOptions() {
     return ocrOptions;
-}public void setOcrOptions(DashScopeAPISpec.OCROption ocrOptions) {
+  }
+
+  public void setOcrOptions(DashScopeAPISpec.OCROption ocrOptions) {
     this.ocrOptions = ocrOptions;
-}public Boolean getVlEnableImageHwOutput() {
-    return vlEnableImageHwOutput;
+  }
+    public Boolean getVlEnableImageHwOutput() {
+        return vlEnableImageHwOutput;
     }
 
     public void setVlEnableImageHwOutput(Boolean vlEnableImageHwOutput) {
