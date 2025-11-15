@@ -27,7 +27,7 @@ import org.springframework.ai.model.ModelDescription;
 public class DashScopeModel {
 
     /**
-     * Spring AI Alibaba Dashscope implements all models that support the dashscope
+     * Spring AI Alibaba DashScope implements all models that support the dashscope
      * platform, and only the Qwen series models are listed here. For more model options,
      * refer to: <a href="https://help.aliyun.com/zh/model-studio/models">Model List</a>
      */
