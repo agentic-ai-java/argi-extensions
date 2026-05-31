@@ -32,10 +32,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.metadata.Usage;
-import org.springframework.ai.model.ModelOptionsUtils;
+import org.springframework.ai.util.JsonHelper;
 
 /**
- * @author yuluo, yingzi, xuguan
+ * @author yuluo
+ * @author yingzi
+ * @author xuguan
  */
 public class DashScopeApiSpec {
 
@@ -509,7 +511,7 @@ public class DashScopeApiSpec {
              * @param jsonSchema tool function schema as json.
              */
             public Function(String description, String name, String jsonSchema) {
-                this(description, name, ModelOptionsUtils.jsonToMap(jsonSchema));
+                this(description, name, new JsonHelper().fromJsonToMap(jsonSchema));
             }
         }
     }
