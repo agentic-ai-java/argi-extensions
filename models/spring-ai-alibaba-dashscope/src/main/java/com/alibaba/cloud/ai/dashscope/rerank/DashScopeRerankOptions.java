@@ -23,10 +23,10 @@ import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Title DashScope rerank options.<br>
- * Description DashScope rerank options.<br>
+ * DashScope rerank auto-configuration properties.
  *
  * @author yuanci.ytb
+ * @author xuguan
  * @since 1.0.0-M2
  */
 public class DashScopeRerankOptions implements RerankOptions {

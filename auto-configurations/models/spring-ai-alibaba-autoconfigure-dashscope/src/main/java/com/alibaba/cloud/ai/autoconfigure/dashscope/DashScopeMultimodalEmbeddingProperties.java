@@ -22,9 +22,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
- * DashScope multimodal embedding properties.
+ * DashScope multimodal embedding auto-configuration properties.
  *
  * @author buvidk
+ * @author xuguan
  */
 @ConfigurationProperties(DashScopeMultimodalEmbeddingProperties.CONFIG_PREFIX)
 public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentProperties {
@@ -34,81 +35,87 @@ public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentPrope
 	public static final String DEFAULT_MULTIMODAL_EMBEDDING_MODEL = "tongyi-embedding-vision-plus";
 
 	private String multimodalPath = DashScopeApiConstants.MULTIMODAL_EMBEDDING_RESTFUL_URL;
-	private DashScopeMultimodalEmbeddingOptions options = DashScopeMultimodalEmbeddingOptions.builder()
-			.model(DEFAULT_MULTIMODAL_EMBEDDING_MODEL)
-			.build();
-	private final Options legacyOptions = new Options();
 
-	public DashScopeMultimodalEmbeddingOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeMultimodalEmbeddingOptions.builder().model(DEFAULT_MULTIMODAL_EMBEDDING_MODEL).build();
-		}
-		return this.options;
-	}
+	private @Nullable String model = DEFAULT_MULTIMODAL_EMBEDDING_MODEL;
 
-	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-	@Deprecated(since = "2.0.0", forRemoval = true)
-	public Options getOptions() {
-		return this.legacyOptions;
-	}
+	private @Nullable Integer dimensions;
 
-	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
-	}
+	private @Nullable String outputType;
 
-	private void updateOptions(java.util.function.Consumer<DashScopeMultimodalEmbeddingOptions.Builder> customizer) {
-		DashScopeMultimodalEmbeddingOptions.Builder builder = DashScopeMultimodalEmbeddingOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
+	private @Nullable Float fps;
+
+	private @Nullable String instruct;
 
 	public @Nullable String getModel() {
-		return toOptions().getModel();
+		return this.model;
 	}
 
-	public void setModel(String model) {
-		updateOptions(builder -> builder.model(model));
+	public void setModel(@Nullable String model) {
+		this.model = model;
 	}
 
 	public @Nullable Integer getDimensions() {
-		return toOptions().getDimensions();
+		return this.dimensions;
 	}
 
-	public void setDimensions(Integer dimensions) {
-		updateOptions(builder -> builder.dimensions(dimensions));
+	public void setDimensions(@Nullable Integer dimensions) {
+		this.dimensions = dimensions;
 	}
 
 	public @Nullable String getOutputType() {
-		return toOptions().getOutputType();
+		return this.outputType;
 	}
 
-	public void setOutputType(String outputType) {
-		updateOptions(builder -> builder.outputType(outputType));
+	public void setOutputType(@Nullable String outputType) {
+		this.outputType = outputType;
 	}
 
 	public @Nullable Float getFps() {
-		return toOptions().getFps();
+		return this.fps;
 	}
 
-	public void setFps(Float fps) {
-		updateOptions(builder -> builder.fps(fps));
+	public void setFps(@Nullable Float fps) {
+		this.fps = fps;
 	}
 
 	public @Nullable String getInstruct() {
-		return toOptions().getInstruct();
+		return this.instruct;
 	}
 
-	public void setInstruct(String instruct) {
-		updateOptions(builder -> builder.instruct(instruct));
+	public void setInstruct(@Nullable String instruct) {
+		this.instruct = instruct;
 	}
 
 	public String getMultimodalPath() {
-		return multimodalPath;
+		return this.multimodalPath;
 	}
 
 	public void setMultimodalPath(String multimodalPath) {
 		this.multimodalPath = multimodalPath;
 	}
+
+	public DashScopeMultimodalEmbeddingOptions toOptions() {
+		return DashScopeMultimodalEmbeddingOptions.builder()
+				.model(this.model)
+				.dimensions(this.dimensions)
+				.outputType(this.outputType)
+				.fps(this.fps)
+				.instruct(this.instruct)
+				.build();
+	}
+
+	private Options options = new Options();
+
+	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+	@Deprecated(since = "2.0.0", forRemoval = true)
+	public Options getOptions() {
+		return this.options;
+	}
+
+	public void setOptions(Options options) {
+		this.options = options;
+	}
+
 	public class Options {
 
 		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
@@ -117,7 +124,7 @@ public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentPrope
 			return DashScopeMultimodalEmbeddingProperties.this.getModel();
 		}
 
-		public void setModel(String model) {
+		public void setModel(@Nullable String model) {
 			DashScopeMultimodalEmbeddingProperties.this.setModel(model);
 		}
 
@@ -127,7 +134,7 @@ public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentPrope
 			return DashScopeMultimodalEmbeddingProperties.this.getDimensions();
 		}
 
-		public void setDimensions(Integer dimensions) {
+		public void setDimensions(@Nullable Integer dimensions) {
 			DashScopeMultimodalEmbeddingProperties.this.setDimensions(dimensions);
 		}
 
@@ -137,7 +144,7 @@ public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentPrope
 			return DashScopeMultimodalEmbeddingProperties.this.getOutputType();
 		}
 
-		public void setOutputType(String outputType) {
+		public void setOutputType(@Nullable String outputType) {
 			DashScopeMultimodalEmbeddingProperties.this.setOutputType(outputType);
 		}
 
@@ -147,7 +154,7 @@ public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentPrope
 			return DashScopeMultimodalEmbeddingProperties.this.getFps();
 		}
 
-		public void setFps(Float fps) {
+		public void setFps(@Nullable Float fps) {
 			DashScopeMultimodalEmbeddingProperties.this.setFps(fps);
 		}
 
@@ -157,11 +164,10 @@ public class DashScopeMultimodalEmbeddingProperties extends DashScopeParentPrope
 			return DashScopeMultimodalEmbeddingProperties.this.getInstruct();
 		}
 
-		public void setInstruct(String instruct) {
+		public void setInstruct(@Nullable String instruct) {
 			DashScopeMultimodalEmbeddingProperties.this.setInstruct(instruct);
 		}
 
 	}
-
 
 }

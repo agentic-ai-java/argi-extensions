@@ -25,436 +25,490 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
- * @author kevinlin09、yingzi
+ * DashScope audio speech auto-configuration properties.
+ *
+ * @author kevinlin09
+ * @author yingzi
+ * @author xuguan
  */
-
 @ConfigurationProperties(DashScopeAudioSpeechProperties.CONFIG_PREFIX)
 public class DashScopeAudioSpeechProperties extends DashScopeParentProperties {
 
-	/**
-	 * Spring AI Alibaba configuration prefix.
-	 */
-	public static final String CONFIG_PREFIX = "spring.ai.dashscope.audio.speech";
+    /**
+     * Spring AI Alibaba configuration prefix.
+     */
+    public static final String CONFIG_PREFIX = "spring.ai.dashscope.audio.speech";
 
     private String websocketUrl = DashScopeAudioApiConstants.DEFAULT_WEBSOCKET_URL;
-	private DashScopeAudioSpeechOptions options = DashScopeAudioSpeechOptions.builder().build();
-	private final Options legacyOptions = new Options();
 
-	public DashScopeAudioSpeechOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeAudioSpeechOptions.builder().build();
-		}
-		return this.options;
-	}
+    private @Nullable String model;
 
-	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-	@Deprecated(since = "2.0.0", forRemoval = true)
-	public Options getOptions() {
-		return this.legacyOptions;
-	}
+    private @Nullable String textType;
 
-	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
-	}
+    private @Nullable String voice;
 
-	private void updateOptions(java.util.function.Consumer<DashScopeAudioSpeechOptions.Builder> customizer) {
-		DashScopeAudioSpeechOptions.Builder builder = DashScopeAudioSpeechOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
+    private @Nullable String format;
 
-	public @Nullable String getModel() {
-		return toOptions().getModel();
-	}
+    private @Nullable Integer sampleRate;
 
-	public void setModel(String model) {
-		updateOptions(builder -> builder.model(model));
-	}
+    private @Nullable Integer volume;
 
-	public @Nullable String getVoice() {
-		return toOptions().getVoice();
-	}
+    private @Nullable Float rate;
 
-	public void setVoice(String voice) {
-		updateOptions(builder -> builder.voice(voice));
-	}
+    private @Nullable Float pitch;
 
-	public @Nullable String getTextType() {
-		return toOptions().getTextType();
-	}
+    private @Nullable Boolean enableSsml;
 
-	public void setTextType(String textType) {
-		updateOptions(builder -> builder.textType(textType));
-	}
+    private @Nullable Integer bitRate;
 
-	public @Nullable Boolean getEnableAigcTag() {
-		return toOptions().getEnableAigcTag();
-	}
+    private @Nullable Double speed;
 
-	public void setEnableAigcTag(Boolean enableAigcTag) {
-		updateOptions(builder -> builder.enableAigcTag(enableAigcTag));
-	}
+    private @Nullable Integer seed;
 
-	public @Nullable String getAigcPropagator() {
-		return toOptions().getAigcPropagator();
-	}
+    private @Nullable Boolean wordTimestampEnabled;
 
-	public void setAigcPropagator(String aigcPropagator) {
-		updateOptions(builder -> builder.aigcPropagator(aigcPropagator));
-	}
+    private @Nullable Boolean phonemeTimestampEnabled;
 
-	public @Nullable String getAigcPropagateId() {
-		return toOptions().getAigcPropagateId();
-	}
+    private @Nullable List<String> languageHints;
 
-	public void setAigcPropagateId(String aigcPropagateId) {
-		updateOptions(builder -> builder.aigcPropagateId(aigcPropagateId));
-	}
+    private @Nullable String instruction;
 
-	public @Nullable Integer getSampleRate() {
-		return toOptions().getSampleRate();
-	}
+    private @Nullable Boolean optimizeInstructions;
 
-	public void setSampleRate(Integer sampleRate) {
-		updateOptions(builder -> builder.sampleRate(sampleRate));
-	}
+    private @Nullable Boolean enableAigcTag;
 
-	public @Nullable String getFormat() {
-		return toOptions().getFormat();
-	}
+    private @Nullable String aigcPropagator;
 
-	public void setFormat(String format) {
-		updateOptions(builder -> builder.format(format));
-	}
+    private @Nullable String aigcPropagateId;
 
-	public void setResponseFormat(String format) {
-		updateOptions(builder -> builder.format(format));
-	}
+    private @Nullable String languageType;
 
-	public @Nullable Boolean getWordTimestampEnabled() {
-		return toOptions().getWordTimestampEnabled();
-	}
+    public @Nullable String getModel() {
+        return this.model;
+    }
 
-	public void setWordTimestampEnabled(Boolean wordTimestampEnabled) {
-		updateOptions(builder -> builder.wordTimestampEnabled(wordTimestampEnabled));
-	}
+    public void setModel(@Nullable String model) {
+        this.model = model;
+    }
 
-	public @Nullable Boolean getPhonemeTimestampEnabled() {
-		return toOptions().getPhonemeTimestampEnabled();
-	}
+    public @Nullable String getTextType() {
+        return this.textType;
+    }
 
-	public void setPhonemeTimestampEnabled(Boolean phonemeTimestampEnabled) {
-		updateOptions(builder -> builder.phonemeTimestampEnabled(phonemeTimestampEnabled));
-	}
+    public void setTextType(@Nullable String textType) {
+        this.textType = textType;
+    }
 
-	public @Nullable Integer getVolume() {
-		return toOptions().getVolume();
-	}
+    public @Nullable String getVoice() {
+        return this.voice;
+    }
 
-	public void setVolume(Integer volume) {
-		updateOptions(builder -> builder.volume(volume));
-	}
+    public void setVoice(@Nullable String voice) {
+        this.voice = voice;
+    }
 
-	public @Nullable Double getSpeed() {
-		return toOptions().getSpeed();
-	}
+    public @Nullable String getFormat() {
+        return this.format;
+    }
 
-	public void setSpeed(Double speed) {
-		updateOptions(builder -> builder.speed(speed));
-	}
+    public void setFormat(@Nullable String format) {
+        this.format = format;
+    }
 
-	public @Nullable Float getRate() {
-		return toOptions().getRate();
-	}
+    public @Nullable Integer getSampleRate() {
+        return this.sampleRate;
+    }
 
-	public void setRate(Float rate) {
-		updateOptions(builder -> builder.rate(rate));
-	}
+    public void setSampleRate(@Nullable Integer sampleRate) {
+        this.sampleRate = sampleRate;
+    }
 
-	public @Nullable Float getPitch() {
-		return toOptions().getPitch();
-	}
+    public @Nullable Integer getVolume() {
+        return this.volume;
+    }
 
-	public void setPitch(Float pitch) {
-		updateOptions(builder -> builder.pitch(pitch));
-	}
+    public void setVolume(@Nullable Integer volume) {
+        this.volume = volume;
+    }
 
-	public @Nullable Boolean getEnableSsml() {
-		return toOptions().getEnableSsml();
-	}
+    public @Nullable Float getRate() {
+        return this.rate;
+    }
 
-	public void setEnableSsml(Boolean enableSsml) {
-		updateOptions(builder -> builder.enableSsml(enableSsml));
-	}
+    public void setRate(@Nullable Float rate) {
+        this.rate = rate;
+    }
 
-	public @Nullable Integer getBitRate() {
-		return toOptions().getBitRate();
-	}
+    public @Nullable Float getPitch() {
+        return this.pitch;
+    }
 
-	public void setBitRate(Integer bitRate) {
-		updateOptions(builder -> builder.bitRate(bitRate));
-	}
+    public void setPitch(@Nullable Float pitch) {
+        this.pitch = pitch;
+    }
 
-	public @Nullable Integer getSeed() {
-		return toOptions().getSeed();
-	}
+    public @Nullable Boolean getEnableSsml() {
+        return this.enableSsml;
+    }
 
-	public void setSeed(Integer seed) {
-		updateOptions(builder -> builder.seed(seed));
-	}
+    public void setEnableSsml(@Nullable Boolean enableSsml) {
+        this.enableSsml = enableSsml;
+    }
 
-	public @Nullable List<String> getLanguageHints() {
-		return toOptions().getLanguageHints();
-	}
+    public @Nullable Integer getBitRate() {
+        return this.bitRate;
+    }
 
-	public void setLanguageHints(List<String> languageHints) {
-		updateOptions(builder -> builder.languageHints(languageHints));
-	}
+    public void setBitRate(@Nullable Integer bitRate) {
+        this.bitRate = bitRate;
+    }
 
-	public @Nullable String getInstruction() {
-		return toOptions().getInstruction();
-	}
+    public @Nullable Double getSpeed() {
+        return this.speed;
+    }
 
-	public void setInstruction(String instruction) {
-		updateOptions(builder -> builder.instruction(instruction));
-	}
+    public void setSpeed(@Nullable Double speed) {
+        this.speed = speed;
+    }
 
-	public @Nullable Boolean getOptimizeInstructions() {
-		return toOptions().getOptimizeInstructions();
-	}
+    public @Nullable Integer getSeed() {
+        return this.seed;
+    }
 
-	public void setOptimizeInstructions(Boolean optimizeInstructions) {
-		updateOptions(builder -> builder.optimizeInstructions(optimizeInstructions));
-	}
+    public void setSeed(@Nullable Integer seed) {
+        this.seed = seed;
+    }
 
-	public @Nullable String getLanguageType() {
-		return toOptions().getLanguageType();
-	}
+    public @Nullable Boolean getWordTimestampEnabled() {
+        return this.wordTimestampEnabled;
+    }
 
-	public void setLanguageType(String languageType) {
-		updateOptions(builder -> builder.languageType(languageType));
-	}
+    public void setWordTimestampEnabled(@Nullable Boolean wordTimestampEnabled) {
+        this.wordTimestampEnabled = wordTimestampEnabled;
+    }
+
+    public @Nullable Boolean getPhonemeTimestampEnabled() {
+        return this.phonemeTimestampEnabled;
+    }
+
+    public void setPhonemeTimestampEnabled(@Nullable Boolean phonemeTimestampEnabled) {
+        this.phonemeTimestampEnabled = phonemeTimestampEnabled;
+    }
+
+    public @Nullable List<String> getLanguageHints() {
+        return this.languageHints;
+    }
+
+    public void setLanguageHints(@Nullable List<String> languageHints) {
+        this.languageHints = languageHints;
+    }
+
+    public @Nullable String getInstruction() {
+        return this.instruction;
+    }
+
+    public void setInstruction(@Nullable String instruction) {
+        this.instruction = instruction;
+    }
+
+    public @Nullable Boolean getOptimizeInstructions() {
+        return this.optimizeInstructions;
+    }
+
+    public void setOptimizeInstructions(@Nullable Boolean optimizeInstructions) {
+        this.optimizeInstructions = optimizeInstructions;
+    }
+
+    public @Nullable Boolean getEnableAigcTag() {
+        return this.enableAigcTag;
+    }
+
+    public void setEnableAigcTag(@Nullable Boolean enableAigcTag) {
+        this.enableAigcTag = enableAigcTag;
+    }
+
+    public @Nullable String getAigcPropagator() {
+        return this.aigcPropagator;
+    }
+
+    public void setAigcPropagator(@Nullable String aigcPropagator) {
+        this.aigcPropagator = aigcPropagator;
+    }
+
+    public @Nullable String getAigcPropagateId() {
+        return this.aigcPropagateId;
+    }
+
+    public void setAigcPropagateId(@Nullable String aigcPropagateId) {
+        this.aigcPropagateId = aigcPropagateId;
+    }
+
+    public @Nullable String getLanguageType() {
+        return this.languageType;
+    }
+
+    public void setLanguageType(@Nullable String languageType) {
+        this.languageType = languageType;
+    }
 
     public String getWebsocketUrl() {
-        return websocketUrl;
+        return this.websocketUrl;
     }
 
     public void setWebsocketUrl(String websocketUrl) {
         this.websocketUrl = websocketUrl;
     }
-	public class Options {
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getModel() {
-			return DashScopeAudioSpeechProperties.this.getModel();
-		}
+    public DashScopeAudioSpeechOptions toOptions() {
+        return DashScopeAudioSpeechOptions.builder()
+                .model(this.model)
+                .textType(this.textType)
+                .voice(this.voice)
+                .format(this.format)
+                .sampleRate(this.sampleRate)
+                .volume(this.volume)
+                .rate(this.rate)
+                .pitch(this.pitch)
+                .enableSsml(this.enableSsml)
+                .bitRate(this.bitRate)
+                .speed(this.speed)
+                .seed(this.seed)
+                .wordTimestampEnabled(this.wordTimestampEnabled)
+                .phonemeTimestampEnabled(this.phonemeTimestampEnabled)
+                .languageHints(this.languageHints)
+                .instruction(this.instruction)
+                .optimizeInstructions(this.optimizeInstructions)
+                .enableAigcTag(this.enableAigcTag)
+                .aigcPropagator(this.aigcPropagator)
+                .aigcPropagateId(this.aigcPropagateId)
+                .languageType(this.languageType)
+                .build();
+    }
 
-		public void setModel(String model) {
-			DashScopeAudioSpeechProperties.this.setModel(model);
-		}
+    private Options options = new Options();
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".voice")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getVoice() {
-			return DashScopeAudioSpeechProperties.this.getVoice();
-		}
+    @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+    @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+    public Options getOptions() {
+        return options;
+    }
 
-		public void setVoice(String voice) {
-			DashScopeAudioSpeechProperties.this.setVoice(voice);
-		}
+    public void setOptions(Options options) {
+        this.options = options;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".text-type")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getTextType() {
-			return DashScopeAudioSpeechProperties.this.getTextType();
-		}
+    public class Options {
 
-		public void setTextType(String textType) {
-			DashScopeAudioSpeechProperties.this.setTextType(textType);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getModel() {
+            return DashScopeAudioSpeechProperties.this.getModel();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".enable-aigc-tag")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getEnableAigcTag() {
-			return DashScopeAudioSpeechProperties.this.getEnableAigcTag();
-		}
+        public void setModel(@Nullable String model) {
+            DashScopeAudioSpeechProperties.this.setModel(model);
+        }
 
-		public void setEnableAigcTag(Boolean enableAigcTag) {
-			DashScopeAudioSpeechProperties.this.setEnableAigcTag(enableAigcTag);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".voice")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getVoice() {
+            return DashScopeAudioSpeechProperties.this.getVoice();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".aigc-propagator")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getAigcPropagator() {
-			return DashScopeAudioSpeechProperties.this.getAigcPropagator();
-		}
+        public void setVoice(@Nullable String voice) {
+            DashScopeAudioSpeechProperties.this.setVoice(voice);
+        }
 
-		public void setAigcPropagator(String aigcPropagator) {
-			DashScopeAudioSpeechProperties.this.setAigcPropagator(aigcPropagator);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".text-type")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getTextType() {
+            return DashScopeAudioSpeechProperties.this.getTextType();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".aigc-propagate-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getAigcPropagateId() {
-			return DashScopeAudioSpeechProperties.this.getAigcPropagateId();
-		}
+        public void setTextType(@Nullable String textType) {
+            DashScopeAudioSpeechProperties.this.setTextType(textType);
+        }
 
-		public void setAigcPropagateId(String aigcPropagateId) {
-			DashScopeAudioSpeechProperties.this.setAigcPropagateId(aigcPropagateId);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".enable-aigc-tag")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Boolean getEnableAigcTag() {
+            return DashScopeAudioSpeechProperties.this.getEnableAigcTag();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".sample-rate")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getSampleRate() {
-			return DashScopeAudioSpeechProperties.this.getSampleRate();
-		}
+        public void setEnableAigcTag(@Nullable Boolean enableAigcTag) {
+            DashScopeAudioSpeechProperties.this.setEnableAigcTag(enableAigcTag);
+        }
 
-		public void setSampleRate(Integer sampleRate) {
-			DashScopeAudioSpeechProperties.this.setSampleRate(sampleRate);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".aigc-propagator")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getAigcPropagator() {
+            return DashScopeAudioSpeechProperties.this.getAigcPropagator();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".format")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getFormat() {
-			return DashScopeAudioSpeechProperties.this.getFormat();
-		}
+        public void setAigcPropagator(@Nullable String aigcPropagator) {
+            DashScopeAudioSpeechProperties.this.setAigcPropagator(aigcPropagator);
+        }
 
-		public void setFormat(String format) {
-			DashScopeAudioSpeechProperties.this.setFormat(format);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".aigc-propagate-id")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getAigcPropagateId() {
+            return DashScopeAudioSpeechProperties.this.getAigcPropagateId();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".word-timestamp-enabled")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getWordTimestampEnabled() {
-			return DashScopeAudioSpeechProperties.this.getWordTimestampEnabled();
-		}
+        public void setAigcPropagateId(@Nullable String aigcPropagateId) {
+            DashScopeAudioSpeechProperties.this.setAigcPropagateId(aigcPropagateId);
+        }
 
-		public void setWordTimestampEnabled(Boolean wordTimestampEnabled) {
-			DashScopeAudioSpeechProperties.this.setWordTimestampEnabled(wordTimestampEnabled);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".sample-rate")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Integer getSampleRate() {
+            return DashScopeAudioSpeechProperties.this.getSampleRate();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".phoneme-timestamp-enabled")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getPhonemeTimestampEnabled() {
-			return DashScopeAudioSpeechProperties.this.getPhonemeTimestampEnabled();
-		}
+        public void setSampleRate(@Nullable Integer sampleRate) {
+            DashScopeAudioSpeechProperties.this.setSampleRate(sampleRate);
+        }
 
-		public void setPhonemeTimestampEnabled(Boolean phonemeTimestampEnabled) {
-			DashScopeAudioSpeechProperties.this.setPhonemeTimestampEnabled(phonemeTimestampEnabled);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".format")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getFormat() {
+            return DashScopeAudioSpeechProperties.this.getFormat();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".volume")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getVolume() {
-			return DashScopeAudioSpeechProperties.this.getVolume();
-		}
+        public void setFormat(@Nullable String format) {
+            DashScopeAudioSpeechProperties.this.setFormat(format);
+        }
 
-		public void setVolume(Integer volume) {
-			DashScopeAudioSpeechProperties.this.setVolume(volume);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".word-timestamp-enabled")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Boolean getWordTimestampEnabled() {
+            return DashScopeAudioSpeechProperties.this.getWordTimestampEnabled();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".speed")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Double getSpeed() {
-			return DashScopeAudioSpeechProperties.this.getSpeed();
-		}
+        public void setWordTimestampEnabled(@Nullable Boolean wordTimestampEnabled) {
+            DashScopeAudioSpeechProperties.this.setWordTimestampEnabled(wordTimestampEnabled);
+        }
 
-		public void setSpeed(Double speed) {
-			DashScopeAudioSpeechProperties.this.setSpeed(speed);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".phoneme-timestamp-enabled")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Boolean getPhonemeTimestampEnabled() {
+            return DashScopeAudioSpeechProperties.this.getPhonemeTimestampEnabled();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".rate")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Float getRate() {
-			return DashScopeAudioSpeechProperties.this.getRate();
-		}
+        public void setPhonemeTimestampEnabled(@Nullable Boolean phonemeTimestampEnabled) {
+            DashScopeAudioSpeechProperties.this.setPhonemeTimestampEnabled(phonemeTimestampEnabled);
+        }
 
-		public void setRate(Float rate) {
-			DashScopeAudioSpeechProperties.this.setRate(rate);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".volume")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Integer getVolume() {
+            return DashScopeAudioSpeechProperties.this.getVolume();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".pitch")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Float getPitch() {
-			return DashScopeAudioSpeechProperties.this.getPitch();
-		}
+        public void setVolume(@Nullable Integer volume) {
+            DashScopeAudioSpeechProperties.this.setVolume(volume);
+        }
 
-		public void setPitch(Float pitch) {
-			DashScopeAudioSpeechProperties.this.setPitch(pitch);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".speed")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Double getSpeed() {
+            return DashScopeAudioSpeechProperties.this.getSpeed();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".enable-ssml")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getEnableSsml() {
-			return DashScopeAudioSpeechProperties.this.getEnableSsml();
-		}
+        public void setSpeed(@Nullable Double speed) {
+            DashScopeAudioSpeechProperties.this.setSpeed(speed);
+        }
 
-		public void setEnableSsml(Boolean enableSsml) {
-			DashScopeAudioSpeechProperties.this.setEnableSsml(enableSsml);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".rate")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Float getRate() {
+            return DashScopeAudioSpeechProperties.this.getRate();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".bit-rate")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getBitRate() {
-			return DashScopeAudioSpeechProperties.this.getBitRate();
-		}
+        public void setRate(@Nullable Float rate) {
+            DashScopeAudioSpeechProperties.this.setRate(rate);
+        }
 
-		public void setBitRate(Integer bitRate) {
-			DashScopeAudioSpeechProperties.this.setBitRate(bitRate);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".pitch")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Float getPitch() {
+            return DashScopeAudioSpeechProperties.this.getPitch();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".seed")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getSeed() {
-			return DashScopeAudioSpeechProperties.this.getSeed();
-		}
+        public void setPitch(@Nullable Float pitch) {
+            DashScopeAudioSpeechProperties.this.setPitch(pitch);
+        }
 
-		public void setSeed(Integer seed) {
-			DashScopeAudioSpeechProperties.this.setSeed(seed);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".enable-ssml")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Boolean getEnableSsml() {
+            return DashScopeAudioSpeechProperties.this.getEnableSsml();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".language-hints")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable List<String> getLanguageHints() {
-			return DashScopeAudioSpeechProperties.this.getLanguageHints();
-		}
+        public void setEnableSsml(@Nullable Boolean enableSsml) {
+            DashScopeAudioSpeechProperties.this.setEnableSsml(enableSsml);
+        }
 
-		public void setLanguageHints(List<String> languageHints) {
-			DashScopeAudioSpeechProperties.this.setLanguageHints(languageHints);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".bit-rate")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Integer getBitRate() {
+            return DashScopeAudioSpeechProperties.this.getBitRate();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".instruction")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getInstruction() {
-			return DashScopeAudioSpeechProperties.this.getInstruction();
-		}
+        public void setBitRate(@Nullable Integer bitRate) {
+            DashScopeAudioSpeechProperties.this.setBitRate(bitRate);
+        }
 
-		public void setInstruction(String instruction) {
-			DashScopeAudioSpeechProperties.this.setInstruction(instruction);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".seed")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Integer getSeed() {
+            return DashScopeAudioSpeechProperties.this.getSeed();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".optimize-instructions")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getOptimizeInstructions() {
-			return DashScopeAudioSpeechProperties.this.getOptimizeInstructions();
-		}
+        public void setSeed(@Nullable Integer seed) {
+            DashScopeAudioSpeechProperties.this.setSeed(seed);
+        }
 
-		public void setOptimizeInstructions(Boolean optimizeInstructions) {
-			DashScopeAudioSpeechProperties.this.setOptimizeInstructions(optimizeInstructions);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".language-hints")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable List<String> getLanguageHints() {
+            return DashScopeAudioSpeechProperties.this.getLanguageHints();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".language-type")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getLanguageType() {
-			return DashScopeAudioSpeechProperties.this.getLanguageType();
-		}
+        public void setLanguageHints(@Nullable List<String> languageHints) {
+            DashScopeAudioSpeechProperties.this.setLanguageHints(languageHints);
+        }
 
-		public void setLanguageType(String languageType) {
-			DashScopeAudioSpeechProperties.this.setLanguageType(languageType);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".instruction")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getInstruction() {
+            return DashScopeAudioSpeechProperties.this.getInstruction();
+        }
 
-	}
+        public void setInstruction(@Nullable String instruction) {
+            DashScopeAudioSpeechProperties.this.setInstruction(instruction);
+        }
 
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".optimize-instructions")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable Boolean getOptimizeInstructions() {
+            return DashScopeAudioSpeechProperties.this.getOptimizeInstructions();
+        }
+
+        public void setOptimizeInstructions(@Nullable Boolean optimizeInstructions) {
+            DashScopeAudioSpeechProperties.this.setOptimizeInstructions(optimizeInstructions);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".language-type")
+        @Deprecated(since = "2.0.0.0-RC1", forRemoval = true)
+        public @Nullable String getLanguageType() {
+            return DashScopeAudioSpeechProperties.this.getLanguageType();
+        }
+
+        public void setLanguageType(@Nullable String languageType) {
+            DashScopeAudioSpeechProperties.this.setLanguageType(languageType);
+        }
+
+    }
 
 }

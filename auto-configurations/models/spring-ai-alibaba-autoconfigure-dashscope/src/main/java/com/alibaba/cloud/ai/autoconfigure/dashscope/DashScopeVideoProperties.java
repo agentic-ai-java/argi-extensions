@@ -23,86 +23,88 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
- * DashScope Video Generation Properties.
+ * DashScope video auto-configuration properties.
  *
  * @author dashscope
  * @author yuluo
+ * @author xuguan
  * @since 1.0.0.3
  */
-
 @ConfigurationProperties(prefix = DashScopeVideoProperties.CONFIG_PREFIX)
 public class DashScopeVideoProperties extends DashScopeParentProperties {
 
 	public static final String CONFIG_PREFIX = "spring.ai.dashscope.video";
 
-    private String videoPath = DashScopeVideoApiConstants.VIDEO_GENERATION_SYNTHESIS;
+	private String videoPath = DashScopeVideoApiConstants.VIDEO_GENERATION_SYNTHESIS;
 
-    private String queryTaskPath = DashScopeApiConstants.QUERY_TASK_RESTFUL_URL;
-    private DashScopeVideoOptions options = DashScopeVideoOptions.builder().build();
-	private final Options legacyOptions = new Options();
+	private String queryTaskPath = DashScopeApiConstants.QUERY_TASK_RESTFUL_URL;
 
-    public DashScopeVideoOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeVideoOptions.builder().build();
-		}
+	private @Nullable String model = DashScopeVideoOptions.DEFAULT_MODEL;
+
+	private DashScopeVideoOptions.@Nullable InputOptions input;
+
+	private DashScopeVideoOptions.@Nullable ParametersOptions parameters;
+
+	public String getVideoPath() {
+		return this.videoPath;
+	}
+
+	public void setVideoPath(String videoPath) {
+		this.videoPath = videoPath;
+	}
+
+	public String getQueryTaskPath() {
+		return this.queryTaskPath;
+	}
+
+	public void setQueryTaskPath(String queryTaskPath) {
+		this.queryTaskPath = queryTaskPath;
+	}
+
+	public @Nullable String getModel() {
+		return this.model;
+	}
+
+	public void setModel(@Nullable String model) {
+		this.model = model;
+	}
+
+	public DashScopeVideoOptions.@Nullable InputOptions getInput() {
+		return this.input;
+	}
+
+	public void setInput(DashScopeVideoOptions.@Nullable InputOptions input) {
+		this.input = input;
+	}
+
+	public DashScopeVideoOptions.@Nullable ParametersOptions getParameters() {
+		return this.parameters;
+	}
+
+	public void setParameters(DashScopeVideoOptions.@Nullable ParametersOptions parameters) {
+		this.parameters = parameters;
+	}
+
+	public DashScopeVideoOptions toOptions() {
+		return DashScopeVideoOptions.builder()
+				.model(this.model)
+				.input(this.input)
+				.parameters(this.parameters)
+				.build();
+	}
+
+	private Options options = new Options();
+
+	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+	@Deprecated(since = "2.0.0", forRemoval = true)
+	public Options getOptions() {
 		return this.options;
 	}
 
-    public String getVideoPath() {
-        return videoPath;
-    }
-
-    public void setVideoPath(String videoPath) {
-        this.videoPath = videoPath;
-    }
-
-    public String getQueryTaskPath() {
-        return queryTaskPath;
-    }
-
-    public void setQueryTaskPath(String queryTaskPath) {
-        this.queryTaskPath = queryTaskPath;
-    }
-
-    @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-    @Deprecated(since = "2.0.0", forRemoval = true)
-	public Options getOptions() {
-		return this.legacyOptions;
-	}
-
 	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
+		this.options = options;
 	}
 
-	private void updateOptions(java.util.function.Consumer<DashScopeVideoOptions.Builder> customizer) {
-		DashScopeVideoOptions.Builder builder = DashScopeVideoOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
-
-    public @Nullable String getModel() {
-        return toOptions().getModel();
-    }
-
-    public void setModel(String model) {
-        updateOptions(builder -> builder.model(model));
-    }
-
-    public DashScopeVideoOptions.@Nullable InputOptions getInput() {
-        return toOptions().getInput();
-    }
-
-    public void setInput(DashScopeVideoOptions.InputOptions input) {
-        updateOptions(builder -> builder.input(input));
-    }
-
-    public DashScopeVideoOptions.@Nullable ParametersOptions getParameters() {
-        return toOptions().getParameters();
-    }
-
-    public void setParameters(DashScopeVideoOptions.ParametersOptions parameters) {
-        updateOptions(builder -> builder.parameters(parameters));
-    }
 	public class Options {
 
 		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
@@ -136,6 +138,5 @@ public class DashScopeVideoProperties extends DashScopeParentProperties {
 		}
 
 	}
-
 
 }

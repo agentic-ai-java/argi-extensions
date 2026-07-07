@@ -30,129 +30,131 @@ import org.springframework.boot.context.properties.DeprecatedConfigurationProper
 @ConfigurationProperties(DashScopeSdkEmbeddingProperties.CONFIG_PREFIX)
 public class DashScopeSdkEmbeddingProperties extends DashScopeSdkParentProperties {
 
-	public static final String CONFIG_PREFIX = "spring.ai.dashscope.sdk.embedding";
+    public static final String CONFIG_PREFIX = "spring.ai.dashscope.sdk.embedding";
 
-	private boolean enabled = true;
+    private boolean enabled = true;
 
-	private MetadataMode metadataMode = MetadataMode.EMBED;
-	private DashScopeSdkEmbeddingOptions options = DashScopeSdkEmbeddingOptions.builder()
-		.model("text-embedding-v2")
-		.build();
-	private final Options legacyOptions = new Options();
+    private MetadataMode metadataMode = MetadataMode.EMBED;
 
-	public DashScopeSdkEmbeddingOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeSdkEmbeddingOptions.builder().model("text-embedding-v2").build();
-		}
-		return this.options;
-	}
+    private @Nullable String model = "text-embedding-v2";
 
-	public boolean isEnabled() {
-		return this.enabled;
-	}
+    private @Nullable String textType;
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    private @Nullable Integer dimensions;
 
-	public MetadataMode getMetadataMode() {
-		return this.metadataMode;
-	}
+    private @Nullable Map<String, String> httpHeaders;
 
-	public void setMetadataMode(MetadataMode metadataMode) {
-		this.metadataMode = metadataMode;
-	}
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 
-	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-	@Deprecated(since = "2.0.0", forRemoval = true)
-	public Options getOptions() {
-		return this.legacyOptions;
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
-	}
+    public MetadataMode getMetadataMode() {
+        return this.metadataMode;
+    }
 
-	private void updateOptions(java.util.function.Consumer<DashScopeSdkEmbeddingOptions.Builder> customizer) {
-		DashScopeSdkEmbeddingOptions.Builder builder = DashScopeSdkEmbeddingOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
+    public void setMetadataMode(MetadataMode metadataMode) {
+        this.metadataMode = metadataMode;
+    }
 
-	public @Nullable String getModel() {
-		return toOptions().getModel();
-	}
+    public @Nullable String getModel() {
+        return this.model;
+    }
 
-	public void setModel(String model) {
-		updateOptions(builder -> builder.model(model));
-	}
+    public void setModel(@Nullable String model) {
+        this.model = model;
+    }
 
-	public @Nullable String getTextType() {
-		return toOptions().getTextType();
-	}
+    public @Nullable String getTextType() {
+        return this.textType;
+    }
 
-	public void setTextType(String textType) {
-		updateOptions(builder -> builder.textType(textType));
-	}
+    public void setTextType(@Nullable String textType) {
+        this.textType = textType;
+    }
 
-	public @Nullable Integer getDimensions() {
-		return toOptions().getDimensions();
-	}
+    public @Nullable Integer getDimensions() {
+        return this.dimensions;
+    }
 
-	public void setDimensions(Integer dimensions) {
-		updateOptions(builder -> builder.dimensions(dimensions));
-	}
+    public void setDimensions(@Nullable Integer dimensions) {
+        this.dimensions = dimensions;
+    }
 
-	public @Nullable Map<String, String> getHttpHeaders() {
-		return toOptions().getHttpHeaders();
-	}
+    public @Nullable Map<String, String> getHttpHeaders() {
+        return this.httpHeaders;
+    }
 
-	public void setHttpHeaders(Map<String, String> httpHeaders) {
-		updateOptions(builder -> builder.httpHeaders(httpHeaders));
-	}
-	public class Options {
+    public void setHttpHeaders(@Nullable Map<String, String> httpHeaders) {
+        this.httpHeaders = httpHeaders;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getModel() {
-			return DashScopeSdkEmbeddingProperties.this.getModel();
-		}
+    public DashScopeSdkEmbeddingOptions toOptions() {
+        return DashScopeSdkEmbeddingOptions.builder()
+                .model(this.model)
+                .textType(this.textType)
+                .dimensions(this.dimensions)
+                .httpHeaders(this.httpHeaders)
+                .build();
+    }
 
-		public void setModel(String model) {
-			DashScopeSdkEmbeddingProperties.this.setModel(model);
-		}
+    private Options options = new Options();
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".text-type")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getTextType() {
-			return DashScopeSdkEmbeddingProperties.this.getTextType();
-		}
+    @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+    @Deprecated(since = "2.0.0", forRemoval = true)
+    public Options getOptions() {
+        return this.options;
+    }
 
-		public void setTextType(String textType) {
-			DashScopeSdkEmbeddingProperties.this.setTextType(textType);
-		}
+    public void setOptions(Options options) {
+        this.options = options;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".dimensions")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getDimensions() {
-			return DashScopeSdkEmbeddingProperties.this.getDimensions();
-		}
+    public class Options {
 
-		public void setDimensions(Integer dimensions) {
-			DashScopeSdkEmbeddingProperties.this.setDimensions(dimensions);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getModel() {
+            return DashScopeSdkEmbeddingProperties.this.getModel();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".http-headers")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Map<String, String> getHttpHeaders() {
-			return DashScopeSdkEmbeddingProperties.this.getHttpHeaders();
-		}
+        public void setModel(String model) {
+            DashScopeSdkEmbeddingProperties.this.setModel(model);
+        }
 
-		public void setHttpHeaders(Map<String, String> httpHeaders) {
-			DashScopeSdkEmbeddingProperties.this.setHttpHeaders(httpHeaders);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".text-type")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getTextType() {
+            return DashScopeSdkEmbeddingProperties.this.getTextType();
+        }
 
-	}
+        public void setTextType(String textType) {
+            DashScopeSdkEmbeddingProperties.this.setTextType(textType);
+        }
 
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".dimensions")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Integer getDimensions() {
+            return DashScopeSdkEmbeddingProperties.this.getDimensions();
+        }
+
+        public void setDimensions(Integer dimensions) {
+            DashScopeSdkEmbeddingProperties.this.setDimensions(dimensions);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".http-headers")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Map<String, String> getHttpHeaders() {
+            return DashScopeSdkEmbeddingProperties.this.getHttpHeaders();
+        }
+
+        public void setHttpHeaders(Map<String, String> httpHeaders) {
+            DashScopeSdkEmbeddingProperties.this.setHttpHeaders(httpHeaders);
+        }
+
+    }
 
 }

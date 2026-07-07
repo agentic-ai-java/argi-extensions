@@ -30,245 +30,268 @@ import org.springframework.boot.context.properties.DeprecatedConfigurationProper
 @ConfigurationProperties(DashScopeSdkAudioTranscriptionProperties.CONFIG_PREFIX)
 public class DashScopeSdkAudioTranscriptionProperties extends DashScopeSdkParentProperties {
 
-	public static final String CONFIG_PREFIX = "spring.ai.dashscope.sdk.audio.transcription";
+    public static final String CONFIG_PREFIX = "spring.ai.dashscope.sdk.audio.transcription";
 
-	private boolean enabled = true;
-	private DashScopeSdkAudioTranscriptionOptions options = DashScopeSdkAudioTranscriptionOptions.builder()
-		.model("paraformer-v2")
-		.build();
-	private final Options legacyOptions = new Options();
+    private boolean enabled = true;
 
-	public DashScopeSdkAudioTranscriptionOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeSdkAudioTranscriptionOptions.builder().model("paraformer-v2").build();
-		}
-		return this.options;
-	}
+    private @Nullable String model = "paraformer-v2";
 
-	public boolean isEnabled() {
-		return this.enabled;
-	}
+    private @Nullable List<String> fileUrls;
 
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
+    private @Nullable String phraseId;
 
-	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-	@Deprecated(since = "2.0.0", forRemoval = true)
-	public Options getOptions() {
-		return this.legacyOptions;
-	}
+    private @Nullable List<Integer> channelId;
 
-	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
-	}
+    private @Nullable Boolean diarizationEnabled;
 
-	private void updateOptions(java.util.function.Consumer<DashScopeSdkAudioTranscriptionOptions.Builder> customizer) {
-		DashScopeSdkAudioTranscriptionOptions.Builder builder = DashScopeSdkAudioTranscriptionOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
+    private @Nullable Integer speakerCount;
 
-	public @Nullable String getModel() {
-		return toOptions().getModel();
-	}
+    private @Nullable Boolean disfluencyRemovalEnabled;
 
-	public void setModel(String model) {
-		updateOptions(builder -> builder.model(model));
-	}
+    private @Nullable Boolean timestampAlignmentEnabled;
 
-	public @Nullable List<String> getFileUrls() {
-		return toOptions().getFileUrls();
-	}
+    private @Nullable String specialWordFilter;
 
-	public void setFileUrls(List<String> fileUrls) {
-		updateOptions(builder -> builder.fileUrls(fileUrls));
-	}
+    private @Nullable Boolean audioEventDetectionEnabled;
 
-	public @Nullable String getPhraseId() {
-		return toOptions().getPhraseId();
-	}
+    private @Nullable Map<String, String> httpHeaders;
 
-	public void setPhraseId(String phraseId) {
-		updateOptions(builder -> builder.phraseId(phraseId));
-	}
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 
-	public @Nullable List<Integer> getChannelId() {
-		return toOptions().getChannelId();
-	}
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
-	public void setChannelId(List<Integer> channelId) {
-		updateOptions(builder -> builder.channelId(channelId));
-	}
+    public @Nullable String getModel() {
+        return this.model;
+    }
 
-	public @Nullable Boolean getDiarizationEnabled() {
-		return toOptions().getDiarizationEnabled();
-	}
+    public void setModel(@Nullable String model) {
+        this.model = model;
+    }
 
-	public void setDiarizationEnabled(Boolean diarizationEnabled) {
-		updateOptions(builder -> builder.diarizationEnabled(diarizationEnabled));
-	}
+    public @Nullable List<String> getFileUrls() {
+        return this.fileUrls;
+    }
 
-	public @Nullable Integer getSpeakerCount() {
-		return toOptions().getSpeakerCount();
-	}
+    public void setFileUrls(@Nullable List<String> fileUrls) {
+        this.fileUrls = fileUrls;
+    }
 
-	public void setSpeakerCount(Integer speakerCount) {
-		updateOptions(builder -> builder.speakerCount(speakerCount));
-	}
+    public @Nullable String getPhraseId() {
+        return this.phraseId;
+    }
 
-	public @Nullable Boolean getDisfluencyRemovalEnabled() {
-		return toOptions().getDisfluencyRemovalEnabled();
-	}
+    public void setPhraseId(@Nullable String phraseId) {
+        this.phraseId = phraseId;
+    }
 
-	public void setDisfluencyRemovalEnabled(Boolean disfluencyRemovalEnabled) {
-		updateOptions(builder -> builder.disfluencyRemovalEnabled(disfluencyRemovalEnabled));
-	}
+    public @Nullable List<Integer> getChannelId() {
+        return this.channelId;
+    }
 
-	public @Nullable Boolean getTimestampAlignmentEnabled() {
-		return toOptions().getTimestampAlignmentEnabled();
-	}
+    public void setChannelId(@Nullable List<Integer> channelId) {
+        this.channelId = channelId;
+    }
 
-	public void setTimestampAlignmentEnabled(Boolean timestampAlignmentEnabled) {
-		updateOptions(builder -> builder.timestampAlignmentEnabled(timestampAlignmentEnabled));
-	}
+    public @Nullable Boolean getDiarizationEnabled() {
+        return this.diarizationEnabled;
+    }
 
-	public @Nullable String getSpecialWordFilter() {
-		return toOptions().getSpecialWordFilter();
-	}
+    public void setDiarizationEnabled(@Nullable Boolean diarizationEnabled) {
+        this.diarizationEnabled = diarizationEnabled;
+    }
 
-	public void setSpecialWordFilter(String specialWordFilter) {
-		updateOptions(builder -> builder.specialWordFilter(specialWordFilter));
-	}
+    public @Nullable Integer getSpeakerCount() {
+        return this.speakerCount;
+    }
 
-	public @Nullable Boolean getAudioEventDetectionEnabled() {
-		return toOptions().getAudioEventDetectionEnabled();
-	}
+    public void setSpeakerCount(@Nullable Integer speakerCount) {
+        this.speakerCount = speakerCount;
+    }
 
-	public void setAudioEventDetectionEnabled(Boolean audioEventDetectionEnabled) {
-		updateOptions(builder -> builder.audioEventDetectionEnabled(audioEventDetectionEnabled));
-	}
+    public @Nullable Boolean getDisfluencyRemovalEnabled() {
+        return this.disfluencyRemovalEnabled;
+    }
 
-	public @Nullable Map<String, String> getHttpHeaders() {
-		return toOptions().getHttpHeaders();
-	}
+    public void setDisfluencyRemovalEnabled(@Nullable Boolean disfluencyRemovalEnabled) {
+        this.disfluencyRemovalEnabled = disfluencyRemovalEnabled;
+    }
 
-	public void setHttpHeaders(Map<String, String> httpHeaders) {
-		updateOptions(builder -> builder.httpHeaders(httpHeaders));
-	}
-	public class Options {
+    public @Nullable Boolean getTimestampAlignmentEnabled() {
+        return this.timestampAlignmentEnabled;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getModel() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getModel();
-		}
+    public void setTimestampAlignmentEnabled(@Nullable Boolean timestampAlignmentEnabled) {
+        this.timestampAlignmentEnabled = timestampAlignmentEnabled;
+    }
 
-		public void setModel(String model) {
-			DashScopeSdkAudioTranscriptionProperties.this.setModel(model);
-		}
+    public @Nullable String getSpecialWordFilter() {
+        return this.specialWordFilter;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".file-urls")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable List<String> getFileUrls() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getFileUrls();
-		}
+    public void setSpecialWordFilter(@Nullable String specialWordFilter) {
+        this.specialWordFilter = specialWordFilter;
+    }
 
-		public void setFileUrls(List<String> fileUrls) {
-			DashScopeSdkAudioTranscriptionProperties.this.setFileUrls(fileUrls);
-		}
+    public @Nullable Boolean getAudioEventDetectionEnabled() {
+        return this.audioEventDetectionEnabled;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".phrase-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getPhraseId() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getPhraseId();
-		}
+    public void setAudioEventDetectionEnabled(@Nullable Boolean audioEventDetectionEnabled) {
+        this.audioEventDetectionEnabled = audioEventDetectionEnabled;
+    }
 
-		public void setPhraseId(String phraseId) {
-			DashScopeSdkAudioTranscriptionProperties.this.setPhraseId(phraseId);
-		}
+    public @Nullable Map<String, String> getHttpHeaders() {
+        return this.httpHeaders;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".channel-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable List<Integer> getChannelId() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getChannelId();
-		}
+    public void setHttpHeaders(@Nullable Map<String, String> httpHeaders) {
+        this.httpHeaders = httpHeaders;
+    }
 
-		public void setChannelId(List<Integer> channelId) {
-			DashScopeSdkAudioTranscriptionProperties.this.setChannelId(channelId);
-		}
+    public DashScopeSdkAudioTranscriptionOptions toOptions() {
+        return DashScopeSdkAudioTranscriptionOptions.builder()
+                .model(this.model)
+                .fileUrls(this.fileUrls)
+                .phraseId(this.phraseId)
+                .channelId(this.channelId)
+                .diarizationEnabled(this.diarizationEnabled)
+                .speakerCount(this.speakerCount)
+                .disfluencyRemovalEnabled(this.disfluencyRemovalEnabled)
+                .timestampAlignmentEnabled(this.timestampAlignmentEnabled)
+                .specialWordFilter(this.specialWordFilter)
+                .audioEventDetectionEnabled(this.audioEventDetectionEnabled)
+                .httpHeaders(this.httpHeaders)
+                .build();
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".diarization-enabled")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getDiarizationEnabled() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getDiarizationEnabled();
-		}
+    private Options options = new Options();
 
-		public void setDiarizationEnabled(Boolean diarizationEnabled) {
-			DashScopeSdkAudioTranscriptionProperties.this.setDiarizationEnabled(diarizationEnabled);
-		}
+    @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+    @Deprecated(since = "2.0.0", forRemoval = true)
+    public Options getOptions() {
+        return this.options;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".speaker-count")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getSpeakerCount() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getSpeakerCount();
-		}
+    public void setOptions(Options options) {
+        this.options = options;
+    }
 
-		public void setSpeakerCount(Integer speakerCount) {
-			DashScopeSdkAudioTranscriptionProperties.this.setSpeakerCount(speakerCount);
-		}
+    public class Options {
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".disfluency-removal-enabled")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getDisfluencyRemovalEnabled() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getDisfluencyRemovalEnabled();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getModel() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getModel();
+        }
 
-		public void setDisfluencyRemovalEnabled(Boolean disfluencyRemovalEnabled) {
-			DashScopeSdkAudioTranscriptionProperties.this.setDisfluencyRemovalEnabled(disfluencyRemovalEnabled);
-		}
+        public void setModel(String model) {
+            DashScopeSdkAudioTranscriptionProperties.this.setModel(model);
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".timestamp-alignment-enabled")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getTimestampAlignmentEnabled() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getTimestampAlignmentEnabled();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".file-urls")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable List<String> getFileUrls() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getFileUrls();
+        }
 
-		public void setTimestampAlignmentEnabled(Boolean timestampAlignmentEnabled) {
-			DashScopeSdkAudioTranscriptionProperties.this.setTimestampAlignmentEnabled(timestampAlignmentEnabled);
-		}
+        public void setFileUrls(List<String> fileUrls) {
+            DashScopeSdkAudioTranscriptionProperties.this.setFileUrls(fileUrls);
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".special-word-filter")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getSpecialWordFilter() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getSpecialWordFilter();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".phrase-id")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getPhraseId() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getPhraseId();
+        }
 
-		public void setSpecialWordFilter(String specialWordFilter) {
-			DashScopeSdkAudioTranscriptionProperties.this.setSpecialWordFilter(specialWordFilter);
-		}
+        public void setPhraseId(String phraseId) {
+            DashScopeSdkAudioTranscriptionProperties.this.setPhraseId(phraseId);
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".audio-event-detection-enabled")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getAudioEventDetectionEnabled() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getAudioEventDetectionEnabled();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".channel-id")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable List<Integer> getChannelId() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getChannelId();
+        }
 
-		public void setAudioEventDetectionEnabled(Boolean audioEventDetectionEnabled) {
-			DashScopeSdkAudioTranscriptionProperties.this.setAudioEventDetectionEnabled(audioEventDetectionEnabled);
-		}
+        public void setChannelId(List<Integer> channelId) {
+            DashScopeSdkAudioTranscriptionProperties.this.setChannelId(channelId);
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".http-headers")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Map<String, String> getHttpHeaders() {
-			return DashScopeSdkAudioTranscriptionProperties.this.getHttpHeaders();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".diarization-enabled")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getDiarizationEnabled() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getDiarizationEnabled();
+        }
 
-		public void setHttpHeaders(Map<String, String> httpHeaders) {
-			DashScopeSdkAudioTranscriptionProperties.this.setHttpHeaders(httpHeaders);
-		}
+        public void setDiarizationEnabled(Boolean diarizationEnabled) {
+            DashScopeSdkAudioTranscriptionProperties.this.setDiarizationEnabled(diarizationEnabled);
+        }
 
-	}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".speaker-count")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Integer getSpeakerCount() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getSpeakerCount();
+        }
 
+        public void setSpeakerCount(Integer speakerCount) {
+            DashScopeSdkAudioTranscriptionProperties.this.setSpeakerCount(speakerCount);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".disfluency-removal-enabled")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getDisfluencyRemovalEnabled() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getDisfluencyRemovalEnabled();
+        }
+
+        public void setDisfluencyRemovalEnabled(Boolean disfluencyRemovalEnabled) {
+            DashScopeSdkAudioTranscriptionProperties.this.setDisfluencyRemovalEnabled(disfluencyRemovalEnabled);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".timestamp-alignment-enabled")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getTimestampAlignmentEnabled() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getTimestampAlignmentEnabled();
+        }
+
+        public void setTimestampAlignmentEnabled(Boolean timestampAlignmentEnabled) {
+            DashScopeSdkAudioTranscriptionProperties.this.setTimestampAlignmentEnabled(timestampAlignmentEnabled);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".special-word-filter")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getSpecialWordFilter() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getSpecialWordFilter();
+        }
+
+        public void setSpecialWordFilter(String specialWordFilter) {
+            DashScopeSdkAudioTranscriptionProperties.this.setSpecialWordFilter(specialWordFilter);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".audio-event-detection-enabled")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getAudioEventDetectionEnabled() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getAudioEventDetectionEnabled();
+        }
+
+        public void setAudioEventDetectionEnabled(Boolean audioEventDetectionEnabled) {
+            DashScopeSdkAudioTranscriptionProperties.this.setAudioEventDetectionEnabled(audioEventDetectionEnabled);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".http-headers")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Map<String, String> getHttpHeaders() {
+            return DashScopeSdkAudioTranscriptionProperties.this.getHttpHeaders();
+        }
+
+        public void setHttpHeaders(Map<String, String> httpHeaders) {
+            DashScopeSdkAudioTranscriptionProperties.this.setHttpHeaders(httpHeaders);
+        }
+
+    }
 
 }

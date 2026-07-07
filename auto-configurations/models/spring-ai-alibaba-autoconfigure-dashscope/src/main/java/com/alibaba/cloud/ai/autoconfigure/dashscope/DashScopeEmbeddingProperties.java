@@ -23,105 +23,119 @@ import org.springframework.ai.document.MetadataMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
+/**
+ * DashScope embedding auto-configuration properties.
+ *
+ * @author nuocheng.lxm
+ * @author yuluo
+ * @author xuguan
+ * @since 2024/8/1 11:14
+ */
 @ConfigurationProperties(DashScopeEmbeddingProperties.CONFIG_PREFIX)
 public class DashScopeEmbeddingProperties extends DashScopeParentProperties {
 
-  public static final String CONFIG_PREFIX = "spring.ai.dashscope.embedding";
+	public static final String CONFIG_PREFIX = "spring.ai.dashscope.embedding";
 
-  public static final String DEFAULT_EMBEDDING_MODEL = "text-embedding-v3";
+	public static final String DEFAULT_EMBEDDING_MODEL = "text-embedding-v3";
 
-  /** Enable DashScope embedding client. */
-  private boolean enabled = true;
+	/**
+	 * Enable DashScope embedding client.
+	 */
+	private boolean enabled = true;
 
-  /**
-   * DashScope embedding path.
-   */
-  private String embeddingsPath = DashScopeApiConstants.TEXT_EMBEDDING_RESTFUL_URL;
+	/**
+	 * DashScope embedding path.
+	 */
+	private String embeddingsPath = DashScopeApiConstants.TEXT_EMBEDDING_RESTFUL_URL;
 
-  private MetadataMode metadataMode = MetadataMode.EMBED;
-  private DashScopeEmbeddingOptions options =
-      DashScopeEmbeddingOptions.builder().model(DEFAULT_EMBEDDING_MODEL).build();
-	private final Options legacyOptions = new Options();
+	private MetadataMode metadataMode = MetadataMode.EMBED;
 
-  public DashScopeEmbeddingOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeEmbeddingOptions.builder().model(DEFAULT_EMBEDDING_MODEL).build();
-		}
+	private @Nullable String model = DEFAULT_EMBEDDING_MODEL;
+
+	private @Nullable String textType;
+
+	private @Nullable Integer dimensions;
+
+	private @Nullable String outputType;
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getEmbeddingsPath() {
+		return this.embeddingsPath;
+	}
+
+	public void setEmbeddingsPath(String embeddingsPath) {
+		this.embeddingsPath = embeddingsPath;
+	}
+
+	public MetadataMode getMetadataMode() {
+		return this.metadataMode;
+	}
+
+	public void setMetadataMode(MetadataMode metadataMode) {
+		this.metadataMode = metadataMode;
+	}
+
+	public @Nullable String getModel() {
+		return this.model;
+	}
+
+	public void setModel(@Nullable String model) {
+		this.model = model;
+	}
+
+	public @Nullable String getTextType() {
+		return this.textType;
+	}
+
+	public void setTextType(@Nullable String textType) {
+		this.textType = textType;
+	}
+
+	public @Nullable Integer getDimensions() {
+		return this.dimensions;
+	}
+
+	public void setDimensions(@Nullable Integer dimensions) {
+		this.dimensions = dimensions;
+	}
+
+	public @Nullable String getOutputType() {
+		return this.outputType;
+	}
+
+	public void setOutputType(@Nullable String outputType) {
+		this.outputType = outputType;
+	}
+
+	public DashScopeEmbeddingOptions toOptions() {
+		return DashScopeEmbeddingOptions.builder()
+				.model(this.model)
+				.textType(this.textType)
+				.dimensions(this.dimensions)
+				.outputType(this.outputType)
+				.embeddingsPath(this.embeddingsPath)
+				.build();
+	}
+
+	private Options options = new Options();
+
+	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+	@Deprecated(since = "2.0.0", forRemoval = true)
+	public Options getOptions() {
 		return this.options;
 	}
 
-  @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-  @Deprecated(since = "2.0.0", forRemoval = true)
-  public Options getOptions() {
-		return this.legacyOptions;
-	}
-
 	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
+		this.options = options;
 	}
 
-	private void updateOptions(java.util.function.Consumer<DashScopeEmbeddingOptions.Builder> customizer) {
-		DashScopeEmbeddingOptions.Builder builder = DashScopeEmbeddingOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
-
-  public @Nullable String getModel() {
-    return toOptions().getModel();
-  }
-
-  public void setModel(String model) {
-    updateOptions(builder -> builder.model(model));
-  }
-
-  public @Nullable Integer getDimensions() {
-    return toOptions().getDimensions();
-  }
-
-  public void setDimensions(Integer dimensions) {
-    updateOptions(builder -> builder.dimensions(dimensions));
-  }
-
-  public @Nullable String getTextType() {
-    return toOptions().getTextType();
-  }
-
-  public void setTextType(String textType) {
-    updateOptions(builder -> builder.textType(textType));
-  }
-
-  public @Nullable String getOutputType() {
-    return toOptions().getOutputType();
-  }
-
-  public void setOutputType(String outputType) {
-    updateOptions(builder -> builder.outputType(outputType));
-  }
-
-  public MetadataMode getMetadataMode() {
-    return this.metadataMode;
-  }
-
-  public void setMetadataMode(MetadataMode metadataMode) {
-    this.metadataMode = metadataMode;
-  }
-
-  public boolean isEnabled() {
-    return this.enabled;
-  }
-
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-  }
-
-  public String getEmbeddingsPath() {
-    return embeddingsPath;
-  }
-
-  public void setEmbeddingsPath(String embeddingsPath) {
-    this.embeddingsPath = embeddingsPath;
-    updateOptions(builder -> builder.embeddingsPath(embeddingsPath));
-  }
 	public class Options {
 
 		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
@@ -165,6 +179,5 @@ public class DashScopeEmbeddingProperties extends DashScopeParentProperties {
 		}
 
 	}
-
 
 }

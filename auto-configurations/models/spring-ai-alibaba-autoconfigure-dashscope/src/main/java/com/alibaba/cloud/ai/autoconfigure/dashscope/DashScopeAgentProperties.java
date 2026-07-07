@@ -21,17 +21,19 @@ import java.util.List;
 import com.alibaba.cloud.ai.dashscope.agent.DashScopeAgentFlowStreamMode;
 import com.alibaba.cloud.ai.dashscope.agent.DashScopeAgentOptions;
 import com.alibaba.cloud.ai.dashscope.agent.DashScopeAgentRagOptions;
-import tools.jackson.databind.JsonNode;
-
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+import tools.jackson.databind.JsonNode;
 
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.APPS_COMPLETION_RESTFUL_URL;
 
 /**
+ * DashScope agent auto-configuration properties.
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
+ * @author xuguan
  */
 
 @ConfigurationProperties(DashScopeAgentProperties.CONFIG_PREFIX)
@@ -51,15 +53,30 @@ public class DashScopeAgentProperties extends DashScopeParentProperties {
      * DashScope ai agent path.
      */
     private String agentPath = APPS_COMPLETION_RESTFUL_URL;
-    private DashScopeAgentOptions options = DashScopeAgentOptions.builder().build();
-	private final Options legacyOptions = new Options();
 
-    public DashScopeAgentOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeAgentOptions.builder().build();
-		}
-		return this.options;
-	}
+    private @Nullable String appId;
+
+    private @Nullable String sessionId;
+
+    private @Nullable String memoryId;
+
+    private @Nullable String modelId;
+
+    private @Nullable Boolean incrementalOutput;
+
+    private @Nullable Boolean hasThoughts;
+
+    private @Nullable Boolean enableThinking;
+
+    private @Nullable List<String> images;
+
+    private @Nullable List<String> files;
+
+    private @Nullable JsonNode bizParams;
+
+    private @Nullable DashScopeAgentRagOptions ragOptions;
+
+    private @Nullable DashScopeAgentFlowStreamMode flowStreamMode;
 
     public boolean isEnabled() {
         return this.enabled;
@@ -77,240 +94,253 @@ public class DashScopeAgentProperties extends DashScopeParentProperties {
         this.agentPath = agentPath;
     }
 
-    @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
-    @Deprecated(since = "2.0.0", forRemoval = true)
-    public Options getOptions() {
-		return this.legacyOptions;
-	}
-
-	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
-	}
-
-	private void updateOptions(java.util.function.Consumer<DashScopeAgentOptions.Builder> customizer) {
-		DashScopeAgentOptions.Builder builder = toOptions().mutate();
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
-
     public @Nullable String getAppId() {
-        return toOptions().getAppId();
+        return this.appId;
     }
 
-    public void setAppId(String appId) {
-        updateOptions(builder -> builder.appId(appId));
+    public void setAppId(@Nullable String appId) {
+        this.appId = appId;
     }
 
     public @Nullable String getSessionId() {
-        return toOptions().getSessionId();
+        return this.sessionId;
     }
 
-    public void setSessionId(String sessionId) {
-        updateOptions(builder -> builder.sessionId(sessionId));
+    public void setSessionId(@Nullable String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public @Nullable String getMemoryId() {
-        return toOptions().getMemoryId();
+        return this.memoryId;
     }
 
-    public void setMemoryId(String memoryId) {
-        updateOptions(builder -> builder.memoryId(memoryId));
+    public void setMemoryId(@Nullable String memoryId) {
+        this.memoryId = memoryId;
     }
 
     public @Nullable String getModelId() {
-        return toOptions().getModelId();
+        return this.modelId;
     }
 
-    public void setModelId(String modelId) {
-        updateOptions(builder -> builder.modelId(modelId));
+    public void setModelId(@Nullable String modelId) {
+        this.modelId = modelId;
     }
 
     public @Nullable Boolean getIncrementalOutput() {
-        return toOptions().getIncrementalOutput();
+        return this.incrementalOutput;
     }
 
-    public void setIncrementalOutput(Boolean incrementalOutput) {
-        updateOptions(builder -> builder.incrementalOutput(incrementalOutput));
+    public void setIncrementalOutput(@Nullable Boolean incrementalOutput) {
+        this.incrementalOutput = incrementalOutput;
     }
 
     public @Nullable Boolean getHasThoughts() {
-        return toOptions().getHasThoughts();
+        return this.hasThoughts;
     }
 
-    public void setHasThoughts(Boolean hasThoughts) {
-        updateOptions(builder -> builder.hasThoughts(hasThoughts));
+    public void setHasThoughts(@Nullable Boolean hasThoughts) {
+        this.hasThoughts = hasThoughts;
     }
 
     public @Nullable Boolean getEnableThinking() {
-        return toOptions().getEnableThinking();
+        return this.enableThinking;
     }
 
-    public void setEnableThinking(Boolean enableThinking) {
-        updateOptions(builder -> builder.enableThinking(enableThinking));
+    public void setEnableThinking(@Nullable Boolean enableThinking) {
+        this.enableThinking = enableThinking;
     }
 
     public @Nullable List<String> getImages() {
-        return toOptions().getImages();
+        return this.images;
     }
 
-    public void setImages(List<String> images) {
-        updateOptions(builder -> builder.images(images));
+    public void setImages(@Nullable List<String> images) {
+        this.images = images;
     }
 
     public @Nullable List<String> getFiles() {
-        return toOptions().getFiles();
+        return this.files;
     }
 
-    public void setFiles(List<String> files) {
-        updateOptions(builder -> builder.files(files));
+    public void setFiles(@Nullable List<String> files) {
+        this.files = files;
     }
 
     public @Nullable JsonNode getBizParams() {
-        return toOptions().getBizParams();
+        return this.bizParams;
     }
 
-    public void setBizParams(JsonNode bizParams) {
-        updateOptions(builder -> builder.bizParams(bizParams));
+    public void setBizParams(@Nullable JsonNode bizParams) {
+        this.bizParams = bizParams;
     }
 
     public @Nullable DashScopeAgentRagOptions getRagOptions() {
-        return toOptions().getRagOptions();
+        return this.ragOptions;
     }
 
-    public void setRagOptions(DashScopeAgentRagOptions ragOptions) {
-        updateOptions(builder -> builder.ragOptions(ragOptions));
+    public void setRagOptions(@Nullable DashScopeAgentRagOptions ragOptions) {
+        this.ragOptions = ragOptions;
     }
 
     public @Nullable DashScopeAgentFlowStreamMode getFlowStreamMode() {
-        return toOptions().getFlowStreamMode();
+        return this.flowStreamMode;
     }
 
-    public void setFlowStreamMode(DashScopeAgentFlowStreamMode flowStreamMode) {
-        updateOptions(builder -> builder.flowStreamMode(flowStreamMode));
+    public void setFlowStreamMode(@Nullable DashScopeAgentFlowStreamMode flowStreamMode) {
+        this.flowStreamMode = flowStreamMode;
     }
-	public class Options {
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".app-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getAppId() {
-			return DashScopeAgentProperties.this.getAppId();
-		}
+    public DashScopeAgentOptions toOptions() {
+        return DashScopeAgentOptions.builder()
+                .appId(this.appId)
+                .sessionId(this.sessionId)
+                .memoryId(this.memoryId)
+                .modelId(this.modelId)
+                .incrementalOutput(this.incrementalOutput)
+                .hasThoughts(this.hasThoughts)
+                .enableThinking(this.enableThinking)
+                .images(this.images)
+                .files(this.files)
+                .bizParams(this.bizParams)
+                .ragOptions(this.ragOptions)
+                .flowStreamMode(this.flowStreamMode)
+                .build();
+    }
 
-		public void setAppId(String appId) {
-			DashScopeAgentProperties.this.setAppId(appId);
-		}
+    private Options options = new Options();
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".session-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getSessionId() {
-			return DashScopeAgentProperties.this.getSessionId();
-		}
+    @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+    @Deprecated(since = "2.0.0", forRemoval = true)
+    public Options getOptions() {
+        return this.options;
+    }
 
-		public void setSessionId(String sessionId) {
-			DashScopeAgentProperties.this.setSessionId(sessionId);
-		}
+    public void setOptions(Options options) {
+        this.options = options;
+    }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".memory-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getMemoryId() {
-			return DashScopeAgentProperties.this.getMemoryId();
-		}
+    public class Options {
 
-		public void setMemoryId(String memoryId) {
-			DashScopeAgentProperties.this.setMemoryId(memoryId);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".app-id")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getAppId() {
+            return DashScopeAgentProperties.this.getAppId();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model-id")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getModelId() {
-			return DashScopeAgentProperties.this.getModelId();
-		}
+        public void setAppId(@Nullable String appId) {
+            DashScopeAgentProperties.this.setAppId(appId);
+        }
 
-		public void setModelId(String modelId) {
-			DashScopeAgentProperties.this.setModelId(modelId);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".session-id")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getSessionId() {
+            return DashScopeAgentProperties.this.getSessionId();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".incremental-output")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getIncrementalOutput() {
-			return DashScopeAgentProperties.this.getIncrementalOutput();
-		}
+        public void setSessionId(@Nullable String sessionId) {
+            DashScopeAgentProperties.this.setSessionId(sessionId);
+        }
 
-		public void setIncrementalOutput(Boolean incrementalOutput) {
-			DashScopeAgentProperties.this.setIncrementalOutput(incrementalOutput);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".memory-id")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getMemoryId() {
+            return DashScopeAgentProperties.this.getMemoryId();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".has-thoughts")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getHasThoughts() {
-			return DashScopeAgentProperties.this.getHasThoughts();
-		}
+        public void setMemoryId(@Nullable String memoryId) {
+            DashScopeAgentProperties.this.setMemoryId(memoryId);
+        }
 
-		public void setHasThoughts(Boolean hasThoughts) {
-			DashScopeAgentProperties.this.setHasThoughts(hasThoughts);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model-id")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getModelId() {
+            return DashScopeAgentProperties.this.getModelId();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".enable-thinking")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getEnableThinking() {
-			return DashScopeAgentProperties.this.getEnableThinking();
-		}
+        public void setModelId(@Nullable String modelId) {
+            DashScopeAgentProperties.this.setModelId(modelId);
+        }
 
-		public void setEnableThinking(Boolean enableThinking) {
-			DashScopeAgentProperties.this.setEnableThinking(enableThinking);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".incremental-output")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getIncrementalOutput() {
+            return DashScopeAgentProperties.this.getIncrementalOutput();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".images")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable List<String> getImages() {
-			return DashScopeAgentProperties.this.getImages();
-		}
+        public void setIncrementalOutput(@Nullable Boolean incrementalOutput) {
+            DashScopeAgentProperties.this.setIncrementalOutput(incrementalOutput);
+        }
 
-		public void setImages(List<String> images) {
-			DashScopeAgentProperties.this.setImages(images);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".has-thoughts")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getHasThoughts() {
+            return DashScopeAgentProperties.this.getHasThoughts();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".files")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable List<String> getFiles() {
-			return DashScopeAgentProperties.this.getFiles();
-		}
+        public void setHasThoughts(@Nullable Boolean hasThoughts) {
+            DashScopeAgentProperties.this.setHasThoughts(hasThoughts);
+        }
 
-		public void setFiles(List<String> files) {
-			DashScopeAgentProperties.this.setFiles(files);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".enable-thinking")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getEnableThinking() {
+            return DashScopeAgentProperties.this.getEnableThinking();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".biz-params")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable JsonNode getBizParams() {
-			return DashScopeAgentProperties.this.getBizParams();
-		}
+        public void setEnableThinking(@Nullable Boolean enableThinking) {
+            DashScopeAgentProperties.this.setEnableThinking(enableThinking);
+        }
 
-		public void setBizParams(JsonNode bizParams) {
-			DashScopeAgentProperties.this.setBizParams(bizParams);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".images")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable List<String> getImages() {
+            return DashScopeAgentProperties.this.getImages();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".rag-options")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable DashScopeAgentRagOptions getRagOptions() {
-			return DashScopeAgentProperties.this.getRagOptions();
-		}
+        public void setImages(@Nullable List<String> images) {
+            DashScopeAgentProperties.this.setImages(images);
+        }
 
-		public void setRagOptions(DashScopeAgentRagOptions ragOptions) {
-			DashScopeAgentProperties.this.setRagOptions(ragOptions);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".files")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable List<String> getFiles() {
+            return DashScopeAgentProperties.this.getFiles();
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".flow-stream-mode")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable DashScopeAgentFlowStreamMode getFlowStreamMode() {
-			return DashScopeAgentProperties.this.getFlowStreamMode();
-		}
+        public void setFiles(@Nullable List<String> files) {
+            DashScopeAgentProperties.this.setFiles(files);
+        }
 
-		public void setFlowStreamMode(DashScopeAgentFlowStreamMode flowStreamMode) {
-			DashScopeAgentProperties.this.setFlowStreamMode(flowStreamMode);
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".biz-params")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable JsonNode getBizParams() {
+            return DashScopeAgentProperties.this.getBizParams();
+        }
 
-	}
+        public void setBizParams(@Nullable JsonNode bizParams) {
+            DashScopeAgentProperties.this.setBizParams(bizParams);
+        }
 
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".rag-options")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable DashScopeAgentRagOptions getRagOptions() {
+            return DashScopeAgentProperties.this.getRagOptions();
+        }
+
+        public void setRagOptions(@Nullable DashScopeAgentRagOptions ragOptions) {
+            DashScopeAgentProperties.this.setRagOptions(ragOptions);
+        }
+
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".flow-stream-mode")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable DashScopeAgentFlowStreamMode getFlowStreamMode() {
+            return DashScopeAgentProperties.this.getFlowStreamMode();
+        }
+
+        public void setFlowStreamMode(@Nullable DashScopeAgentFlowStreamMode flowStreamMode) {
+            DashScopeAgentProperties.this.setFlowStreamMode(flowStreamMode);
+        }
+
+    }
 
 }

@@ -23,10 +23,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
- * Title DashScope rerank properties.<br>
- * Description DashScope rerank properties.<br>
+ * DashScope rerank auto-configuration properties.
  *
  * @author yuanci.ytb
+ * @author xuguan
  * @since 1.0.0-M2
  */
 @ConfigurationProperties(DashScopeRerankProperties.CONFIG_PREFIX)
@@ -46,100 +46,97 @@ public class DashScopeRerankProperties extends DashScopeParentProperties {
      * Default rerank path.
      */
     private String rerankPath = DashScopeApiConstants.TEXT_RERANK_RESTFUL_URL;
-    private DashScopeRerankOptions options = DashScopeRerankOptions.builder()
-            .model(DEFAULT_RERANK_MODEL)
-            .topN(5)
-            .returnDocuments(false)
-            .build();
-	private final Options legacyOptions = new Options();
 
-    public DashScopeRerankOptions toOptions() {
-		if (this.options == null) {
-			this.options = DashScopeRerankOptions.builder().build();
-		}
-		return this.options;
-	}
+    private @Nullable String model = DEFAULT_RERANK_MODEL;
 
-    public @Nullable Integer getTopN() {
-        return toOptions().getTopN();
-    }
+    private @Nullable Integer topN = 3;
 
-    public void setTopN(Integer topN) {
-        updateOptions(builder -> builder.topN(topN));
-    }
-
-    public @Nullable Boolean getReturnDocuments() {
-        return toOptions().getReturnDocuments();
-    }
-
-    public void setReturnDocuments(Boolean returnDocuments) {
-        updateOptions(builder -> builder.returnDocuments(returnDocuments));
-    }
-
-    public @Nullable String getModel() {
-        return toOptions().getModel();
-    }
-
-    public void setModel(String model) {
-        updateOptions(builder -> builder.model(model));
-    }
+    private @Nullable Boolean returnDocuments = false;
 
     public String getRerankPath() {
-        return rerankPath;
+        return this.rerankPath;
     }
 
     public void setRerankPath(String rerankPath) {
         this.rerankPath = rerankPath;
     }
 
+    public @Nullable String getModel() {
+        return this.model;
+    }
+
+    public void setModel(@Nullable String model) {
+        this.model = model;
+    }
+
+    public @Nullable Integer getTopN() {
+        return this.topN;
+    }
+
+    public void setTopN(@Nullable Integer topN) {
+        this.topN = topN;
+    }
+
+    public @Nullable Boolean getReturnDocuments() {
+        return this.returnDocuments;
+    }
+
+    public void setReturnDocuments(@Nullable Boolean returnDocuments) {
+        this.returnDocuments = returnDocuments;
+    }
+
+    public DashScopeRerankOptions toOptions() {
+        return DashScopeRerankOptions.builder()
+                .model(this.model)
+                .topN(this.topN)
+                .returnDocuments(this.returnDocuments)
+                .build();
+    }
+
+    private Options options = new Options();
+
     @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
     @Deprecated(since = "2.0.0", forRemoval = true)
     public Options getOptions() {
-		return this.legacyOptions;
-	}
+        return this.options;
+    }
 
-	public void setOptions(Options options) {
-		// Deprecated options are applied by the nested Options setters.
-	}
+    public void setOptions(Options options) {
+        this.options = options;
+    }
 
-	private void updateOptions(java.util.function.Consumer<DashScopeRerankOptions.Builder> customizer) {
-		DashScopeRerankOptions.Builder builder = DashScopeRerankOptions.builder().from(toOptions());
-		customizer.accept(builder);
-		this.options = builder.build();
-	}
-	public class Options {
+    public class Options {
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".top-n")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Integer getTopN() {
-			return DashScopeRerankProperties.this.getTopN();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable String getModel() {
+            return DashScopeRerankProperties.this.getModel();
+        }
 
-		public void setTopN(Integer topN) {
-			DashScopeRerankProperties.this.setTopN(topN);
-		}
+        public void setModel(String model) {
+            DashScopeRerankProperties.this.setModel(model);
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".return-documents")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable Boolean getReturnDocuments() {
-			return DashScopeRerankProperties.this.getReturnDocuments();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".top-n")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Integer getTopN() {
+            return DashScopeRerankProperties.this.getTopN();
+        }
 
-		public void setReturnDocuments(Boolean returnDocuments) {
-			DashScopeRerankProperties.this.setReturnDocuments(returnDocuments);
-		}
+        public void setTopN(Integer topN) {
+            DashScopeRerankProperties.this.setTopN(topN);
+        }
 
-		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
-		@Deprecated(since = "2.0.0", forRemoval = true)
-		public @Nullable String getModel() {
-			return DashScopeRerankProperties.this.getModel();
-		}
+        @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".return-documents")
+        @Deprecated(since = "2.0.0", forRemoval = true)
+        public @Nullable Boolean getReturnDocuments() {
+            return DashScopeRerankProperties.this.getReturnDocuments();
+        }
 
-		public void setModel(String model) {
-			DashScopeRerankProperties.this.setModel(model);
-		}
+        public void setReturnDocuments(Boolean returnDocuments) {
+            DashScopeRerankProperties.this.setReturnDocuments(returnDocuments);
+        }
 
-	}
-
+    }
 
 }
