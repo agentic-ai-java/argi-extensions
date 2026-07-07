@@ -16,7 +16,6 @@
 
 package com.alibaba.cloud.ai.dashscope.spec;
 
-import org.jspecify.annotations.NonNull;
 import org.springframework.ai.model.ChatModelDescription;
 
 /**
@@ -410,7 +409,6 @@ public class DashScopeModel {
             this.value = value;
         }
 
-        @NonNull
         public String getName() {
             return value;
         }

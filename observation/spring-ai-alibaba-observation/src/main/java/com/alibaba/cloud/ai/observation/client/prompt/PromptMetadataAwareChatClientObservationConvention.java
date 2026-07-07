@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.cloud.ai.observation.client.prompt;
+
+import java.util.Collections;
+import java.util.Map;
+
+import com.alibaba.cloud.ai.observation.model.ObservationMetadataAwareOptions;
+import io.micrometer.common.KeyValue;
+import io.micrometer.common.KeyValues;
+import org.springframework.ai.chat.client.observation.ChatClientObservationContext;
+import org.springframework.ai.chat.client.observation.DefaultChatClientObservationConvention;
+import org.springframework.ai.chat.prompt.ChatOptions;
 
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.AGENT_IP;
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.AGENT_NAME;
@@ -25,27 +34,17 @@ import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.PROM
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.PROMPT_VERSION;
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.STUDIO_SOURCE;
 
-import com.alibaba.cloud.ai.observation.model.ObservationMetadataAwareOptions;
-import io.micrometer.common.KeyValue;
-import io.micrometer.common.KeyValues;
-import java.util.Collections;
-import java.util.Map;
-import org.springframework.ai.chat.client.observation.ChatClientObservationContext;
-import org.springframework.ai.chat.client.observation.DefaultChatClientObservationConvention;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.jspecify.annotations.NonNull;
-
 public class PromptMetadataAwareChatClientObservationConvention extends DefaultChatClientObservationConvention {
 
 	@Override
-	@NonNull
-	public KeyValues getLowCardinalityKeyValues(@NonNull ChatClientObservationContext context) {
+
+	public KeyValues getLowCardinalityKeyValues(ChatClientObservationContext context) {
 		return super.getLowCardinalityKeyValues(context);
 	}
 
 	@Override
-	@NonNull
-	public KeyValues getHighCardinalityKeyValues(@NonNull ChatClientObservationContext context) {
+
+	public KeyValues getHighCardinalityKeyValues(ChatClientObservationContext context) {
 		KeyValues keyValues = super.getHighCardinalityKeyValues(context);
 		keyValues = promptKey(keyValues, context);
 		keyValues = promptVersion(keyValues, context);

@@ -20,7 +20,6 @@ import com.alibaba.cloud.ai.dashscope.rerank.DashScopeRerankOptions;
 import com.alibaba.cloud.ai.model.RerankModel;
 import com.alibaba.cloud.ai.model.RerankRequest;
 import com.alibaba.cloud.ai.model.RerankResponse;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +99,6 @@ public class DashScopeRerankPostProcessor implements DocumentPostProcessor {
             return this;
         }
 
-        @NonNull
         public DashScopeRerankPostProcessor build() {
             return new DashScopeRerankPostProcessor(Objects.requireNonNull(rerankModel, "rerankModel is required"),
                     Objects.requireNonNull(rerankOptions, "rerankOptions is required"));

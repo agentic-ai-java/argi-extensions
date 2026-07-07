@@ -56,7 +56,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
-import org.jspecify.annotations.NonNull;
 import org.springframework.http.client.reactive.JdkClientHttpConnector;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.util.CollectionUtils;
@@ -687,13 +686,13 @@ public class NacosMcpGatewayToolCallback implements ToolCallback {
     }
 
     @Override
-    public String call(@NonNull final String input) {
+    public String call(final String input) {
         return call(input, new ToolContext(Maps.newHashMap()));
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public String call(@NonNull final String input, final @Nullable ToolContext toolContext) {
+    public String call(final String input, final @Nullable ToolContext toolContext) {
         try {
             logger.info("[call] input: {} toolContext: {}", input, JacksonUtils.toJson(toolContext));
 

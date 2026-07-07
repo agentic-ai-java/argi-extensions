@@ -15,20 +15,27 @@
  */
 package com.alibaba.cloud.ai.memory.jdbc;
 
-import org.jspecify.annotations.NonNull;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.messages.*;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.util.Assert;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.MessageType;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.util.Assert;
 
 public abstract class JdbcChatMemoryRepository implements ChatMemoryRepository {
 
@@ -75,13 +82,13 @@ public abstract class JdbcChatMemoryRepository implements ChatMemoryRepository {
 	}
 
 	@Override
-	public List<Message> findByConversationId(@NonNull String conversationId) {
+	public List<Message> findByConversationId(String conversationId) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		return this.jdbcTemplate.query(getGetSql(), new JdbcChatMemoryRepository.MessageRowMapper(), conversationId);
 	}
 
 	@Override
-	public void saveAll(@NonNull String conversationId, @NonNull List<Message> messages) {
+	public void saveAll(String conversationId, List<Message> messages) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		Assert.notNull(messages, "messages cannot be null");
 		Assert.noNullElements(messages, "messages cannot contain null elements");
@@ -91,7 +98,7 @@ public abstract class JdbcChatMemoryRepository implements ChatMemoryRepository {
 	}
 
 	@Override
-	public void deleteByConversationId(@NonNull String conversationId) {
+	public void deleteByConversationId(String conversationId) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		this.jdbcTemplate.update(QUERY_CLEAR, conversationId);
 	}

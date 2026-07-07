@@ -16,6 +16,15 @@
 
 package com.alibaba.cloud.ai.observation.model;
 
+import java.util.Collections;
+import java.util.Map;
+
+import io.micrometer.common.KeyValue;
+import io.micrometer.common.KeyValues;
+import org.springframework.ai.chat.observation.ChatModelObservationContext;
+import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
+import org.springframework.ai.chat.prompt.ChatOptions;
+
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.AGENT_IP;
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.AGENT_NAME;
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.PROMPT_KEY;
@@ -24,26 +33,17 @@ import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.PROM
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.PROMPT_VERSION;
 import static com.alibaba.cloud.ai.observation.constants.MetadataAttributes.STUDIO_SOURCE;
 
-import io.micrometer.common.KeyValue;
-import io.micrometer.common.KeyValues;
-import java.util.Collections;
-import java.util.Map;
-import org.springframework.ai.chat.observation.ChatModelObservationContext;
-import org.springframework.ai.chat.observation.DefaultChatModelObservationConvention;
-import org.springframework.ai.chat.prompt.ChatOptions;
-import org.jspecify.annotations.NonNull;
-
 public class PromptMetadataAwareChatModelObservationConvention extends DefaultChatModelObservationConvention {
 
 	@Override
-	@NonNull
-	public KeyValues getLowCardinalityKeyValues(@NonNull ChatModelObservationContext context) {
+
+	public KeyValues getLowCardinalityKeyValues(ChatModelObservationContext context) {
 		return super.getLowCardinalityKeyValues(context);
 	}
 
 	@Override
-	@NonNull
-	public KeyValues getHighCardinalityKeyValues(@NonNull ChatModelObservationContext context) {
+
+	public KeyValues getHighCardinalityKeyValues(ChatModelObservationContext context) {
 		KeyValues keyValues = super.getHighCardinalityKeyValues(context);
 		keyValues = promptKey(keyValues, context);
 		keyValues = promptVersion(keyValues, context);

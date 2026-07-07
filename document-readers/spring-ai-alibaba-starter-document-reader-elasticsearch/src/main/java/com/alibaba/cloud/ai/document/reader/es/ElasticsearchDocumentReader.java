@@ -29,7 +29,6 @@ import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
@@ -89,7 +88,6 @@ public class ElasticsearchDocumentReader implements DocumentReader {
 		}
 	}
 
-	@NonNull
 	private List<Document> getDocuments(SearchResponse<Map> response) {
 		List<Document> documents = new ArrayList<>();
 		response.hits().hits().forEach(hit -> {
