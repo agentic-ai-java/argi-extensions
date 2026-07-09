@@ -1132,7 +1132,7 @@ public class DashScopeChatApiSpec {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public record MediaContent(@JsonIgnore String type, @JsonProperty("text") @Nullable String text,
-			@JsonProperty("image") @Nullable String image, @JsonProperty("video") @Nullable List<String> video,
+			@JsonProperty("image") @Nullable String image, @JsonProperty("video") @Nullable Object video,
 			@JsonProperty("audio") @Nullable String audio,
 			@JsonProperty("cache_control") @Nullable Map<String, String> cacheControl) {
 
@@ -1144,11 +1144,11 @@ public class DashScopeChatApiSpec {
 			this("text", text, null, null, null, cacheControl);
 		}
 
-		public MediaContent(String type, @Nullable String text, @Nullable String image, @Nullable List<String> video) {
+		public MediaContent(String type, @Nullable String text, @Nullable String image, @Nullable Object video) {
 			this(type, text, image, video, null, null);
 		}
 
-		public MediaContent(String type, @Nullable String text, @Nullable String image, @Nullable List<String> video,
+		public MediaContent(String type, @Nullable String text, @Nullable String image, @Nullable Object video,
 				@Nullable String audio) {
 			this(type, text, image, video, audio, null);
 		}
@@ -1165,7 +1165,7 @@ public class DashScopeChatApiSpec {
 
 			private @Nullable String image;
 
-			private @Nullable List<String> video;
+			private @Nullable Object video;
 
 			private @Nullable String audio;
 
@@ -1183,6 +1183,12 @@ public class DashScopeChatApiSpec {
 			public Builder image(@Nullable String image) {
 				this.type = "image";
 				this.image = image;
+				return this;
+			}
+
+			public Builder video(@Nullable String video) {
+				this.type = "video";
+				this.video = video;
 				return this;
 			}
 

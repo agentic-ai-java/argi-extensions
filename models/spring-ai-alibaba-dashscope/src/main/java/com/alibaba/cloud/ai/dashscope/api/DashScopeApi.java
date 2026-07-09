@@ -548,7 +548,7 @@ public class DashScopeApi {
 		startManagedIngest(pipelineId, upsertPipelineRequest);
 	}
 
-	private String createPipeline(DashScopeApiSpec.UpsertPipelineRequest upsertPipelineRequest) {
+	private @Nullable String createPipeline(DashScopeApiSpec.UpsertPipelineRequest upsertPipelineRequest) {
 		ResponseEntity<DashScopeApiSpec.UpsertPipelineResponse> upsertPipelineResponse = this.restClient.put()
 			.uri(PIPELINE_RESTFUL_URL)
 			.body(upsertPipelineRequest)

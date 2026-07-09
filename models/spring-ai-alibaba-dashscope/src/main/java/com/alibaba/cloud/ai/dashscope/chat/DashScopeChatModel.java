@@ -505,7 +505,7 @@ public final class DashScopeChatModel implements ChatModel {
         if (format == MessageFormat.IMAGE) {
             contentList.addAll(message.getMedia()
                     .stream()
-                    .map(media -> new MediaContent("image", null, this.fromMediaData(media.getMimeType(), media.getData()), null))
+                    .map(media -> MediaContent.builder().image(this.fromMediaData(media.getMimeType(), media.getData())).build())
                     .toList());
         }
         else if (format == MessageFormat.VIDEO) {
@@ -518,24 +518,24 @@ public final class DashScopeChatModel implements ChatModel {
                 }
                 // Video
                 else {
-                    contentList.add(new MediaContent("video", null, null, this.fromMediaData(media.getMimeType(), media.getData())));
+                    contentList.add(MediaContent.builder().video(this.fromMediaData(media.getMimeType(), media.getData())).build());
                 }
             }
             if (!imageList.isEmpty()) {
-                contentList.add(new MediaContent("video", null, null, imageList));
+                contentList.add(MediaContent.builder().video(List.of(this.fromMediaData(media.getMimeType(), media.getData()))).build());
             }
         }
         else if (format == MessageFormat.AUDIO) {
             contentList.addAll(message.getMedia()
                     .stream()
-                    .map(media -> new MediaContent("audio", null, null, null, this.fromMediaData(media.getMimeType(), media.getData())))
+                    .map(media -> MediaContent.builder().audio(this.fromMediaData(media.getMimeType(), media.getData())).build())
                     .toList());
         }
         else {
             // Default to text
             contentList.addAll(message.getMedia()
                     .stream()
-                    .map(media -> new MediaContent(this.fromMediaData(media.getMimeType(), media.getData())))
+                    .map(media -> MediaContent.builder().text(this.fromMediaData(media.getMimeType(), media.getData())).build())
                     .toList());
         }
 

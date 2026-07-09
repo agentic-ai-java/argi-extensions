@@ -34,6 +34,7 @@ import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatApiSpec.ChatCompletionRe
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatApiSpec.MediaContent;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatApiSpec.Role;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatApiSpec.TokenUsage;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -424,7 +425,8 @@ public class DashScopeMultiModalChatTests {
         MediaContent videoContent = (MediaContent) content.get(0);
         MediaContent textContent = (MediaContent) content.get(1);
         assertThat(videoContent.type()).isEqualTo("video");
-        assertThat(videoContent.video()).containsExactlyElementsOf(MULTIMODAL_VIDEO_FRAME_URLS);
+        assertThat(videoContent.video()).asInstanceOf(InstanceOfAssertFactories.LIST)
+                .containsExactlyElementsOf(MULTIMODAL_VIDEO_FRAME_URLS);
         assertThat(textContent.type()).isEqualTo("text");
         assertThat(textContent.text()).isEqualTo(MULTIMODAL_VIDEO_PROMPT);
 
