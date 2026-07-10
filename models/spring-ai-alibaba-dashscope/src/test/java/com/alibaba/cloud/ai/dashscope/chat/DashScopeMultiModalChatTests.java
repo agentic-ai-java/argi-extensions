@@ -15,7 +15,6 @@
  */
 package com.alibaba.cloud.ai.dashscope.chat;
 
-import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -507,11 +506,9 @@ public class DashScopeMultiModalChatTests {
         // Create real API client
         String apiKey = System.getenv("AI_DASHSCOPE_API_KEY");
         DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey).build();
-        ;
 
         // Create real chat model
         DashScopeChatModel realChatModel = DashScopeChatModel.builder().dashScopeApi(realApi).build();
-        ;
 
         // Create media list with URL
         List<Media> mediaList = List.of(new Media(MimeTypeUtils.IMAGE_PNG, new URI("https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg")));
@@ -539,11 +536,10 @@ public class DashScopeMultiModalChatTests {
     @Test
     @Tag("integration")
     @EnabledIfEnvironmentVariable(named = "AI_DASHSCOPE_API_KEY", matches = ".+")
-    void integrationTestImageWithBinaryResource() throws IOException {
+    void integrationTestImageWithBinaryResource() {
         // Create real API client
         String apiKey = System.getenv("AI_DASHSCOPE_API_KEY");
         DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey).build();
-        ;
 
         // Create real chat model
         DashScopeChatModel realChatModel = DashScopeChatModel.builder().dashScopeApi(realApi).build();
@@ -574,19 +570,19 @@ public class DashScopeMultiModalChatTests {
     @Test
     @Tag("integration")
     @EnabledIfEnvironmentVariable(named = "AI_DASHSCOPE_API_KEY", matches = ".+")
-    void integrationTestVideoWithMultipleFrames() throws IOException {
+    void integrationTestVideoWithMultipleFrames() {
         // Create real API client
         String apiKey = System.getenv("AI_DASHSCOPE_API_KEY");
         DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey).build();
-        ;
 
         // Create real chat model
         DashScopeChatModel realChatModel = DashScopeChatModel.builder().dashScopeApi(realApi).build();
 
         // Create media list with multiple frames (simulating video frames)
         List<Media> mediaList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            mediaList.add(new Media(MimeTypeUtils.IMAGE_JPEG, new ClassPathResource("multimodel/dog_and_girl.jpeg")));
+
+        for (String url : MULTIMODAL_VIDEO_FRAME_URLS) {
+            mediaList.add(new Media(MimeTypeUtils.IMAGE_JPEG, URI.create(url)));
         }
 
         // Create user message with media
@@ -647,7 +643,7 @@ public class DashScopeMultiModalChatTests {
     @Test
     @Tag("integration")
     @EnabledIfEnvironmentVariable(named = "AI_DASHSCOPE_API_KEY", matches = "sk.+")
-    void integrationTestAudioWithMultipleFrames() throws IOException {
+    void integrationTestAudioWithMultipleFrames() {
         // Create real API client
         String apiKey = System.getenv("AI_DASHSCOPE_API_KEY");
         DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey).build();
@@ -684,11 +680,10 @@ public class DashScopeMultiModalChatTests {
     @Test
     @Tag("integration")
     @EnabledIfEnvironmentVariable(named = "AI_DASHSCOPE_API_KEY", matches = ".+")
-    void integrationTestStreamImageResponse() throws IOException {
+    void integrationTestStreamImageResponse() {
         // Create real API client
         String apiKey = System.getenv("AI_DASHSCOPE_API_KEY");
         DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey).build();
-        ;
 
         // Create real chat model
         DashScopeChatModel realChatModel = DashScopeChatModel.builder().dashScopeApi(realApi).build();
@@ -729,11 +724,10 @@ public class DashScopeMultiModalChatTests {
     @Test
     @Tag("integration")
     @EnabledIfEnvironmentVariable(named = "AI_DASHSCOPE_API_KEY", matches = ".+")
-    void integrationTestImageAnalysisWithCustomPrompt() throws IOException {
+    void integrationTestImageAnalysisWithCustomPrompt() {
         // Create real API client
         String apiKey = System.getenv("AI_DASHSCOPE_API_KEY");
         DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey).build();
-        ;
 
         // Create real chat model
         DashScopeChatModel realChatModel = DashScopeChatModel.builder().dashScopeApi(realApi).build();
@@ -772,8 +766,12 @@ public class DashScopeMultiModalChatTests {
     }
 
     private static DashScopeChatModel realChatModel() {
-        DashScopeApi realApi = DashScopeApi.builder().apiKey(apiKey()).build();
+        DashScopeApi realApi = realApi();
         return DashScopeChatModel.builder().dashScopeApi(realApi).build();
+    }
+
+    private static DashScopeApi realApi() {
+        return DashScopeApi.builder().apiKey(apiKey()).build();
     }
 
     private static String apiKey() {

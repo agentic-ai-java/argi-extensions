@@ -497,7 +497,7 @@ public final class DashScopeChatModel implements ChatModel {
 
 	private List<MediaContent> convertMediaContent(UserMessage message, @Nullable Map<String, String> cacheControl) {
         Assert.hasText(message.getText(), "User message text must not be empty");
-        List<MediaContent> contentList = new ArrayList<>();
+		List<MediaContent> contentList = new ArrayList<>();
         MessageFormat format = null;
         if (message.getMetadata().get(DashScopeApiConstants.MESSAGE_FORMAT) instanceof MessageFormat messageFormat) {
             format = messageFormat;
@@ -505,7 +505,9 @@ public final class DashScopeChatModel implements ChatModel {
         if (format == MessageFormat.IMAGE) {
             contentList.addAll(message.getMedia()
                     .stream()
-                    .map(media -> MediaContent.builder().image(this.fromMediaData(media.getMimeType(), media.getData())).build())
+                    .map(media -> MediaContent.builder()
+                            .image(this.fromMediaData(media.getMimeType(), media.getData()))
+                            .build())
                     .toList());
         }
         else if (format == MessageFormat.VIDEO) {
@@ -518,24 +520,30 @@ public final class DashScopeChatModel implements ChatModel {
                 }
                 // Video
                 else {
-                    contentList.add(MediaContent.builder().video(this.fromMediaData(media.getMimeType(), media.getData())).build());
+                    contentList.add(MediaContent.builder()
+                            .video(this.fromMediaData(media.getMimeType(), media.getData()))
+                            .build());
                 }
             }
             if (!imageList.isEmpty()) {
-                contentList.add(MediaContent.builder().video(List.of(this.fromMediaData(media.getMimeType(), media.getData()))).build());
+                contentList.add(MediaContent.builder().video(imageList).build());
             }
         }
         else if (format == MessageFormat.AUDIO) {
             contentList.addAll(message.getMedia()
                     .stream()
-                    .map(media -> MediaContent.builder().audio(this.fromMediaData(media.getMimeType(), media.getData())).build())
+                    .map(media -> MediaContent.builder()
+                            .audio(this.fromMediaData(media.getMimeType(), media.getData()))
+                            .build())
                     .toList());
         }
         else {
             // Default to text
             contentList.addAll(message.getMedia()
                     .stream()
-                    .map(media -> MediaContent.builder().text(this.fromMediaData(media.getMimeType(), media.getData())).build())
+                    .map(media -> MediaContent.builder()
+                            .text(this.fromMediaData(media.getMimeType(), media.getData()))
+                            .build())
                     .toList());
         }
 
