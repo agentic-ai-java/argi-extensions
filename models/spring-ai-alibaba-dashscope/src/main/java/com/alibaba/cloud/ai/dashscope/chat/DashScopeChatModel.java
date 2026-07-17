@@ -548,7 +548,7 @@ public final class DashScopeChatModel implements ChatModel {
         }
 
 		// Apply cache_control to the text content (last content part)
-        contentList.add(new MediaContent(message.getText(), cacheControl));
+        contentList.add(textMediaContent(message.getText(), cacheControl));
 		return contentList;
 	}
 
