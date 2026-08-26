@@ -1,0 +1,61 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.spring.ai.toolcalling.googletranslate;
+
+import io.github.agentic.spring.ai.toolcalling.common.JsonParseTool;
+import io.github.agentic.spring.ai.toolcalling.common.WebClientTool;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+
+import java.util.function.Function;
+
+/**
+ * @author erasernoob
+ */
+@Configuration
+@EnableConfigurationProperties(GoogleTranslateProperties.class)
+@ConditionalOnProperty(prefix = GoogleTranslateConstants.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = true)
+public class GoogleTranslateAutoConfiguration {
+
+	@Bean(name = GoogleTranslateConstants.TOOL_NAME)
+	@ConditionalOnMissingBean
+	@Description("Implement natural language translation capabilities.")
+	public GoogleTranslateService googleTranslate(JsonParseTool jsonParseTool, GoogleTranslateProperties properties) {
+		return new GoogleTranslateService(properties,
+				WebClientTool.builder(jsonParseTool, properties).httpHeadersConsumer(headers -> {
+					headers.add("Content-Type", "application/json");
+				}).build(), jsonParseTool);
+	}
+
+	@Bean(name = "googleTranslateToolCallback")
+	@ConditionalOnMissingBean(name = "googleTranslateToolCallback")
+	public ToolCallback googleTranslateToolCallback(GoogleTranslateService googleTranslate) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Function<GoogleTranslateService.Request, Object> googleTranslateFunction = (Function) googleTranslate;
+		return FunctionToolCallback.builder(GoogleTranslateConstants.TOOL_NAME, googleTranslateFunction)
+			.description("Implement natural language translation capabilities.")
+			.inputType(GoogleTranslateService.Request.class)
+			.build();
+	}
+
+}

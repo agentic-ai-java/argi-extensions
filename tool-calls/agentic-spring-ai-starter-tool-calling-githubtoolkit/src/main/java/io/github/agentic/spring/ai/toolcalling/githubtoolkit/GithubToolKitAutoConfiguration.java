@@ -1,0 +1,101 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.spring.ai.toolcalling.githubtoolkit;
+
+import io.github.agentic.spring.ai.toolcalling.common.JsonParseTool;
+import io.github.agentic.spring.ai.toolcalling.common.WebClientTool;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+import org.springframework.http.HttpHeaders;
+
+/**
+ * @author Yeaury
+ */
+@Configuration
+@EnableConfigurationProperties(GithubToolKitProperties.class)
+@ConditionalOnClass(GithubToolKitProperties.class)
+@ConditionalOnProperty(prefix = GithubToolKitConstants.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = true)
+public class GithubToolKitAutoConfiguration {
+
+	@Bean(name = GithubToolKitConstants.GET_ISSUE_TOOL_NAME)
+	@ConditionalOnMissingBean
+	@Description("implement the function of get a GitHub issue operation")
+	public GetIssueService getIssue(GithubToolKitProperties properties, JsonParseTool jsonParseTool) {
+		WebClientTool githubWebClientTool = githubWebClientTool(properties, jsonParseTool);
+		return new GetIssueService(properties, githubWebClientTool, jsonParseTool);
+	}
+
+	@Bean(name = GithubToolKitConstants.CREATE_PR_TOOL_NAME)
+	@ConditionalOnMissingBean
+	@Description("implement the function of create GitHub pull request operation")
+	public CreatePullRequestService createPullRequest(GithubToolKitProperties properties, JsonParseTool jsonParseTool) {
+		WebClientTool githubWebClientTool = githubWebClientTool(properties, jsonParseTool);
+		return new CreatePullRequestService(properties, githubWebClientTool, jsonParseTool);
+	}
+
+	@Bean(name = GithubToolKitConstants.SEARCH_REPOSITORY_TOOL_NAME)
+	@ConditionalOnMissingBean
+	@Description("implement the function of search the list of repositories operation")
+	public SearchRepositoryService searchRepository(GithubToolKitProperties properties, JsonParseTool jsonParseTool) {
+		WebClientTool githubWebClientTool = githubWebClientTool(properties, jsonParseTool);
+		return new SearchRepositoryService(githubWebClientTool, jsonParseTool);
+	}
+
+	private WebClientTool githubWebClientTool(GithubToolKitProperties properties, JsonParseTool jsonParseTool) {
+		return WebClientTool.builder(jsonParseTool, properties).httpHeadersConsumer(headers -> {
+			headers.set(HttpHeaders.USER_AGENT, HttpHeaders.USER_AGENT);
+			headers.set(HttpHeaders.ACCEPT, "application/vnd.github.v3+json");
+			headers.set("X-GitHub-Api-Version", GithubToolKitProperties.X_GitHub_Api_Version);
+			headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getToken());
+		}).build();
+	}
+
+	@Bean(name = "getIssueToolCallback")
+	@ConditionalOnMissingBean(name = "getIssueToolCallback")
+	public ToolCallback getIssueToolCallback(GetIssueService getIssue) {
+		return FunctionToolCallback.builder(GithubToolKitConstants.GET_ISSUE_TOOL_NAME, getIssue)
+			.description("implement the function of get a GitHub issue operation")
+			.inputType(GetIssueService.Request.class)
+			.build();
+	}
+
+	@Bean(name = "createPullRequestToolCallback")
+	@ConditionalOnMissingBean(name = "createPullRequestToolCallback")
+	public ToolCallback createPullRequestToolCallback(CreatePullRequestService createPullRequest) {
+		return FunctionToolCallback.builder(GithubToolKitConstants.CREATE_PR_TOOL_NAME, createPullRequest)
+			.description("implement the function of create GitHub pull request operation")
+			.inputType(CreatePullRequestService.Request.class)
+			.build();
+	}
+
+	@Bean(name = "searchRepositoryToolCallback")
+	@ConditionalOnMissingBean(name = "searchRepositoryToolCallback")
+	public ToolCallback searchRepositoryToolCallback(SearchRepositoryService searchRepository) {
+		return FunctionToolCallback.builder(GithubToolKitConstants.SEARCH_REPOSITORY_TOOL_NAME, searchRepository)
+			.description("implement the function of search the list of repositories operation")
+			.inputType(SearchRepositoryService.Request.class)
+			.build();
+	}
+
+}

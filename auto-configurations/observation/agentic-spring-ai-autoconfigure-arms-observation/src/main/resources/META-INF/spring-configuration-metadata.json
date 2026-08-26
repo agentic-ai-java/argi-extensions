@@ -1,0 +1,12 @@
+{
+  "properties": [
+    {
+      "name": "spring.ai.alibaba.arms.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable Arms instrumentations and conventions.",
+      "sourceType": "io.github.agentic.spring.ai.autoconfigure.arms.ArmsCommonProperties",
+      "defaultValue": false
+    }
+  ],
+  "hints": []
+}

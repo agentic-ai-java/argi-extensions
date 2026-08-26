@@ -1,0 +1,58 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.spring.ai.toolcalling.alitranslate;
+
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+
+import java.util.function.Function;
+
+/**
+ * @author yunlong
+ */
+@Configuration
+@ConditionalOnClass(AliTranslateService.class)
+@EnableConfigurationProperties(AliTranslateProperties.class)
+@ConditionalOnProperty(prefix = AliTranslateConstants.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = true)
+public class AliTranslateAutoConfiguration {
+
+	@Bean(name = AliTranslateConstants.TOOL_NAME, destroyMethod = "close")
+	@ConditionalOnMissingBean
+	@Description("Implement natural language translation capabilities.")
+	public AliTranslateService aliTranslateService(AliTranslateProperties properties) {
+		return new AliTranslateService(properties);
+	}
+
+	@Bean(name = "aliTranslateServiceToolCallback")
+	@ConditionalOnMissingBean(name = "aliTranslateServiceToolCallback")
+	public ToolCallback aliTranslateServiceToolCallback(AliTranslateService aliTranslateService) {
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Function<AliTranslateService.Request, Object> aliTranslateServiceFunction = (Function) aliTranslateService;
+		return FunctionToolCallback.builder(AliTranslateConstants.TOOL_NAME, aliTranslateServiceFunction)
+			.description("Implement natural language translation capabilities.")
+			.inputType(AliTranslateService.Request.class)
+			.build();
+	}
+
+}

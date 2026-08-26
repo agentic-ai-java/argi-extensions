@@ -1,0 +1,10 @@
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeChatAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeAgentAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeImageAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeVideoAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeAudioSpeechAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeAudioTranscriptionAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeRerankAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeEmbeddingAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeMultimodalEmbeddingAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeAsyncToolCallingManagerAutoConfiguration

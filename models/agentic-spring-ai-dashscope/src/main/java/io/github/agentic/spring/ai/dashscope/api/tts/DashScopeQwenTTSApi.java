@@ -1,0 +1,220 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.spring.ai.dashscope.api.tts;
+
+import io.github.agentic.spring.ai.dashscope.audio.tts.DashScopeAudioSpeechOptions;
+import io.github.agentic.spring.ai.dashscope.audio.tts.DashScopeTTSApiSpec.DashScopeAudioTTSRequest;
+import io.github.agentic.spring.ai.dashscope.audio.tts.DashScopeTTSApiSpec.DashScopeAudioTTSResponse;
+import io.github.agentic.spring.ai.dashscope.common.DashScopeAudioApiConstants;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.model.ApiKey;
+import org.springframework.ai.model.NoopApiKey;
+import org.springframework.ai.util.JacksonUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
+import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import static io.github.agentic.spring.ai.dashscope.common.DashScopeApiConstants.ENABLED;
+import static io.github.agentic.spring.ai.dashscope.common.DashScopeApiConstants.HEADER_SSE;
+
+/**
+ * DashScope Qwen-TTS REST API client.
+ * Supports call (sync) and stream (SSE) for Qwen-TTS models.
+ *
+ * @author agentic-spring-ai
+ */
+public class DashScopeQwenTTSApi {
+
+	private static final Logger log = LoggerFactory.getLogger(DashScopeQwenTTSApi.class);
+
+	private final String baseUrl;
+	private final ApiKey apiKey;
+	private final @Nullable String workSpaceId;
+	private final RestClient restClient;
+	private final WebClient webClient;
+	private final JsonMapper jsonMapper;
+
+	public DashScopeQwenTTSApi(String baseUrl, ApiKey apiKey, @Nullable String workSpaceId,
+			@Nullable HttpHeaders headers, RestClient.Builder restClientBuilder,
+			WebClient.Builder webClientBuilder, ResponseErrorHandler responseErrorHandler) {
+		this.baseUrl = baseUrl;
+		this.apiKey = apiKey;
+		this.workSpaceId = workSpaceId;
+
+		Consumer<HttpHeaders> authHeaders = h -> {
+			if (headers != null) {
+				h.addAll(headers);
+			}
+			h.setContentType(MediaType.APPLICATION_JSON);
+			if (!(apiKey instanceof NoopApiKey)) {
+				h.setBearerAuth(apiKey.getValue());
+			}
+		};
+
+		this.restClient = restClientBuilder.clone()
+				.baseUrl(baseUrl)
+				.defaultHeaders(authHeaders)
+				.defaultStatusHandler(responseErrorHandler)
+				.build();
+
+		this.webClient = webClientBuilder.clone()
+				.baseUrl(baseUrl)
+				.defaultHeaders(authHeaders)
+				.build();
+
+		this.jsonMapper = JsonMapper.builder()
+				.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+				.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+				.disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .changeDefaultPropertyInclusion(incl -> incl.withValueInclusion(JsonInclude.Include.NON_NULL))
+                .changeDefaultPropertyInclusion(incl -> incl.withContentInclusion(JsonInclude.Include.NON_NULL))
+				.addModules(JacksonUtils.instantiateAvailableModules())
+				.build();
+	}
+
+	public DashScopeAudioTTSResponse call(String text, DashScopeAudioSpeechOptions options) {
+		DashScopeAudioTTSRequest request = DashScopeAudioTTSRequest.builder()
+				.model(options.getModel())
+				.text(text)
+				.voice(options.getVoice())
+				.languageType(options.getLanguageType())
+				.stream(false)
+				.instructions(options.getInstruction())
+				.optimizeInstructions(options.getOptimizeInstructions())
+				.build();
+
+		ResponseEntity<DashScopeAudioTTSResponse> response = restClient.post()
+				.uri(DashScopeAudioApiConstants.MULTIMODAL_GENERATION)
+				.body(request)
+				.retrieve()
+				.toEntity(DashScopeAudioTTSResponse.class);
+
+		if (response.getStatusCode().is2xxSuccessful()) {
+			return Objects.requireNonNull(response.getBody(), "DashScope Qwen TTS response body must not be null");
+		}
+		log.error("Failed to call Qwen TTS API: " + response.getStatusCode());
+		throw new RuntimeException("Failed to call Qwen TTS API: " + response.getStatusCode());
+	}
+
+	public Flux<DashScopeAudioTTSResponse> stream(String text, DashScopeAudioSpeechOptions options) {
+		DashScopeAudioTTSRequest request = DashScopeAudioTTSRequest.builder()
+				.model(options.getModel())
+				.text(text)
+				.voice(options.getVoice())
+				.languageType(options.getLanguageType())
+				.stream(true)
+				.instructions(options.getInstruction())
+				.optimizeInstructions(options.getOptimizeInstructions())
+				.build();
+
+		Predicate<String> SSE_DONE_PREDICATE = "[DONE]"::equals;
+
+		return webClient.post()
+				.uri(DashScopeAudioApiConstants.MULTIMODAL_GENERATION)
+				.headers(headers -> headers.add(HEADER_SSE, ENABLED))
+				.body(Mono.just(request), DashScopeAudioTTSRequest.class)
+				.retrieve()
+				.bodyToFlux(String.class)
+				.takeUntil(SSE_DONE_PREDICATE)
+				.filter(SSE_DONE_PREDICATE.negate())
+				.map(content -> jsonMapper.readValue(content, DashScopeAudioTTSResponse.class));
+	}
+
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	public static class Builder {
+
+		private @Nullable String baseUrl;
+		private @Nullable ApiKey apiKey;
+		private @Nullable String workSpaceId;
+		private @Nullable HttpHeaders headers;
+		private RestClient.@Nullable Builder restClientBuilder;
+		private WebClient.@Nullable Builder webClientBuilder;
+		private @Nullable ResponseErrorHandler responseErrorHandler;
+
+		public Builder baseUrl(String baseUrl) {
+			this.baseUrl = baseUrl;
+			return this;
+		}
+
+		public Builder apiKey(ApiKey apiKey) {
+			this.apiKey = apiKey;
+			return this;
+		}
+
+		public Builder workSpaceId(@Nullable String workSpaceId) {
+			this.workSpaceId = workSpaceId;
+			return this;
+		}
+
+		public Builder headers(HttpHeaders headers) {
+			this.headers = headers;
+			return this;
+		}
+
+		public Builder restClientBuilder(RestClient.Builder restClientBuilder) {
+			this.restClientBuilder = restClientBuilder;
+			return this;
+		}
+
+		public Builder webClientBuilder(WebClient.Builder webClientBuilder) {
+			this.webClientBuilder = webClientBuilder;
+			return this;
+		}
+
+		public Builder responseErrorHandler(ResponseErrorHandler responseErrorHandler) {
+			this.responseErrorHandler = responseErrorHandler;
+			return this;
+		}
+
+		public DashScopeQwenTTSApi build() {
+			Assert.hasText(baseUrl, "baseUrl cannot be null or empty");
+			Assert.notNull(apiKey, "apiKey must be set");
+			Assert.notNull(restClientBuilder, "restClientBuilder cannot be null");
+			Assert.notNull(webClientBuilder, "webClientBuilder cannot be null");
+			Assert.notNull(responseErrorHandler, "responseErrorHandler cannot be null");
+			String baseUrl = Objects.requireNonNull(this.baseUrl, "baseUrl cannot be null");
+			ApiKey apiKey = Objects.requireNonNull(this.apiKey, "apiKey must be set");
+			RestClient.Builder restClientBuilder = Objects.requireNonNull(this.restClientBuilder,
+					"restClientBuilder cannot be null");
+			WebClient.Builder webClientBuilder = Objects.requireNonNull(this.webClientBuilder,
+					"webClientBuilder cannot be null");
+			ResponseErrorHandler responseErrorHandler = Objects.requireNonNull(this.responseErrorHandler,
+					"responseErrorHandler cannot be null");
+			return new DashScopeQwenTTSApi(baseUrl, apiKey, this.workSpaceId, this.headers, restClientBuilder,
+					webClientBuilder, responseErrorHandler);
+		}
+	}
+}

@@ -17,14 +17,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-extensions</artifactId>
+    <groupId>io.github.agentic-spring-ai</groupId>
+    <artifactId>agentic-spring-ai-extensions</artifactId>
     <version>${revision}</version>
 
     <packaging>pom</packaging>
-    <name>Spring AI Extensions</name>
+    <name>Agentic Spring AI Extensions</name>
     <description>Extensions of Spring AI core concepts and components.</description>
-    <url>https://github.com/alibaba/spring-ai-alibaba</url>
+    <url>https://github.com/agentic-for-spring-ai/agentic-spring-ai-extensions</url>
 
     <licenses>
         <license>
@@ -36,187 +36,190 @@
 
     <developers>
         <developer>
-            <id>chickenlj</id>
-            <name>Jun Liu</name>
-            <email>ken.lj.hz@gmail.com</email>
-            <organization>Alibaba Cloud</organization>
-            <organizationUrl>https://aliyun.com</organizationUrl>
+            <id>yuluo-yx</id>
+            <name>yuluo-yx</name>
+            <url>https://github.com/yuluo-yx</url>
+        </developer>
+        <developer>
+            <id>Aias00</id>
+            <name>Aias00</name>
+            <url>https://github.com/Aias00</url>
         </developer>
     </developers>
 
     <modules>
         <!-- document-parsers modules -->
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-apache-pdfbox</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-bibtex</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-bshtml</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-directory</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-markdown</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-multi-modality</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-pdf-tables</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-tika</module>
-        <module>document-parsers/spring-ai-alibaba-starter-document-parser-yaml</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-apache-pdfbox</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-bibtex</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-bshtml</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-directory</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-markdown</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-multi-modality</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-pdf-tables</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-tika</module>
+        <module>document-parsers/agentic-spring-ai-starter-document-parser-yaml</module>
 
         <!-- document-readers modules -->
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-archive</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-arxiv</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-bilibili</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-csdn</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-chatgpt-data</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-elasticsearch</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-email</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-gitbook</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-github</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-gitlab</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-gpt-repo</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-huggingface-fs</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-larksuite</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-mbox</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-mongodb</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-mysql</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-notion</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-obsidian</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-onenote</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-poi</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-sqlite</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-tencent-cos</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-youtube</module>
-        <module>document-readers/spring-ai-alibaba-starter-document-reader-yuque</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-archive</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-arxiv</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-bilibili</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-csdn</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-chatgpt-data</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-elasticsearch</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-email</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-gitbook</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-github</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-gitlab</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-gpt-repo</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-huggingface-fs</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-larksuite</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-mbox</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-mongodb</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-mysql</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-notion</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-obsidian</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-onenote</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-poi</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-sqlite</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-tencent-cos</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-youtube</module>
+        <module>document-readers/agentic-spring-ai-starter-document-reader-yuque</module>
 
         <!-- memory modules -->
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-elasticsearch</module>
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-jdbc</module>
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-mem0</module>
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-memcached</module>
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-mongodb</module>
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-redis</module>
-        <module>memory-repository/spring-ai-alibaba-model-chat-memory-repository-tablestore</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-elasticsearch</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-jdbc</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-mem0</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-memcached</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-mongodb</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-redis</module>
+        <module>memory-repository/agentic-spring-ai-model-chat-memory-repository-tablestore</module>
 
         <!-- auto-configurations modules -->
-        <module>auto-configurations/models/spring-ai-alibaba-autoconfigure-dashscope</module>
-        <module>auto-configurations/models/spring-ai-alibaba-autoconfigure-dashscope-sdk</module>
-        <module>auto-configurations/models/chat/memory/spring-ai-alibaba-autoconfigure-model-chat-memory</module>
-        <module>auto-configurations/models/chat/memory/spring-ai-alibaba-autoconfigure-model-chat-memory-mem0</module>
-        <module>auto-configurations/models/chat/memory/repository/spring-ai-alibaba-autoconfigure-model-chat-memory-repository-elasticsearch</module>
-        <module>auto-configurations/models/chat/memory/repository/spring-ai-alibaba-autoconfigure-model-chat-memory-repository-jdbc</module>
-        <module>auto-configurations/models/chat/memory/repository/spring-ai-alibaba-autoconfigure-model-chat-memory-repository-memcached</module>
-        <module>auto-configurations/models/chat/memory/repository/spring-ai-alibaba-autoconfigure-model-chat-memory-repository-mongodb</module>
-        <module>auto-configurations/models/chat/memory/repository/spring-ai-alibaba-autoconfigure-model-chat-memory-repository-redis</module>
-        <module>auto-configurations/models/chat/memory/repository/spring-ai-alibaba-autoconfigure-model-chat-memory-repository-tablestore</module>
+        <module>auto-configurations/models/agentic-spring-ai-autoconfigure-dashscope</module>
+        <module>auto-configurations/models/agentic-spring-ai-autoconfigure-dashscope-sdk</module>
+        <module>auto-configurations/models/chat/memory/agentic-spring-ai-autoconfigure-model-chat-memory</module>
+        <module>auto-configurations/models/chat/memory/agentic-spring-ai-autoconfigure-model-chat-memory-mem0</module>
+        <module>auto-configurations/models/chat/memory/repository/agentic-spring-ai-autoconfigure-model-chat-memory-repository-elasticsearch</module>
+        <module>auto-configurations/models/chat/memory/repository/agentic-spring-ai-autoconfigure-model-chat-memory-repository-jdbc</module>
+        <module>auto-configurations/models/chat/memory/repository/agentic-spring-ai-autoconfigure-model-chat-memory-repository-memcached</module>
+        <module>auto-configurations/models/chat/memory/repository/agentic-spring-ai-autoconfigure-model-chat-memory-repository-mongodb</module>
+        <module>auto-configurations/models/chat/memory/repository/agentic-spring-ai-autoconfigure-model-chat-memory-repository-redis</module>
+        <module>auto-configurations/models/chat/memory/repository/agentic-spring-ai-autoconfigure-model-chat-memory-repository-tablestore</module>
 
-        <module>auto-configurations/prompt/spring-ai-alibaba-autoconfigure-nacos-prompt</module>
-        <module>auto-configurations/observation/spring-ai-alibaba-autoconfigure-arms-observation</module>
-        <module>auto-configurations/mcp/spring-ai-alibaba-autoconfigure-mcp-registry</module>
-        <module>auto-configurations/mcp/spring-ai-alibaba-autoconfigure-mcp-router</module>
-        <module>auto-configurations/rag/spring-ai-alibaba-autoconfigure-rag-elasticsearch</module>
-        <module>auto-configurations/mcp/spring-ai-alibaba-autoconfigure-mcp-distributed</module>
-        <module>auto-configurations/mcp/spring-ai-alibaba-autoconfigure-mcp-gateway</module>
+        <module>auto-configurations/prompt/agentic-spring-ai-autoconfigure-nacos-prompt</module>
+        <module>auto-configurations/observation/agentic-spring-ai-autoconfigure-arms-observation</module>
+        <module>auto-configurations/mcp/agentic-spring-ai-autoconfigure-mcp-registry</module>
+        <module>auto-configurations/mcp/agentic-spring-ai-autoconfigure-mcp-router</module>
+        <module>auto-configurations/rag/agentic-spring-ai-autoconfigure-rag-elasticsearch</module>
+        <module>auto-configurations/mcp/agentic-spring-ai-autoconfigure-mcp-distributed</module>
+        <module>auto-configurations/mcp/agentic-spring-ai-autoconfigure-mcp-gateway</module>
 
-        <module>auto-configurations/vector-stores/spring-ai-alibaba-autoconfigure-vector-store-analyticdb</module>
-        <module>auto-configurations/vector-stores/spring-ai-alibaba-autoconfigure-vector-store-oceanbase</module>
-        <module>auto-configurations/vector-stores/spring-ai-alibaba-autoconfigure-vector-store-opensearch</module>
-        <module>auto-configurations/vector-stores/spring-ai-alibaba-autoconfigure-vector-store-tablestore</module>
-        <module>auto-configurations/vector-stores/spring-ai-alibaba-autoconfigure-vector-store-tair</module>
+        <module>auto-configurations/vector-stores/agentic-spring-ai-autoconfigure-vector-store-analyticdb</module>
+        <module>auto-configurations/vector-stores/agentic-spring-ai-autoconfigure-vector-store-oceanbase</module>
+        <module>auto-configurations/vector-stores/agentic-spring-ai-autoconfigure-vector-store-opensearch</module>
+        <module>auto-configurations/vector-stores/agentic-spring-ai-autoconfigure-vector-store-tablestore</module>
+        <module>auto-configurations/vector-stores/agentic-spring-ai-autoconfigure-vector-store-tair</module>
 
         <!-- spring-boot-starters modules -->
-        <module>starters/spring-ai-alibaba-starter-dashscope</module>
-        <module>starters/spring-ai-alibaba-starter-dashscope-sdk</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-mem0</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-repository-elasticsearch</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-repository-jdbc</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-repository-memcached</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-repository-mongodb</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-repository-redis</module>
-        <module>starters/spring-ai-alibaba-starter-model-chat-memory-repository-tablestore</module>
+        <module>starters/agentic-spring-ai-starter-dashscope</module>
+        <module>starters/agentic-spring-ai-starter-dashscope-sdk</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-mem0</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-elasticsearch</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-jdbc</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-memcached</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-mongodb</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-redis</module>
+        <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-tablestore</module>
 
-        <module>starters/spring-ai-alibaba-starter-nacos-prompt</module>
-        <module>starters/spring-ai-alibaba-starter-arms-observation</module>
-        <module>starters/spring-ai-alibaba-starter-mcp-registry</module>
-        <module>starters/spring-ai-alibaba-starter-mcp-router</module>
-        <module>starters/spring-ai-alibaba-starter-rag</module>
-        <module>starters/spring-ai-alibaba-starter-rag-bailian</module>
-        <module>starters/spring-ai-alibaba-starter-mcp-distributed</module>
-        <module>starters/spring-ai-alibaba-starter-mcp-gateway</module>
+        <module>starters/agentic-spring-ai-starter-nacos-prompt</module>
+        <module>starters/agentic-spring-ai-starter-arms-observation</module>
+        <module>starters/agentic-spring-ai-starter-mcp-registry</module>
+        <module>starters/agentic-spring-ai-starter-mcp-router</module>
+        <module>starters/agentic-spring-ai-starter-rag</module>
+        <module>starters/agentic-spring-ai-starter-rag-bailian</module>
+        <module>starters/agentic-spring-ai-starter-mcp-distributed</module>
+        <module>starters/agentic-spring-ai-starter-mcp-gateway</module>
 
-        <module>starters/spring-ai-alibaba-starter-vector-store-analyticdb</module>
-        <module>starters/spring-ai-alibaba-starter-vector-store-oceanbase</module>
-        <module>starters/spring-ai-alibaba-starter-vector-store-opensearch</module>
-        <module>starters/spring-ai-alibaba-starter-vector-store-tablestore</module>
-        <module>starters/spring-ai-alibaba-starter-vector-store-tair</module>
+        <module>starters/agentic-spring-ai-starter-vector-store-analyticdb</module>
+        <module>starters/agentic-spring-ai-starter-vector-store-oceanbase</module>
+        <module>starters/agentic-spring-ai-starter-vector-store-opensearch</module>
+        <module>starters/agentic-spring-ai-starter-vector-store-tablestore</module>
+        <module>starters/agentic-spring-ai-starter-vector-store-tair</module>
 
         <!-- tool-calls modules -->
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-alitranslate</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-aliyunaisearch</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-amap</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-baidumap</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-baidusearch</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-baidutranslate</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-bravesearch</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-common</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-dingtalk</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-duckduckgo</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-firecrawl</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-githubtoolkit</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-googlescholar</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-googletranslate</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-googletrends</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-jinacrawler</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-jsonprocessor</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-kuaidi100</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-larksuite</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-memcached</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-metaso</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-microsofttranslate</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-minio</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-ollamasearchmodel</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-openalex</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-opentripmap</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-regex</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-searches</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-sensitivefilter</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-serpapi</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-sinanews</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-tavilysearch</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-tencentmap</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-time</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-toolsearch</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-toutiaonews</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-tripadvisor</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-tushare</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-weather</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-wikipedia</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-worldbankdata</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-youdaotranslate</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-yuque</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-python</module>
-        <module>tool-calls/spring-ai-alibaba-starter-tool-calling-agentbay</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-alitranslate</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-aliyunaisearch</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-amap</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-baidumap</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-baidusearch</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-baidutranslate</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-bravesearch</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-common</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-dingtalk</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-duckduckgo</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-firecrawl</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-githubtoolkit</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-googlescholar</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-googletranslate</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-googletrends</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-jinacrawler</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-jsonprocessor</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-kuaidi100</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-larksuite</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-memcached</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-metaso</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-microsofttranslate</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-minio</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-ollamasearchmodel</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-openalex</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-opentripmap</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-regex</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-searches</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-sensitivefilter</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-serpapi</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-sinanews</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-tavilysearch</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-tencentmap</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-time</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-toolsearch</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-toutiaonews</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-tripadvisor</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-tushare</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-weather</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-wikipedia</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-worldbankdata</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-youdaotranslate</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-yuque</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-python</module>
+        <module>tool-calls/agentic-spring-ai-starter-tool-calling-agentbay</module>
 
         <!-- vector-stores modules -->
-        <module>vector-stores/spring-ai-alibaba-analyticdb-store</module>
-        <module>vector-stores/spring-ai-alibaba-oceanbase-store</module>
-        <module>vector-stores/spring-ai-alibaba-opensearch-store</module>
-        <module>vector-stores/spring-ai-alibaba-tablestore-store</module>
-        <module>vector-stores/spring-ai-alibaba-tair-store</module>
+        <module>vector-stores/agentic-spring-ai-analyticdb-store</module>
+        <module>vector-stores/agentic-spring-ai-oceanbase-store</module>
+        <module>vector-stores/agentic-spring-ai-opensearch-store</module>
+        <module>vector-stores/agentic-spring-ai-tablestore-store</module>
+        <module>vector-stores/agentic-spring-ai-tair-store</module>
 
-        <module>mcp/spring-ai-alibaba-mcp-common</module>
-        <module>mcp/spring-ai-alibaba-mcp-registry</module>
-        <module>mcp/spring-ai-alibaba-mcp-router</module>
-        <module>mcp/spring-ai-alibaba-mcp-distributed</module>
-        <module>mcp/spring-ai-alibaba-mcp-gateway</module>
+        <module>mcp/agentic-spring-ai-mcp-common</module>
+        <module>mcp/agentic-spring-ai-mcp-registry</module>
+        <module>mcp/agentic-spring-ai-mcp-router</module>
+        <module>mcp/agentic-spring-ai-mcp-distributed</module>
+        <module>mcp/agentic-spring-ai-mcp-gateway</module>
 
-        <module>prompt/spring-ai-alibaba-prompt-nacos</module>
+        <module>prompt/agentic-spring-ai-prompt-nacos</module>
 
-        <module>models/spring-ai-alibaba-dashscope</module>
-        <module>models/spring-ai-alibaba-dashscope-sdk</module>
-        <module>rag/spring-ai-alibaba-rag</module>
-        <module>observation/spring-ai-alibaba-observation</module>
-        <module>spring-ai-alibaba-extensions-bom</module>
+        <module>models/agentic-spring-ai-dashscope</module>
+        <module>models/agentic-spring-ai-dashscope-sdk</module>
+        <module>rag/agentic-spring-ai-rag</module>
+        <module>observation/agentic-spring-ai-observation</module>
+        <module>agentic-spring-ai-extensions-bom</module>
     </modules>
 
     <scm>
-        <connection>git://github.com/spring-ai-alibaba/spring-ai-extensions.git</connection>
-        <developerConnection>git@github.com:spring-ai-alibaba/spring-ai-extensions.git</developerConnection>
-        <url>https://github.com/spring-ai-alibaba/spring-ai-extensions</url>
+        <connection>git://github.com/agentic-for-spring-ai/agentic-spring-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-for-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-for-spring-ai/agentic-spring-ai-extensions</url>
     </scm>
 
     <properties>

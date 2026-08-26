@@ -2,7 +2,7 @@
 
 本项目基于 Spring AI 构建，提供了对核心概念的扩展实现，如 `ChatModel`、`ImageModel`、`AudioModel`、`MCP`、`DocumentParser`、`ChatMemory`、`ToolCallback`、`VectorStore` 等。帮助开发者快速集成阿里云百炼模型服务、向量数据库服务、聊天记忆组件、工具调用等功能。
 
-基于这些组件，开发者可以使用 Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/)，或 [Spring AI Alibaba Agent 框架](https://github.com/alibaba/spring-ai-alibaba) 快速构建自己的 AI 智能体应用。请根据您的具体使用场景选择。
+基于这些组件，开发者可以使用 Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/)，或 [Spring AI Alibaba Agent 框架](https://github.com/alibaba/agentic-spring-ai) 快速构建自己的 AI 智能体应用。请根据您的具体使用场景选择。
 
 [📖 English Version](README.md) | [中文版](README-zh.md)
 
@@ -17,13 +17,13 @@
 ### 使用 `ChatClient` 开发聊天机器人
 
 #### 添加依赖
-要快速开始使用 Spring AI Alibaba，请在您的 Java 项目中添加 `spring-ai-alibaba-starter-dashscope` 依赖。
+要快速开始使用 Spring AI Alibaba，请在您的 Java 项目中添加 `agentic-spring-ai-starter-dashscope` 依赖。
 
 ```xml
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>com.alibaba.cloud.ai</groupId>
+      <groupId>io.github.agentic.spring.ai</groupId>
       <artifactId>spring-ai-extensions-bom</artifactId>
       <version>2.0.0.0-RC1</version>
       <type>pom</type>
@@ -34,8 +34,8 @@
 
 <dependencies>
   <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
+    <groupId>io.github.agentic.spring.ai</groupId>
+    <artifactId>agentic-spring-ai-starter-dashscope</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -44,8 +44,8 @@
 
 ```xml
 <dependency>
-  <groupId>com.alibaba.cloud.ai</groupId>
-  <artifactId>spring-ai-alibaba-starter-dashscope-sdk</artifactId>
+  <groupId>io.github.agentic.spring.ai</groupId>
+  <artifactId>agentic-spring-ai-starter-dashscope-sdk</artifactId>
 </dependency>
 ```
 
@@ -90,14 +90,14 @@ public class HelloworldController {
 
 ## 示例和演示
 
-社区开发了一个包含完整前端 UI 和后端实现的 [Playground](https://github.com/springaialibaba/spring-ai-alibaba-examples/tree/main/spring-ai-alibaba-playground) 智能体。Playground 后端使用 Spring AI Alibaba 开发，让用户快速体验聊天机器人、多轮对话、图像生成、多模态、工具调用、MCP、RAG 等所有核心框架能力。
+社区开发了一个包含完整前端 UI 和后端实现的 [Playground](https://github.com/springaialibaba/agentic-spring-ai-examples/tree/main/agentic-spring-ai-playground) 智能体。Playground 后端使用 Spring AI Alibaba 开发，让用户快速体验聊天机器人、多轮对话、图像生成、多模态、工具调用、MCP、RAG 等所有核心框架能力。
 
 <p align="center">
     <img src="./docs/imgs/playground.png" alt="PlayGround" style="max-width: 949px; height: 537px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" />
 </p>
 
-您可以[本地部署 Playground 示例](https://github.com/springaialibaba/spring-ai-alibaba-examples)并通过浏览器访问体验，或复制源代码并调整到您自己的业务需求，更快速地构建自己的 AI 应用套件。
-更多示例请参考我们的官方示例仓库：[https://github.com/springaialibaba/spring-ai-alibaba-examples](https://github.com/springaialibaba/spring-ai-alibaba-examples)
+您可以[本地部署 Playground 示例](https://github.com/springaialibaba/agentic-spring-ai-examples)并通过浏览器访问体验，或复制源代码并调整到您自己的业务需求，更快速地构建自己的 AI 应用套件。
+更多示例请参考我们的官方示例仓库：[https://github.com/springaialibaba/agentic-spring-ai-examples](https://github.com/springaialibaba/agentic-spring-ai-examples)
 
 ## 可用扩展
 
@@ -127,23 +127,23 @@ DashScopeChatModel 支持：
 
 #### DashScopeSdkChatModel
 
-基于 DashScope Java SDK 的聊天模型实现。使用 `spring-ai-alibaba-starter-dashscope-sdk` 并配置 `spring.ai.model.chat=dashscope-sdk` 即可启用。
+基于 DashScope Java SDK 的聊天模型实现。使用 `agentic-spring-ai-starter-dashscope-sdk` 并配置 `spring.ai.model.chat=dashscope-sdk` 即可启用。
 
 #### DashScopeSdkImageModel
 
-基于 DashScope Java SDK 的图像模型实现。使用 `spring-ai-alibaba-starter-dashscope-sdk` 并配置 `spring.ai.model.image=dashscope-sdk` 即可启用。
+基于 DashScope Java SDK 的图像模型实现。使用 `agentic-spring-ai-starter-dashscope-sdk` 并配置 `spring.ai.model.image=dashscope-sdk` 即可启用。
 
 #### DashScopeSdkEmbeddingModel
 
-基于 DashScope Java SDK 的向量模型实现。使用 `spring-ai-alibaba-starter-dashscope-sdk` 并配置 `spring.ai.model.embedding=dashscope-sdk` 即可启用。
+基于 DashScope Java SDK 的向量模型实现。使用 `agentic-spring-ai-starter-dashscope-sdk` 并配置 `spring.ai.model.embedding=dashscope-sdk` 即可启用。
 
 #### DashScopeSdkAudioSpeechModel
 
-基于 DashScope Java SDK 的语音合成模型实现。使用 `spring-ai-alibaba-starter-dashscope-sdk` 并配置 `spring.ai.model.audio.speech=dashscope-sdk` 即可启用。
+基于 DashScope Java SDK 的语音合成模型实现。使用 `agentic-spring-ai-starter-dashscope-sdk` 并配置 `spring.ai.model.audio.speech=dashscope-sdk` 即可启用。
 
 #### DashScopeSdkAudioTranscriptionModel
 
-基于 DashScope Java SDK 的语音识别模型实现。使用 `spring-ai-alibaba-starter-dashscope-sdk` 并配置 `spring.ai.model.audio.transcription=dashscope-sdk` 即可启用。
+基于 DashScope Java SDK 的语音识别模型实现。使用 `agentic-spring-ai-starter-dashscope-sdk` 并配置 `spring.ai.model.audio.transcription=dashscope-sdk` 即可启用。
 
 #### DashScopeImageModel
 
@@ -173,8 +173,8 @@ MCP 提供了一个标准化协议，用于管理和路由 AI 模型上下文。
 **MCP SDK 版本**: 2.0.0
 
 **可用的 Starter：**
-- `spring-ai-alibaba-starter-mcp-registry`
-- `spring-ai-alibaba-starter-mcp-router`
+- `agentic-spring-ai-starter-mcp-registry`
+- `agentic-spring-ai-starter-mcp-router`
 
 ### 工具回调
 
@@ -259,9 +259,9 @@ MCP 提供了一个标准化协议，用于管理和路由 AI 模型上下文。
 - **Mem0**: 具有智能摘要和检索功能的高级长期记忆
 
 可用的 Starter：
-- `spring-ai-alibaba-starter-model-chat-memory`（短期记忆）
-- `spring-ai-alibaba-starter-model-chat-memory-long`（长期记忆）
-- 单独的存储后端 Starter（如 `spring-ai-alibaba-starter-model-chat-memory-repository-redis`）
+- `agentic-spring-ai-starter-model-chat-memory`（短期记忆）
+- `agentic-spring-ai-starter-model-chat-memory-long`（长期记忆）
+- 单独的存储后端 Starter（如 `agentic-spring-ai-starter-model-chat-memory-repository-redis`）
 
 ### 检索增强生成 (RAG)
 
@@ -273,8 +273,8 @@ MCP 提供了一个标准化协议，用于管理和路由 AI 模型上下文。
 可用的 Starter：
 ```xml
 <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter-rag</artifactId>
+    <groupId>io.github.agentic.spring.ai</groupId>
+    <artifactId>agentic-spring-ai-starter-rag</artifactId>
 </dependency>
 ```
 
@@ -291,8 +291,8 @@ MCP 提供了一个标准化协议，用于管理和路由 AI 模型上下文。
 **Starter：**
 ```xml
 <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter-nacos-prompt</artifactId>
+    <groupId>io.github.agentic.spring.ai</groupId>
+    <artifactId>agentic-spring-ai-starter-nacos-prompt</artifactId>
 </dependency>
 ```
 
@@ -368,8 +368,8 @@ ARMS（应用实时监控服务）集成，提供全面的 AI 应用可观测性
 **Starter：**
 ```xml
 <dependency>
-    <groupId>com.alibaba.cloud.ai</groupId>
-    <artifactId>spring-ai-alibaba-starter-arms-observation</artifactId>
+    <groupId>io.github.agentic.spring.ai</groupId>
+    <artifactId>agentic-spring-ai-starter-arms-observation</artifactId>
 </dependency>
 ```
 
@@ -383,6 +383,6 @@ ARMS（应用实时监控服务）集成，提供全面的 AI 应用可观测性
 
 ## 社区与支持
 
-- Spring AI Alibaba Agent 框架: [https://github.com/alibaba/spring-ai-alibaba](https://github.com/alibaba/spring-ai-alibaba)
+- Spring AI Alibaba Agent 框架: [https://github.com/alibaba/agentic-spring-ai](https://github.com/alibaba/agentic-spring-ai)
 - 文档: [https://java2ai.com](https://java2ai.com)
-- 示例: [Spring AI Alibaba 示例](https://github.com/springaialibaba/spring-ai-alibaba-examples)
+- 示例: [Spring AI Alibaba 示例](https://github.com/springaialibaba/agentic-spring-ai-examples)

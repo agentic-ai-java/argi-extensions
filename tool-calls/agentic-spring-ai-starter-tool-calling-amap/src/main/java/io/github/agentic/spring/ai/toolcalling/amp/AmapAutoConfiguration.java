@@ -1,0 +1,55 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.spring.ai.toolcalling.amp;
+
+import io.github.agentic.spring.ai.toolcalling.common.JsonParseTool;
+import io.github.agentic.spring.ai.toolcalling.common.WebClientTool;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Description;
+
+/**
+ * @author YunLong
+ */
+@Configuration
+@EnableConfigurationProperties(AmapProperties.class)
+@ConditionalOnProperty(prefix = AmapConstants.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = true)
+public class AmapAutoConfiguration {
+
+	@Bean(name = AmapConstants.TOOL_NAME)
+	@ConditionalOnMissingBean
+	@Description("Get weather information according to address from Amap.")
+	public WeatherSearchService gaoDeGetAddressWeather(JsonParseTool jsonParseTool, AmapProperties amapProperties) {
+		return new WeatherSearchService(jsonParseTool, amapProperties,
+				WebClientTool.builder(jsonParseTool, amapProperties).build());
+	}
+
+	@Bean(name = "gaoDeGetAddressWeatherToolCallback")
+	@ConditionalOnMissingBean(name = "gaoDeGetAddressWeatherToolCallback")
+	public ToolCallback gaoDeGetAddressWeatherToolCallback(WeatherSearchService gaoDeGetAddressWeather) {
+		return FunctionToolCallback.builder(AmapConstants.TOOL_NAME, gaoDeGetAddressWeather)
+			.description("Get weather information according to address from Amap.")
+			.inputType(WeatherSearchService.Request.class)
+			.build();
+	}
+
+}

@@ -1,0 +1,192 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.spring.ai.toolcalling.tavily;
+
+import io.github.agentic.spring.ai.toolcalling.common.JsonParseTool;
+import io.github.agentic.spring.ai.toolcalling.common.WebClientTool;
+import io.github.agentic.spring.ai.toolcalling.common.interfaces.SearchService;
+import io.github.agentic.spring.ai.toolcalling.tavily.TavilySearchService.Response.ImageInfo;
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
+
+/**
+ * TavilySearch Service
+ *
+ * @author Allen Hu
+ */
+public class TavilySearchService
+		implements SearchService, Function<TavilySearchService.Request, TavilySearchService.Response> {
+
+	private static final Logger logger = LoggerFactory.getLogger(TavilySearchService.class);
+
+	private final JsonParseTool jsonParseTool;
+
+	private final WebClientTool webClientTool;
+
+	public TavilySearchService(JsonParseTool jsonParseTool, WebClientTool webClientTool) {
+		this.jsonParseTool = jsonParseTool;
+		this.webClientTool = webClientTool;
+	}
+
+	@Override
+	public SearchService.Response query(String query) {
+		return this.apply(Request.simpleQuery(query));
+	}
+
+	@Override
+	public TavilySearchService.Response apply(TavilySearchService.Request request) {
+		if (request == null || !StringUtils.hasText(request.query())) {
+			return Response.errorResponse(request != null ? request.query : "", "query is empty");
+		}
+
+		try {
+			String responseData = Objects.requireNonNull(webClientTool.post("search", request).block(),
+					"Tavily response must not be null");
+			return jsonParseTool.jsonToObject(responseData, new TypeReference<Response>() {
+			});
+		}
+		catch (Exception ex) {
+			logger.error("tavily search error: {}", ex.getMessage());
+			String errorMessage = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
+			return Response.errorResponse(request.query, errorMessage);
+		}
+	}
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@JsonClassDescription("This is the parameter entity class for TavilySearchService; values must be strictly populated according to field requirements.")
+	public record Request(
+			@JsonProperty(value = "query",
+					required = true) @JsonPropertyDescription("The search query to execute with Tavily.") String query,
+			@JsonProperty(value = "topic",
+					defaultValue = "general") @JsonPropertyDescription("The category of the search.news is useful for retrieving real-time updates, particularly about politics, sports, and major current events covered by mainstream media sources. general is for broader, more general-purpose searches that may include a wide range of sources.\n"
+							+ "Available options: general, news ") @Nullable String topic,
+			@JsonProperty(value = "search_depth",
+					defaultValue = "basic") @JsonPropertyDescription("The depth of the search. advanced search is tailored to retrieve the most relevant sources and content snippets for your query, while basic search provides generic content snippets from each source. A basic search costs 1 API Credit, while an advanced search costs 2 API Credits.\n"
+							+ "Available options: basic, advanced") @Nullable String searchDepth,
+			@JsonProperty(value = "chunks_per_source",
+					defaultValue = "3") @JsonPropertyDescription("Chunks are short content snippets (maximum 500 characters each) pulled directly from the source. Use chunks_per_source to define the maximum number of relevant chunks returned per source and to control the content length. Chunks will appear in the content field as: <chunk 1> [...] <chunk 2> [...] <chunk 3>. Available only when search_depth is advanced.\n"
+							+ "Required range: 1 <= x <= 3") @Nullable Integer chunksPerSource,
+			@JsonProperty(value = "max_results",
+					defaultValue = "5") @JsonPropertyDescription("The maximum number of search results to return.\n"
+							+ "Required range: 0 <= x <= 20") @Nullable Integer maxResults,
+			@JsonProperty(value = "time_range",
+					defaultValue = "year") @JsonPropertyDescription("The time range back from the current date to filter results. Useful when looking for sources that have published data.\n"
+							+ "Available options: day," + "week, " + "month, " + "year, " + "d, " + "w, " + "m, "
+							+ "y ") @Nullable String timeRange,
+			@JsonProperty(value = "days",
+					defaultValue = "7") @JsonPropertyDescription("Number of days back from the current date to include. Available only if topic is news.\n"
+							+ "Required range: x >= 1") @Nullable Integer days,
+			@JsonProperty(value = "include_answer",
+					defaultValue = "false") @JsonPropertyDescription("Include an LLM-generated answer to the provided query. basic or true returns a quick answer. advanced returns a more detailed answer.") @Nullable Boolean includeAnswer,
+			@JsonProperty(value = "include_raw_content",
+					defaultValue = "false") @JsonPropertyDescription("Include the cleaned and parsed HTML content of each search result.") @Nullable Boolean includeRawContent,
+			@JsonProperty(value = "include_images",
+					defaultValue = "false") @JsonPropertyDescription("Also perform an image search and include the results in the response.") @Nullable Boolean includeImages,
+			@JsonProperty(value = "include_image_descriptions",
+					defaultValue = "false") @JsonPropertyDescription("When include_images is true, also add a descriptive text for each image.") @Nullable Boolean includeImageDescriptions,
+			@JsonProperty(value = "include_domains",
+					defaultValue = "[]") @JsonPropertyDescription("A list of domains to specifically include in the search results.") @Nullable List<String> includeDomains,
+			@JsonProperty(value = "exclude_domains",
+					defaultValue = "[]") @JsonPropertyDescription("A list of domains to specifically exclude from the search results.") @Nullable List<String> excludeDomains,
+			@JsonProperty(value = "include_favicon",
+					defaultValue = "true") @JsonPropertyDescription("the icon of search results.") boolean includeIcon)
+			implements
+				Serializable,
+				SearchService.Request {
+
+		public static Request simpleQuery(String query) {
+			return new Request(query, null, null, null, null, null, null, null, null, null, null, null, null, true);
+		}
+
+		@Override
+		public String getQuery() {
+			return this.query();
+		}
+	}
+
+	@JsonIgnoreProperties(ignoreUnknown = true)
+	public record Response(@JsonProperty("query") String query, @JsonProperty("answer") @Nullable String answer,
+			@JsonProperty("images") @Nullable List<ImageInfo> images,
+			@JsonProperty("results") @Nullable List<ResultInfo> results,
+			@JsonProperty("response_time") @Nullable String responseTime) implements SearchService.Response {
+		@JsonIgnoreProperties(ignoreUnknown = true)
+		@JsonDeserialize(using = ImageInfoDeserializer.class)
+		public record ImageInfo(@JsonProperty("url") @Nullable String url,
+				@JsonProperty("description") @Nullable String description) {
+		}
+
+		@JsonIgnoreProperties(ignoreUnknown = true)
+		public record ResultInfo(@JsonProperty("title") @Nullable String title,
+				@JsonProperty("url") @Nullable String url, @JsonProperty("content") @Nullable String content,
+				@JsonProperty("score") @Nullable String score, @JsonProperty("raw_content") @Nullable String raw_content,
+				@JsonProperty("favicon") @Nullable String icon) {
+		}
+
+		public static Response errorResponse(String query, String errorMsg) {
+			return new Response(query, errorMsg, null, null, null);
+		}
+
+		@Override
+		public SearchResult getSearchResult() {
+			if (this.results() == null) {
+				return new SearchResult(List.of());
+			}
+			return new SearchResult(this.results()
+				.stream()
+				.map(item -> new SearchService.SearchContent(item.title(), item.content(), item.url(), item.icon()))
+				.toList());
+		}
+	}
+
+}
+
+class ImageInfoDeserializer extends ValueDeserializer<ImageInfo> {
+
+	@Override
+	public TavilySearchService.Response.@Nullable ImageInfo deserialize(JsonParser p, DeserializationContext ctxt) {
+		JsonNode node = ctxt.readTree(p);
+
+		if (node.isString()) {
+			return new TavilySearchService.Response.ImageInfo(node.asString(), null);
+		}
+		else if (node.isObject()) {
+			String url = node.has("url") ? node.get("url").asString() : null;
+			String description = node.has("description") ? node.get("description").asString() : null;
+			return new TavilySearchService.Response.ImageInfo(url, description);
+		}
+
+		return null;
+	}
+
+}

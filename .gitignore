@@ -36,14 +36,14 @@ target/
 **/node_modules
 
 # Generated Files
-spring-ai-alibaba-examples/playground-flight-booking/frontend/generated/
-spring-ai-alibaba-examples/playground-flight-booking/src/main/bundles/
-/spring-ai-alibaba-examples/playground-flight-booking-example/
-**/spring-ai-alibaba-jmanus/extensions/*
+agentic-spring-ai-examples/playground-flight-booking/frontend/generated/
+agentic-spring-ai-examples/playground-flight-booking/src/main/bundles/
+/agentic-spring-ai-examples/playground-flight-booking-example/
+**/agentic-spring-ai-jmanus/extensions/*
 **/venv/*
-**/spring-ai-alibaba-jmanus/h2-data/*
+**/agentic-spring-ai-jmanus/h2-data/*
 **/playwright/*
-spring-ai-alibaba-jmanus/ui-vue3/pnpm-lock.yaml
+agentic-spring-ai-jmanus/ui-vue3/pnpm-lock.yaml
 
 
 # windows os
@@ -67,14 +67,14 @@ modified_mcp_config.json
 .idea/LocalCodeIndex/
 
 
-/spring-ai-alibaba-studio/spring-ai-alibaba-studio-server/docker/middleware/elasticsearch/*
-!/spring-ai-alibaba-studio/spring-ai-alibaba-studio-server/docker/middleware/elasticsearch/data/
-!/spring-ai-alibaba-studio/spring-ai-alibaba-studio-server/docker/middleware/elasticsearch/data/.gitkeep
+/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/elasticsearch/*
+!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/elasticsearch/data/
+!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/elasticsearch/data/.gitkeep
 
-/spring-ai-alibaba-studio/spring-ai-alibaba-studio-server/docker/middleware/kibana/*
-!/spring-ai-alibaba-studio/spring-ai-alibaba-studio-server/docker/middleware/kibana/data/
-!/spring-ai-alibaba-studio/spring-ai-alibaba-studio-server/docker/middleware/kibana/data/.gitkeep
-/spring-ai-alibaba-studio/ui/
+/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/kibana/*
+!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/kibana/data/
+!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/kibana/data/.gitkeep
+/agentic-spring-ai-studio/ui/
 
 .claude
 

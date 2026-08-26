@@ -1,0 +1,5 @@
+io.github.agentic.spring.ai.autoconfigure.dashscope.sdk.DashScopeSdkChatAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.sdk.DashScopeSdkImageAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.sdk.DashScopeSdkEmbeddingAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.sdk.DashScopeSdkAudioSpeechAutoConfiguration
+io.github.agentic.spring.ai.autoconfigure.dashscope.sdk.DashScopeSdkAudioTranscriptionAutoConfiguration
