@@ -327,7 +327,6 @@ MCP 提供了一个标准化协议，用于管理和路由 AI 模型上下文。
 - 语雀
 - 飞书
 - Obsidian
-- OneNote
 - GitBook
 
 **代码仓库：**

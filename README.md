@@ -327,7 +327,6 @@ Specialized document readers for various data sources and platforms:
 - Yuque (语雀)
 - LarkSuite (飞书)
 - Obsidian
-- OneNote
 - GitBook
 
 **Code Repositories:**

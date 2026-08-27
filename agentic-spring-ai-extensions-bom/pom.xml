@@ -123,12 +123,6 @@
 
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-starter-tool-calling-toolsearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-starter-mcp-registry</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -490,12 +484,6 @@
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-starter-tool-calling-tavilysearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-starter-tool-calling-searches</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -891,12 +879,6 @@
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-starter-document-reader-obsidian</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-starter-document-reader-onenote</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
