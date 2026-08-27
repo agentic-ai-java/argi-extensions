@@ -1,31 +1,40 @@
-# Alibaba Extensions for Spring AI
+# [Agentic Spring AI Extensions](https://agentic-spring-ai.github.io/website/en/)
 
-This project builds upon Spring AI, providing extended implementations of core concepts such as `ChatModel`, `ImageModel`, `AudioModel`, `MCP`, `DocumentParser`, `ChatMemory`, `ToolCallback`, `VectorStore`, etc. It helps developers quickly integrate with Alibaba Cloud Bailian model services, vector database services, chat memory components, tool calling, and other features.
+[English](README.md) | [简体中文](README-zh.md)
 
-Based on these components, developers can use Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/), or [Spring AI Alibaba Agent Framework](https://github.com/agentic-spring-ai/agentic-spring-ai) to quickly build their own AI agent applications. Please choose according to your specific use case.
+[![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-2.1.0--dev-blue)](https://github.com/agentic-spring-ai/agentic-spring-ai-extensions)
 
-**English** | [📖 中文版](README-zh.md)
+Agentic Spring AI Extensions provides Spring AI integrations for models, MCP, tool calling, vector stores, chat memory, RAG, document processing, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai) framework.
 
-## Get Started
+## Features
 
-### Prerequsites
+- **Models**: DashScope chat, image, embedding, speech, and transcription implementations.
+- **MCP**: registry, router, distributed service, and gateway modules.
+- **Tool calling**: integrations for search, translation, maps, storage, collaboration, and other services.
+- **Data and memory**: vector stores and chat memory repositories for common databases and cloud services.
+- **RAG and documents**: reusable RAG components, document parsers, and document readers.
+- **Operations**: Nacos prompt management and ARMS observation integration.
 
-1. Requires JDK 17+.
-2. If there are any `spring-ai` dependency issue, please lean how to configure the `spring-milestones` Maven repository on [FAQ page](https://java2ai.com/docs/1.0.0.2/faq).
-3. The current release uses `spring-ai-extensions-bom` `2.0.0.0-RC1`, Spring AI `2.0.0`, and Spring Boot `4.1.0`.
+## Getting Started
 
-### Use `ChatClient` to Develop a Chatbot
+Requirements: JDK 17 or later and Maven 3.9.1 or later. The commands below install the current development version.
 
-#### Add Dependencies
-To quickly get started with Spring AI Alibaba, add 'agentic-spring-ai-starter-dashscope' dependency to your java project.
+```shell
+git clone --depth=1 https://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git
+cd agentic-spring-ai-extensions
+mvn -DskipTests install
+```
+
+Import the BOM and add the extensions you need:
 
 ```xml
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.github.agentic.spring.ai</groupId>
-      <artifactId>spring-ai-extensions-bom</artifactId>
-      <version>2.0.0.0-RC1</version>
+      <groupId>io.github.agentic-spring-ai</groupId>
+      <artifactId>agentic-spring-ai-extensions-bom</artifactId>
+      <version>2.1.0-dev</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -34,354 +43,36 @@ To quickly get started with Spring AI Alibaba, add 'agentic-spring-ai-starter-da
 
 <dependencies>
   <dependency>
-    <groupId>io.github.agentic.spring.ai</groupId>
+    <groupId>io.github.agentic-spring-ai</groupId>
     <artifactId>agentic-spring-ai-starter-dashscope</artifactId>
   </dependency>
 </dependencies>
 ```
 
-To use DashScope Java SDK based chat model implementation, use the SDK starter instead:
-
-```xml
-<dependency>
-  <groupId>io.github.agentic.spring.ai</groupId>
-  <artifactId>agentic-spring-ai-starter-dashscope-sdk</artifactId>
-</dependency>
-```
-
-And set `spring.ai.model.chat=dashscope-sdk`.
-
-#### Declare ChatClient
-Decare a `ChatClient` instance that would have `DashScopeChatModel` automatically injected.
-
-```java
-@RestController
-@RequestMapping("/helloworld")
-public class HelloworldController {
-  private static final String DEFAULT_PROMPT = "你是一个博学的智能聊天助手，请根据用户提问回答！";
-  private final ChatClient dashScopeChatClient;
-
-  public HelloworldController(ChatClient.Builder chatClientBuilder) {
-    this.dashScopeChatClient = chatClientBuilder
-        .defaultSystem(DEFAULT_PROMPT)
-        .defaultAdvisors(
-            new SimpleLoggerAdvisor()
-        )
-        .defaultOptions(
-            DashScopeChatOptions.builder()
-                .topP(0.7)
-                .build()
-        )
-        .build();
-  }
-
-  @GetMapping("/simple/chat")
-  public String simpleChat(@RequestParam(value = "query") String query) {
-    return dashScopeChatClient.prompt(query).call().content();
-  }
-}
-```
-
-Please check [Quick Start](https://java2ai.com/docs/1.0.0.2/get-started/chatbot) on our official website to learn more details.
-
-### Use Agent Framework to Develop an Agent
-
-// TBD
-
-## Playground and Example
-
-The community has developed a [Playground](https://github.com/springaialibaba/agentic-spring-ai-examples/tree/main/agentic-spring-ai-playground) agent that includes a complete front-end UI and back-end implementation. The Playground back-end is developed using Spring AI Alibaba and gives users a quick overview of all core framework capabilities such as chatbot, multi-round conversations, image generation, multi-modality, tool calling, MCP, and RAG.
-
-<p align="center">
-    <img src="./docs/imgs/playground.png" alt="PlayGround" style="max-width: 949px; height: 537px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);" />
-</p>
-
-You can [deploy the Playground example locally](https://github.com/springaialibaba/agentic-spring-ai-examples) and access the experience through your browser, or copy the source code and tweak it to your own business needs to build your own set of AI apps more quickly.
-For more examples, please refer to our official example repository: [https://github.com/springaialibaba/agentic-spring-ai-examples](https://github.com/springaialibaba/agentic-spring-ai-examples)
-
-## Available Extensions
-
-* Model
-* MCP
-* ToolCallback
-* VectorStore
-* ChatMemory
-* RAG
-* DocumentParser & DocumentReader
-* Prompt Management
-* Observation
-
-### Models
-
-Spring AI Alibaba provides comprehensive model implementations through DashScope (Alibaba Cloud's AI model service platform):
-
-#### DashScopeChatModel
-
-The DashScope Chat Model provides access to Bailian(百炼) -- Alibaba Cloud's large language model service， which supports Qwen series, Deepseek series models.
-
-DashScopeChatModel supports:
-- Multi-turn conversations
-- Function calling / Tool use
-- Streaming responses
-- Structured output
-
-#### DashScopeSdkChatModel
-
-DashScope SDK based chat model implementation. Configure with `agentic-spring-ai-starter-dashscope-sdk` and `spring.ai.model.chat=dashscope-sdk`.
-
-#### DashScopeSdkImageModel
-
-DashScope SDK based image model implementation. Configure with `agentic-spring-ai-starter-dashscope-sdk` and `spring.ai.model.image=dashscope-sdk`.
-
-#### DashScopeSdkEmbeddingModel
-
-DashScope SDK based embedding model implementation. Configure with `agentic-spring-ai-starter-dashscope-sdk` and `spring.ai.model.embedding=dashscope-sdk`.
-
-#### DashScopeSdkAudioSpeechModel
-
-DashScope SDK based text-to-speech model implementation. Configure with `agentic-spring-ai-starter-dashscope-sdk` and `spring.ai.model.audio.speech=dashscope-sdk`.
-
-#### DashScopeSdkAudioTranscriptionModel
-
-DashScope SDK based audio transcription model implementation. Configure with `agentic-spring-ai-starter-dashscope-sdk` and `spring.ai.model.audio.transcription=dashscope-sdk`.
-
-#### DashScopeImageModel
-
-Image generation capabilities powered by DashScope, supporting text-to-image generation with various styles and parameters.
-
-#### DashScopeEmbeddingModel
-
-Text embedding model for converting text into vector representations, essential for RAG (Retrieval Augmented Generation) applications and semantic search.
-
-#### DashScopeAudioSpeechModel
-
-Text-to-speech synthesis model that converts text into natural-sounding audio with support for multiple voices and languages.
-
-#### DashScopeAudioTranscriptionModel
-
-Speech-to-text transcription model that converts audio into text with high accuracy.
-
-### MCP (Model Context Protocol)
-
-MCP provides a standardized protocol for managing and routing AI model contexts. This extension includes:
-
-- **MCP Common**: Core abstractions and utilities for Model Context Protocol
-- **MCP Gateway**: Unified MCP service gateway with multi-protocol and OAuth authentication support
-- **MCP Registry**: Service registry for discovering and managing MCP services
-- **MCP Router**: Intelligent routing capabilities for distributing requests across multiple model contexts
-
-**MCP SDK Version**: 2.0.0
-
-**Available Starters:**
-- `agentic-spring-ai-starter-mcp-registry`
-- `agentic-spring-ai-starter-mcp-router`
-
-### ToolCallback
-
-Extensive collection of pre-built tool integrations that enable AI models to interact with external services and APIs. The framework includes 40+ ready-to-use tools:
-
-**Search & Information:**
-- Baidu Search, Brave Search, DuckDuckGo, Metaso Search, Tavily Search, SerpAPI
-- Wikipedia, Google Scholar, OpenAlex
-- Aliyun AI Search
-
-**Translation Services:**
-- Alibaba Translate, Baidu Translate, Google Translate, Microsoft Translate, Youdao Translate
-
-**Map & Location:**
-- Amap (高德地图), Baidu Map, Tencent Map, OpenTripMap, TripAdvisor
-
-**News & Media:**
-- Sina News, Toutiao News
-
-**Collaboration Tools:**
-- DingTalk, Lark Suite (飞书)
-- GitHub Toolkit, GitLab
-- Yuque (语雀), Notion
-
-**Web Scraping:**
-- Firecrawl, Jina Crawler
-
-**Data & Storage:**
-- Memcached, Minio
-- MongoDB, MySQL, Elasticsearch, SQLite
-
-**Academic & Research:**
-- Arxiv, Google Scholar, OpenAlex, Semantic Scholar
-
-**Finance & Data:**
-- Tushare (financial data)
-- World Bank Data
-
-**Utilities:**
-- Time, Weather, Kuaidi100 (logistics tracking)
-- JSON Processor, Regex
-- Sensitive Filter
-
-**Trend Analysis:**
-- Google Trends
-
-**Specialized:**
-- Ollama Search Model
-- Bilibili (video platform)
-
-Each tool comes with auto-configuration support and can be easily enabled via properties configuration.
-
-### VectorStore
-
-Vector database integrations for building RAG applications and semantic search capabilities:
-
-- **AnalyticDB Store**: Alibaba Cloud AnalyticDB vector storage
-- **OceanBase Store**: OceanBase distributed database with vector support
-- **OpenSearch Store**: Alibaba Cloud OpenSearch vector search
-- **TableStore Store**: Alibaba Cloud TableStore for vector data
-- **Tair Store**: Alibaba Cloud Tair (Redis-compatible) vector storage
-
-All vector stores provide consistent APIs for:
-- Embedding storage and retrieval
-- Similarity search
-- Metadata filtering
-- Batch operations
-
-### ChatMemory
-
-Multiple storage backends for managing conversation history and long-term memory:
-
-**Short-term Memory:**
-- **Redis**: High-performance in-memory storage
-- **Memcached**: Distributed memory caching
-- **JDBC**: Relational database storage
-- **MongoDB**: Document-based storage
-- **Elasticsearch**: Full-text search enabled memory
-- **TableStore**: Alibaba Cloud TableStore
-
-**Long-term Memory:**
-- **Mem0**: Advanced long-term memory with intelligent summarization and retrieval
-
-Available starters:
-- `agentic-spring-ai-starter-memory` (short-term memory)
-- `agentic-spring-ai-starter-memory-long` (long-term memory)
-- Individual storage backend starters (e.g., `agentic-spring-ai-starter-model-chat-memory-repository-redis`)
-
-### RAG
-
-Popular RAG architecture and a variety of reusable components:
-
-- **Hybrid Search**: Hybrid retriever using BM25 and KNN search with Reciprocal Rank Fusion (RRF). Now Support Elasticsearch.
-- **[HyDE Search](https://arxiv.org/abs/2212.10496)**: Hypothetical Document Embeddings RAG, using hypothetical document embeddings to improve retrieval recall and accuracy
-
-Available starters:
-```xml
-<dependency>
-    <groupId>io.github.agentic.spring.ai</groupId>
-    <artifactId>agentic-spring-ai-starter-rag</artifactId>
-</dependency>
-```
-
-### Prompt
-
-Dynamic prompt management and versioning capabilities:
-
-- **Nacos Prompt**: Store and manage prompts in Nacos configuration center with support for:
-  - Dynamic prompt updates without code changes
-  - Version control
-  - Environment-specific prompts
-  - Multi-tenancy support
-
-**Starter:**
-```xml
-<dependency>
-    <groupId>io.github.agentic.spring.ai</groupId>
-    <artifactId>agentic-spring-ai-starter-nacos-prompt</artifactId>
-</dependency>
-```
-
-### DocumentParser
-
-Comprehensive document parsing capabilities supporting various formats:
-
-- **Apache PDFBox**: PDF document parsing
-- **BibTeX**: Bibliography file parsing
-- **BSHtml**: HTML content parsing with BeautifulSoup-like capabilities
-- **Directory**: Batch directory parsing
-- **Markdown**: Markdown document parsing
-- **Multi-modality**: Multi-modal document parsing (text, images, etc.)
-- **PDF Tables**: Advanced PDF table extraction
-- **Tika**: Apache Tika integration for 1000+ file formats
-- **YAML**: YAML configuration file parsing
-
-### DocumentReader
-
-Specialized document readers for various data sources and platforms:
-
-**Archive & Storage:**
-- Archive files (ZIP, TAR, etc.)
-- Tencent COS (Cloud Object Storage)
-
-**Academic & Research:**
-- Arxiv papers
-- HuggingFace filesystem
-
-**Collaboration Platforms:**
-- Notion
-- Yuque (语雀)
-- LarkSuite (飞书)
-- Obsidian
-- GitBook
-
-**Code Repositories:**
-- GitHub
-- GitLab
-- GPT Repository Loader format
-
-**Media:**
-- Bilibili transcripts
-- YouTube transcripts
-
-**Databases:**
-- Elasticsearch
-- MongoDB
-- MySQL
-- SQLite
-
-**Communication:**
-- Email (IMAP, POP3)
-- Mbox format
-
-**AI Data:**
-- ChatGPT conversation data
-- POI (Point of Interest) data
-
-Each reader can extract and structure content from its respective source, making it ready for RAG pipelines and AI processing.
-
-### Observation
-
-ARMS (Application Real-Time Monitoring Service) integration for comprehensive AI application observability:
-
-- Request/response tracing
-- Performance metrics
-- Token usage tracking
-- Error monitoring
-- Cost analysis
-
-**Starter:**
-```xml
-<dependency>
-    <groupId>io.github.agentic.spring.ai</groupId>
-    <artifactId>agentic-spring-ai-starter-arms-observation</artifactId>
-</dependency>
-```
+## Modules
+
+| Area | Directory |
+| --- | --- |
+| Models | [`models`](models) |
+| MCP | [`mcp`](mcp) |
+| Tool calling | [`tool-calls`](tool-calls) |
+| Vector stores | [`vector-stores`](vector-stores) |
+| Chat memory | [`memory-repository`](memory-repository) |
+| RAG | [`rag`](rag) |
+| Document parsers and readers | [`document-parsers`](document-parsers), [`document-readers`](document-readers) |
+| Spring Boot integration | [`starters`](starters), [`auto-configurations`](auto-configurations) |
+| Prompt management and observation | [`prompt`](prompt), [`observation`](observation) |
+
+## Documentation
+
+- [Chat model integrations](https://agentic-spring-ai.github.io/website/en/integration/chatmodels/comparison)
+- [ChatClient](https://agentic-spring-ai.github.io/website/en/integration/chatclient)
+- [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
 
 ## Contributing
 
-We welcome contributions! Please see our contributing guidelines and follow the development standards outlined in each module's README.
+Issues and pull requests are welcome. Report problems and suggestions through [GitHub Issues](https://github.com/agentic-spring-ai/agentic-spring-ai-extensions/issues).
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-
-## Community & Support
-
-- Spring AI Alibaba Agent Framework: [https://github.com/agentic-spring-ai/agentic-spring-ai](https://github.com/agentic-spring-ai/agentic-spring-ai)
-- Documentation: [https://java2ai.com](https://java2ai.com)
-- Examples: [Spring AI Alibaba Examples](https://github.com/springaialibaba/agentic-spring-ai-examples)
+Agentic Spring AI Extensions is available under the [Apache License 2.0](LICENSE).
