@@ -38,7 +38,7 @@ import java.util.function.BiFunction;
  * This tool allows the agent to execute Python code snippets and get results.
  * It uses GraalVM's polyglot API to run Python code in a sandboxed environment.
  */
-public class PythonService implements BiFunction<PythonService.@Nullable Request, @Nullable ToolContext, PythonService.Response> {
+public class PythonService implements BiFunction<PythonService.Request, ToolContext, PythonService.Response> {
 
     private static final Logger log = LoggerFactory.getLogger(PythonService.class);
 

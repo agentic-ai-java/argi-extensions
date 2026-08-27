@@ -1089,6 +1089,7 @@ public class DashScopeImageProperties extends DashScopeParentProperties {
         this.requestType = requestType;
     }
 
+    @SuppressWarnings("NullAway")
     public DashScopeImageOptions toOptions() {
         return DashScopeImageOptions.builder()
                 .model(this.model)
