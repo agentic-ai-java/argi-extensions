@@ -2,7 +2,7 @@
 
 本项目基于 Spring AI 构建，提供了对核心概念的扩展实现，如 `ChatModel`、`ImageModel`、`AudioModel`、`MCP`、`DocumentParser`、`ChatMemory`、`ToolCallback`、`VectorStore` 等。帮助开发者快速集成阿里云百炼模型服务、向量数据库服务、聊天记忆组件、工具调用等功能。
 
-基于这些组件，开发者可以使用 Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/)，或 [Spring AI Alibaba Agent 框架](https://github.com/alibaba/agentic-spring-ai) 快速构建自己的 AI 智能体应用。请根据您的具体使用场景选择。
+基于这些组件，开发者可以使用 Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/)，或 [Spring AI Alibaba Agent 框架](https://github.com/agentic-spring-ai/agentic-spring-ai) 快速构建自己的 AI 智能体应用。请根据您的具体使用场景选择。
 
 [📖 English Version](README.md) | [中文版](README-zh.md)
 
@@ -383,6 +383,6 @@ ARMS（应用实时监控服务）集成，提供全面的 AI 应用可观测性
 
 ## 社区与支持
 
-- Spring AI Alibaba Agent 框架: [https://github.com/alibaba/agentic-spring-ai](https://github.com/alibaba/agentic-spring-ai)
+- Spring AI Alibaba Agent 框架: [https://github.com/agentic-spring-ai/agentic-spring-ai](https://github.com/agentic-spring-ai/agentic-spring-ai)
 - 文档: [https://java2ai.com](https://java2ai.com)
 - 示例: [Spring AI Alibaba 示例](https://github.com/springaialibaba/agentic-spring-ai-examples)

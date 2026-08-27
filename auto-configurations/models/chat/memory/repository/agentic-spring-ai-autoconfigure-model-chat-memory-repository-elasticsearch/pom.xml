@@ -26,12 +26,12 @@
     <artifactId>agentic-spring-ai-autoconfigure-model-chat-memory-repository-elasticsearch</artifactId>
     <name>Agentic Spring AI Elasticsearch Chat Memory Auto Configuration</name>
     <description>Spring AI Alibaba Elasticsearch Chat Memory Auto Configuration</description>
-    <url>https://github.com/alibaba/agentic-spring-ai</url>
+    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
 
     <scm>
-        <connection>git://github.com/alibaba/agentic-spring-ai.git</connection>
-        <developerConnection>git@github.com:alibaba/agentic-spring-ai.git</developerConnection>
-        <url>https://github.com/alibaba/agentic-spring-ai</url>
+        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
     </scm>
 
     <dependencies>

@@ -24,7 +24,7 @@
     <packaging>pom</packaging>
     <name>Agentic Spring AI Extensions</name>
     <description>Extensions of Spring AI core concepts and components.</description>
-    <url>https://github.com/agentic-for-spring-ai/agentic-spring-ai-extensions</url>
+    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
 
     <licenses>
         <license>
@@ -217,15 +217,15 @@
     </modules>
 
     <scm>
-        <connection>git://github.com/agentic-for-spring-ai/agentic-spring-ai-extensions.git</connection>
-        <developerConnection>git@github.com:agentic-for-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
-        <url>https://github.com/agentic-for-spring-ai/agentic-spring-ai-extensions</url>
+        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
     </scm>
 
     <properties>
 
         <!-- Spring AI Alibaba Version -->
-        <revision>2.0.0.0-RC1</revision>
+        <revision>2.0.0.0</revision>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
@@ -316,7 +316,7 @@
         <spring-javaformat-maven-plugin.version>0.0.39</spring-javaformat-maven-plugin.version>
         <maven-project-info-reports-plugin.version>3.4.5</maven-project-info-reports-plugin.version>
         <sorter-maven-plugin.version>1.0.1</sorter-maven-plugin.version>
-        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
         <maven.deploy.skip>false</maven.deploy.skip>
 
         <!-- CheckStyle Maven Plugin -->
@@ -330,7 +330,7 @@
         <error-prone.version>2.42.0</error-prone.version>
         <nullaway.version>0.13.4</nullaway.version>
 
-        <central.publishing.maven.version>0.7.0</central.publishing.maven.version>
+        <central.publishing.maven.version>0.11.0</central.publishing.maven.version>
     </properties>
 
     <dependencyManagement>
@@ -813,6 +813,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
                     </plugin>
                 </plugins>

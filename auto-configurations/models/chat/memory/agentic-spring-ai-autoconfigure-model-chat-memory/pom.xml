@@ -28,7 +28,7 @@
 
     <name>Agentic Spring AI Memory Autoconfiguration</name>
     <description>Spring AI Alibaba Memory Autoconfiguration</description>
-    <url>https://github.com/alibaba/agentic-spring-ai</url>
+    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
 
     <licenses>
         <license>
@@ -51,9 +51,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>git://github.com/alibaba/agentic-spring-ai.git</connection>
-        <developerConnection>git@github.com:alibaba/agentic-spring-ai.git</developerConnection>
-        <url>https://github.com/alibaba/agentic-spring-ai</url>
+        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
     </scm>
 
     <dependencies>

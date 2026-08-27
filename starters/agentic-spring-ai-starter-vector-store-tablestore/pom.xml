@@ -28,11 +28,11 @@
     <packaging>jar</packaging>
     <name>Spring Ai Alibaba Starter - Tablestore Store</name>
     <description>Spring AI Alibaba Tablestore Vector Store Starter</description>
-    <url>https://github.com/alibaba/agentic-spring-ai</url>
+    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
     <scm>
-        <connection>git://github.com/alibaba/agentic-spring-ai.git</connection>
-        <developerConnection>git@github.com:alibaba/agentic-spring-ai.git</developerConnection>
-        <url>https://github.com/alibaba/agentic-spring-ai</url>
+        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
     </scm>
 
     <dependencies>

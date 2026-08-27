@@ -2,7 +2,7 @@
 
 This project builds upon Spring AI, providing extended implementations of core concepts such as `ChatModel`, `ImageModel`, `AudioModel`, `MCP`, `DocumentParser`, `ChatMemory`, `ToolCallback`, `VectorStore`, etc. It helps developers quickly integrate with Alibaba Cloud Bailian model services, vector database services, chat memory components, tool calling, and other features.
 
-Based on these components, developers can use Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/), or [Spring AI Alibaba Agent Framework](https://github.com/alibaba/agentic-spring-ai) to quickly build their own AI agent applications. Please choose according to your specific use case.
+Based on these components, developers can use Spring AI [ChatClient](https://java2ai.com/docs/1.0.0.2/tutorials/basics/chat-client/), or [Spring AI Alibaba Agent Framework](https://github.com/agentic-spring-ai/agentic-spring-ai) to quickly build their own AI agent applications. Please choose according to your specific use case.
 
 **English** | [📖 中文版](README-zh.md)
 
@@ -383,6 +383,6 @@ This project is licensed under the Apache License 2.0 - see the LICENSE file for
 
 ## Community & Support
 
-- Spring AI Alibaba Agent Framework: [https://github.com/alibaba/agentic-spring-ai](https://github.com/alibaba/agentic-spring-ai)
+- Spring AI Alibaba Agent Framework: [https://github.com/agentic-spring-ai/agentic-spring-ai](https://github.com/agentic-spring-ai/agentic-spring-ai)
 - Documentation: [https://java2ai.com](https://java2ai.com)
 - Examples: [Spring AI Alibaba Examples](https://github.com/springaialibaba/agentic-spring-ai-examples)
