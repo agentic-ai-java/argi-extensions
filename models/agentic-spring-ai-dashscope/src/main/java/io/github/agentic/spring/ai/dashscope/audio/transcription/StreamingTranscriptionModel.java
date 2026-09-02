@@ -19,7 +19,6 @@ package io.github.agentic.spring.ai.dashscope.audio.transcription;
 import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
-import org.springframework.ai.model.StreamingModel;
 import org.springframework.core.io.Resource;
 import reactor.core.publisher.Flux;
 
@@ -41,7 +40,8 @@ import reactor.core.publisher.Flux;
  * @since 1.1.0.0
  */
 @FunctionalInterface
-public interface StreamingTranscriptionModel extends StreamingModel<AudioTranscriptionPrompt, AudioTranscriptionResponse> {
+public interface StreamingTranscriptionModel
+		extends org.springframework.ai.audio.transcription.StreamingTranscriptionModel {
 
 	default Flux<String> stream(Resource audioResource) {
 		AudioTranscriptionPrompt prompt = new AudioTranscriptionPrompt(audioResource);
@@ -55,6 +55,7 @@ public interface StreamingTranscriptionModel extends StreamingModel<AudioTranscr
 			? "" : response.getResult().getOutput());
 	}
 
+	@Override
 	Flux<AudioTranscriptionResponse> stream(AudioTranscriptionPrompt prompt);
 
 }

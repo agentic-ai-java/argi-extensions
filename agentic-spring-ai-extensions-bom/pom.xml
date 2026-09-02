@@ -65,6 +65,7 @@
 
     <properties>
         <revision>2.1.0-dev</revision>
+        <agentic-spring-ai.version>2.1.0-dev</agentic-spring-ai.version>
 
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
@@ -92,6 +93,24 @@
 
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-model</artifactId>
+                <version>${agentic-spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-graph-core</artifactId>
+                <version>${agentic-spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-agent-framework</artifactId>
+                <version>${agentic-spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-dashscope</artifactId>
                 <version>${project.version}</version>
                 <optional>true</optional>
@@ -114,6 +133,30 @@
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-starter-dashscope-sdk</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-starter-agentscope</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-starter-a2a-nacos</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-starter-config-nacos</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-sandbox</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -803,6 +846,12 @@
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-starter-document-reader-chatgpt-data</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-starter-document-reader-csdn</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

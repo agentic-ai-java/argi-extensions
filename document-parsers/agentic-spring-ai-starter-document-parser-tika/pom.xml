@@ -58,9 +58,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.agentic-spring-ai</groupId>
-            <artifactId>agentic-spring-ai-dashscope</artifactId>
-            <version>${project.parent.version}</version>
-            <optional>true</optional>
+            <artifactId>agentic-spring-ai-model</artifactId>
         </dependency>
 
         <dependency>

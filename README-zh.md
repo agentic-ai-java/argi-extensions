@@ -15,6 +15,7 @@ Agentic Spring AI Extensions 为 Spring AI 提供模型、MCP、工具调用、�
 - **数据与记忆**：提供常用数据库和云服务的向量存储与聊天记忆实现。
 - **RAG 与文档处理**：提供可复用的 RAG 组件、文档解析器和文档读取器。
 - **运行管理**：提供 Nacos 提示词管理和 ARMS 可观测性集成。
+- **厂商相关示例**：提供 DashScope 多模态、语音智能体和 AgentScope 集成示例。
 
 ## 快速开始
 
@@ -62,11 +63,13 @@ mvn -DskipTests install
 | 文档解析与读取 | [`document-parsers`](document-parsers)、[`document-readers`](document-readers) |
 | Spring Boot 集成 | [`starters`](starters)、[`auto-configurations`](auto-configurations) |
 | 提示词管理与可观测性 | [`prompt`](prompt)、[`observation`](observation) |
+| 示例 | [`examples`](examples) |
 
 ## 文档
 
 - [聊天模型集成](https://agentic-spring-ai.github.io/website/integration/chatmodels/comparison)
 - [ChatClient](https://agentic-spring-ai.github.io/website/integration/chatclient)
+- [示例项目](examples)
 - [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
 
 ## 参与贡献

@@ -277,7 +277,7 @@ class DefaultToolCallValidatorTests {
 		@DisplayName("Should filter truncated string value")
 		void shouldFilterTruncatedStringValue() {
 			// String value truncated mid-way
-			String truncatedString = "{\"message\": \"Hello, this is a very long message that gets trun";
+			String truncatedString = "{\"message\": \"Hello, this is a very long message that ends mid";
 			ToolCall truncatedToolCall = createToolCall("tc-1", "sendMessage", truncatedString);
 
 			List<ToolCall> result = validator.validate(

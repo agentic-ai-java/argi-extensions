@@ -15,6 +15,7 @@ Agentic Spring AI Extensions provides Spring AI integrations for models, MCP, to
 - **Data and memory**: vector stores and chat memory repositories for common databases and cloud services.
 - **RAG and documents**: reusable RAG components, document parsers, and document readers.
 - **Operations**: Nacos prompt management and ARMS observation integration.
+- **Provider examples**: DashScope multimodal, voice agent, and AgentScope integration examples.
 
 ## Getting Started
 
@@ -62,11 +63,13 @@ Import the BOM and add the extensions you need:
 | Document parsers and readers | [`document-parsers`](document-parsers), [`document-readers`](document-readers) |
 | Spring Boot integration | [`starters`](starters), [`auto-configurations`](auto-configurations) |
 | Prompt management and observation | [`prompt`](prompt), [`observation`](observation) |
+| Examples | [`examples`](examples) |
 
 ## Documentation
 
 - [Chat model integrations](https://agentic-spring-ai.github.io/website/en/integration/chatmodels/comparison)
 - [ChatClient](https://agentic-spring-ai.github.io/website/en/integration/chatclient)
+- [Examples](examples)
 - [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
 
 ## Contributing

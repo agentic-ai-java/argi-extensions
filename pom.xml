@@ -122,6 +122,9 @@
         <!-- spring-boot-starters modules -->
         <module>starters/agentic-spring-ai-starter-dashscope</module>
         <module>starters/agentic-spring-ai-starter-dashscope-sdk</module>
+        <module>starters/agentic-spring-ai-starter-agentscope</module>
+        <module>starters/agentic-spring-ai-starter-a2a-nacos</module>
+        <module>starters/agentic-spring-ai-starter-config-nacos</module>
         <module>starters/agentic-spring-ai-starter-model-chat-memory</module>
         <module>starters/agentic-spring-ai-starter-model-chat-memory-mem0</module>
         <module>starters/agentic-spring-ai-starter-model-chat-memory-repository-elasticsearch</module>
@@ -209,6 +212,7 @@
         <module>models/agentic-spring-ai-dashscope-sdk</module>
         <module>rag/agentic-spring-ai-rag</module>
         <module>observation/agentic-spring-ai-observation</module>
+        <module>sandbox/agentic-spring-ai-sandbox</module>
         <module>agentic-spring-ai-extensions-bom</module>
     </modules>
 
@@ -222,6 +226,7 @@
 
         <!-- Spring AI Alibaba Version -->
         <revision>2.1.0-dev</revision>
+        <agentic-spring-ai.version>2.1.0-dev</agentic-spring-ai.version>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
@@ -231,18 +236,21 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
         <!-- Spring version -->
-        <spring-ai.version>2.0.0</spring-ai.version>
-        <spring-boot.version>4.1.0</spring-boot.version>
+        <spring-ai.version>2.0.1</spring-ai.version>
+        <spring-boot.version>4.1.1</spring-boot.version>
         <springdoc-openapi.version>2.8.15</springdoc-openapi.version>
 
         <!-- MCP -->
-        <mcp.sdk.version>2.0.0</mcp.sdk.version>
+        <mcp.sdk.version>2.0.1</mcp.sdk.version>
+
+        <!-- A2A SDK -->
+        <a2a-sdk.version>0.2.5</a2a-sdk.version>
 
         <!-- DashScope SDK Version -->
-        <dashscope-sdk-java.version>2.15.1</dashscope-sdk-java.version>
+        <dashscope-sdk-java.version>2.22.31</dashscope-sdk-java.version>
 
         <!-- Nacos -->
-        <nacos3.version>3.1.0</nacos3.version>
+        <nacos3.version>3.2.4</nacos3.version>
         <nacos-client-mse-extension.version>1.0.6</nacos-client-mse-extension.version>
         <spring-alibaba-nacos-config.version>2023.0.1.3</spring-alibaba-nacos-config.version>
 
@@ -331,6 +339,54 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-model</artifactId>
+                <version>${agentic-spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-graph-core</artifactId>
+                <version>${agentic-spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-agent-framework</artifactId>
+                <version>${agentic-spring-ai.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-sandbox</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-starter-dashscope</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-starter-config-nacos</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-mcp-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-observation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${commons-lang3.version}</version>
@@ -376,6 +432,28 @@
                 <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <!-- A2A SDK Dependencies -->
+            <dependency>
+                <groupId>io.github.a2asdk</groupId>
+                <artifactId>a2a-java-reference-server</artifactId>
+                <version>${a2a-sdk.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.jboss.slf4j</groupId>
+                        <artifactId>slf4j-jboss-logmanager</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.github.a2asdk</groupId>
+                <artifactId>a2a-java-sdk-server-common</artifactId>
+                <version>${a2a-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.a2asdk</groupId>
+                <artifactId>a2a-java-sdk-client</artifactId>
+                <version>${a2a-sdk.version}</version>
             </dependency>
 
             <dependency>

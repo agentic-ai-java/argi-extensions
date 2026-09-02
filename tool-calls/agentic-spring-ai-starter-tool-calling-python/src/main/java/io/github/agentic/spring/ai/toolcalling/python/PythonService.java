@@ -150,7 +150,7 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
     /**
      * Request structure for the Python tool.
      */
-    @JsonClassDescription("Python Reuqest")
+    @JsonClassDescription("Python Request")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public record Request(
             @JsonProperty(required = true, value = "code")

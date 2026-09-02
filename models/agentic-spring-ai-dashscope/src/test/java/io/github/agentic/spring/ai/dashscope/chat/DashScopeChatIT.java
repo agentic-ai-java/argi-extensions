@@ -344,7 +344,7 @@ class DashScopeChatIT {
                 case "Beijing" -> new WeatherResponse(10.0, Unit.C);
                 case "Shanghai" -> new WeatherResponse(20.0, Unit.C);
                 case "Hangzhou" -> new WeatherResponse(30.0, Unit.C);
-                default -> throw new IllegalArgumentException("Unknow location: " + location);
+                default -> throw new IllegalArgumentException("Unknown location: " + location);
             };
         }
 

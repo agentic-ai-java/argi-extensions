@@ -1,0 +1,37 @@
+#
+# Copyright 2024-2026 the original author or authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+name: setup-core
+description: Install the Agentic Spring AI core artifacts required by extensions
+inputs:
+  ref:
+    description: Agentic Spring AI git ref
+    required: false
+    default: 10893c69a3682d691d1a58da56690ebebe88c993
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        repository: agentic-spring-ai/agentic-spring-ai
+        ref: ${{ inputs.ref }}
+        path: target/agentic-spring-ai
+    - name: Install core artifacts
+      shell: bash
+      run: |
+        target/agentic-spring-ai/mvnw -B \
+          -f target/agentic-spring-ai/pom.xml \
+          -pl :agentic-spring-ai-bom,:agentic-spring-ai-model,:agentic-spring-ai-graph-core,:agentic-spring-ai-agent-framework,:agentic-spring-ai-studio \
+          -am -DskipTests install
