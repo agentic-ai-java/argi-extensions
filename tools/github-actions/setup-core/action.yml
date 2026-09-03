@@ -19,7 +19,7 @@ inputs:
   ref:
     description: Agentic Spring AI git ref
     required: false
-    default: 57657b9afd28688ea8a47fa290131a4dec098a2e
+    default: 07190ef1e40a666c41d9f0a71e7b85998a45ed90
 runs:
   using: composite
   steps:
