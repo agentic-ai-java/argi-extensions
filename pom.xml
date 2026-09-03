@@ -69,6 +69,7 @@
 
         <!-- graph-nodes modules -->
         <module>graph-nodes/agentic-spring-ai-graph-node-rag</module>
+        <module>graph-nodes/agentic-spring-ai-graph-node-network</module>
 
         <!-- document-readers modules -->
         <module>document-readers/agentic-spring-ai-starter-document-reader-archive</module>
