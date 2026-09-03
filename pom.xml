@@ -61,6 +61,7 @@
 
         <!-- graph-persistence modules -->
         <module>graph-persistence/agentic-spring-ai-graph-persistence-jdbc</module>
+        <module>graph-persistence/agentic-spring-ai-graph-persistence-redis</module>
 
         <!-- document-readers modules -->
         <module>document-readers/agentic-spring-ai-starter-document-reader-archive</module>
