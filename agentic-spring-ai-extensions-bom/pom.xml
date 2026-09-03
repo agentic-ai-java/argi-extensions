@@ -117,6 +117,12 @@
 
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-graph-persistence-mongodb</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-graph-persistence-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
