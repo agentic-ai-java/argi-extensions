@@ -59,6 +59,7 @@ mvn -DskipTests install
 | 工具调用 | [`tool-calls`](tool-calls) |
 | 向量存储 | [`vector-stores`](vector-stores) |
 | 聊天记忆 | [`memory-repository`](memory-repository) |
+| 图节点 | [`graph-nodes`](graph-nodes) |
 | RAG | [`rag`](rag) |
 | 文档解析与读取 | [`document-parsers`](document-parsers)、[`document-readers`](document-readers) |
 | Spring Boot 集成 | [`starters`](starters)、[`auto-configurations`](auto-configurations) |

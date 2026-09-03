@@ -60,6 +60,7 @@ Import the BOM and add the extensions you need:
 | Vector stores | [`vector-stores`](vector-stores) |
 | Chat memory | [`memory-repository`](memory-repository) |
 | Graph persistence | [`graph-persistence`](graph-persistence) |
+| Graph nodes | [`graph-nodes`](graph-nodes) |
 | Code executors | [`code-executors`](code-executors) |
 | RAG | [`rag`](rag) |
 | Document parsers and readers | [`document-parsers`](document-parsers), [`document-readers`](document-readers) |
