@@ -60,7 +60,6 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-model</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
