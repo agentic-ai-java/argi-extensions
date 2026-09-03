@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.agentic.spring.ai.graph.node.code.docker.internal;
+package io.github.agentic.spring.ai.graph.node.code.docker;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
-public final class ExecutionOutputBuffer {
+final class ExecutionOutputBuffer {
 
 	static final String TRUNCATION_MARKER = "\n... output truncated ...";
 
@@ -32,14 +32,14 @@ public final class ExecutionOutputBuffer {
 
 	private final ByteArrayOutputStream captured = new ByteArrayOutputStream();
 
-	public ExecutionOutputBuffer(long maxBytes) {
+	ExecutionOutputBuffer(long maxBytes) {
 		if (maxBytes < 1) {
 			throw new IllegalArgumentException("maxOutputBytes must be greater than zero");
 		}
 		this.maxBytes = maxBytes;
 	}
 
-	public OutputStream newStream() {
+	OutputStream newStream() {
 		return new LimitedStream();
 	}
 
@@ -57,7 +57,7 @@ public final class ExecutionOutputBuffer {
 		}
 	}
 
-	public synchronized String text() {
+	synchronized String text() {
 		String value = captured.toString(StandardCharsets.UTF_8);
 		return truncated ? value + TRUNCATION_MARKER : value;
 	}
