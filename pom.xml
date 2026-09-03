@@ -67,6 +67,9 @@
         <!-- code-executors modules -->
         <module>code-executors/agentic-spring-ai-code-executor-docker</module>
 
+        <!-- graph-nodes modules -->
+        <module>graph-nodes/agentic-spring-ai-graph-node-rag</module>
+
         <!-- document-readers modules -->
         <module>document-readers/agentic-spring-ai-starter-document-reader-archive</module>
         <module>document-readers/agentic-spring-ai-starter-document-reader-arxiv</module>
