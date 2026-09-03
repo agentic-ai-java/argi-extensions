@@ -54,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class NetworkNodeCompatibilityTests {
@@ -162,6 +163,56 @@ class NetworkNodeCompatibilityTests {
 		assertEquals("field1=v1&field2=v2", server.takeRequest().getBody().readUtf8());
 	}
 
+	@ParameterizedTest(name = "{0} preserves HTTP multipart form-data bodies")
+	@MethodSource("nodeFactories")
+	void httpSendsMultipartFormDataBodies(NetworkNodeFactory factory) throws Exception {
+		MockWebServer server = server();
+		server.enqueue(new MockResponse().setBody("OK"));
+		InMemoryFileStorage.FileRecord file = InMemoryFileStorage.save("binary-payload".getBytes(StandardCharsets.UTF_8),
+				MediaType.APPLICATION_OCTET_STREAM_VALUE, "payload.bin");
+
+		factory.httpBuilder(server.url("/multipart").toString())
+			.webClient(WebClient.create(server.url("/").toString()))
+			.method(HttpMethod.POST)
+			.bodyFrom(Map.of("type", "FORM_DATA", "data",
+					List.of(Map.of("key", "description", "type", "RAW_TEXT", "value", "report ${name}"),
+							Map.of("key", "upload", "type", "file", "value", file.getId()))))
+			.allowPrivateNetworkAccess(true)
+			.build()
+			.apply(new OverAllState(Map.of("name", "Alice")));
+
+		RecordedRequest request = server.takeRequest();
+		assertTrue(request.getHeader(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE));
+		String body = request.getBody().readUtf8();
+		assertTrue(body.contains("Content-Disposition: form-data; name=\"description\""));
+		assertTrue(body.contains("report Alice"));
+		assertTrue(body.contains("Content-Disposition: form-data; name=\"upload\"; filename=\"payload.bin\""));
+		assertTrue(body.contains("Content-Type: " + MediaType.APPLICATION_OCTET_STREAM_VALUE));
+		assertTrue(body.contains("binary-payload"));
+	}
+
+	@ParameterizedTest(name = "{0} preserves HTTP standalone binary bodies")
+	@MethodSource("nodeFactories")
+	void httpSendsStandaloneBinaryBodies(NetworkNodeFactory factory) throws Exception {
+		MockWebServer server = server();
+		server.enqueue(new MockResponse().setBody("OK"));
+		byte[] payload = "standalone-binary".getBytes(StandardCharsets.UTF_8);
+
+		factory.httpBuilder(server.url("/binary").toString())
+			.webClient(WebClient.create(server.url("/").toString()))
+			.method(HttpMethod.POST)
+			.bodyFrom(Map.of("type", "BINARY", "data", List
+				.of(Map.of("fileBytes", payload, "filename", "standalone.bin", "mimeType", "application/x-agentic-test"))))
+			.allowPrivateNetworkAccess(true)
+			.build()
+			.apply(new OverAllState());
+
+		RecordedRequest request = server.takeRequest();
+		assertEquals("application/x-agentic-test", request.getHeader(HttpHeaders.CONTENT_TYPE));
+		assertNull(request.getHeader(HttpHeaders.CONTENT_DISPOSITION));
+		assertArrayEquals(payload, request.getBody().readByteArray());
+	}
+
 	@ParameterizedTest(name = "{0} preserves HTTP basic auth")
 	@MethodSource("nodeFactories")
 	void httpSendsBasicAuth(NetworkNodeFactory factory) throws Exception {
@@ -178,6 +229,23 @@ class NetworkNodeCompatibilityTests {
 
 		assertEquals("Basic " + Base64.getEncoder().encodeToString("user:pass".getBytes(StandardCharsets.UTF_8)),
 				server.takeRequest().getHeader(HttpHeaders.AUTHORIZATION));
+	}
+
+	@ParameterizedTest(name = "{0} preserves HTTP bearer auth")
+	@MethodSource("nodeFactories")
+	void httpSendsBearerAuth(NetworkNodeFactory factory) throws Exception {
+		MockWebServer server = server();
+		server.enqueue(new MockResponse().setBody("OK"));
+
+		factory.httpBuilder(server.url("/bearer").toString())
+			.webClient(WebClient.create(server.url("/").toString()))
+			.method(HttpMethod.GET)
+			.bearerAuth("token-123")
+			.allowPrivateNetworkAccess(true)
+			.build()
+			.apply(new OverAllState());
+
+		assertEquals("Bearer token-123", server.takeRequest().getHeader(HttpHeaders.AUTHORIZATION));
 	}
 
 	@ParameterizedTest(name = "{0} preserves HTTP retry behavior")
@@ -618,6 +686,12 @@ class NetworkNodeCompatibilityTests {
 		HttpBuilder basicAuth(String username, String password) throws ReflectiveOperationException {
 			Object auth = invokeStatic(nested(this.httpType, "AuthConfig"), "basic", String.class, String.class, username,
 					password);
+			invoke(this.builder, "auth", nested(this.httpType, "AuthConfig"), auth);
+			return this;
+		}
+
+		HttpBuilder bearerAuth(String token) throws ReflectiveOperationException {
+			Object auth = invokeStatic(nested(this.httpType, "AuthConfig"), "bearer", String.class, token);
 			invoke(this.builder, "auth", nested(this.httpType, "AuthConfig"), auth);
 			return this;
 		}
