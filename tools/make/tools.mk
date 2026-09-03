@@ -33,7 +33,7 @@ tools: ## Install ci tools
 	npm install markdownlint-cli --global
 
 	@echo "Installing licenses-eyes"
-	go install github.com/apache/skywalking-eyes/cmd/license-eye@v0.6.1-0.20250110091440-69f34abb75ec
+	go install github.com/apache/skywalking-eyes/cmd/license-eye@v0.9.0
 
 	@echo "Installing codespell"
 	pip install codespell
