@@ -134,7 +134,7 @@ public class OracleSaver extends AbstractJdbcCheckpointSaver {
 			   state_data JSON NOT NULL,
 			   state_content_type VARCHAR(100) NOT NULL,
 			   saved_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-			
+
 			   CONSTRAINT GRAPH_FK_THREAD
 			       FOREIGN KEY(thread_id)
 			       REFERENCES GRAPH_THREAD(thread_id)

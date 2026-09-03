@@ -129,7 +129,7 @@ public class MysqlSaver extends AbstractJdbcCheckpointSaver {
 			   next_node_id VARCHAR(255),
 			   state_data JSON NOT NULL,
 			   saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			
+
 			   CONSTRAINT GRAPH_FK_THREAD
 			       FOREIGN KEY(thread_id)
 			       REFERENCES GRAPH_THREAD(thread_id)
