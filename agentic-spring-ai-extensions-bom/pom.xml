@@ -111,6 +111,12 @@
 
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
+                <artifactId>agentic-spring-ai-code-executor-docker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-spring-ai</groupId>
                 <artifactId>agentic-spring-ai-graph-persistence-jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>

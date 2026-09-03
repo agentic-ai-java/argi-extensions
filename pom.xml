@@ -64,6 +64,9 @@
         <module>graph-persistence/agentic-spring-ai-graph-persistence-mongodb</module>
         <module>graph-persistence/agentic-spring-ai-graph-persistence-redis</module>
 
+        <!-- code-executors modules -->
+        <module>code-executors/agentic-spring-ai-code-executor-docker</module>
+
         <!-- document-readers modules -->
         <module>document-readers/agentic-spring-ai-starter-document-reader-archive</module>
         <module>document-readers/agentic-spring-ai-starter-document-reader-arxiv</module>
