@@ -59,6 +59,8 @@ Import the BOM and add the extensions you need:
 | Tool calling | [`tool-calls`](tool-calls) |
 | Vector stores | [`vector-stores`](vector-stores) |
 | Chat memory | [`memory-repository`](memory-repository) |
+| Graph persistence | [`graph-persistence`](graph-persistence) |
+| Code executors | [`code-executors`](code-executors) |
 | RAG | [`rag`](rag) |
 | Document parsers and readers | [`document-parsers`](document-parsers), [`document-readers`](document-readers) |
 | Spring Boot integration | [`starters`](starters), [`auto-configurations`](auto-configurations) |
