@@ -33,5 +33,5 @@ runs:
       run: |
         target/agentic-spring-ai/mvnw -B \
           -f target/agentic-spring-ai/pom.xml \
-          -pl :agentic-spring-ai-bom,:agentic-spring-ai-model,:agentic-spring-ai-graph-core,:agentic-spring-ai-agent-framework,:agentic-spring-ai-studio \
+          -pl :agentic-spring-ai-bom,:agentic-spring-ai-model,:agentic-spring-ai-graph-core,:agentic-spring-ai-agent-framework,:agentic-spring-ai-studio,:agentic-spring-ai-starter-builtin-nodes \
           -am -DskipTests install
