@@ -36,6 +36,10 @@
         <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
     </scm>
 
+    <properties>
+        <jdbc.persistence.oracle.enabled>false</jdbc.persistence.oracle.enabled>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.github.agentic-spring-ai</groupId>
@@ -79,5 +83,58 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-mysql</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-oracle-free</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <jdbc.persistence.oracle.enabled>${jdbc.persistence.oracle.enabled}</jdbc.persistence.oracle.enabled>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>oracle-integration</id>
+            <properties>
+                <jdbc.persistence.oracle.enabled>true</jdbc.persistence.oracle.enabled>
+            </properties>
+        </profile>
+    </profiles>
 </project>
