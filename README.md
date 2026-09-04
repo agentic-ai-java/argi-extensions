@@ -54,6 +54,7 @@ Import the BOM and add the extensions you need:
 
 | Area | Directory |
 | --- | --- |
+| Model and document contracts | [`agentic-spring-ai-extensions-model`](agentic-spring-ai-extensions-model) |
 | Models | [`models`](models) |
 | MCP | [`mcp`](mcp) |
 | Tool calling | [`tool-calls`](tool-calls) |

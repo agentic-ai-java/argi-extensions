@@ -40,44 +40,30 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class KnowledgeRetrievalNodeCompatibilityTests {
+class KnowledgeRetrievalNodeRegressionTests {
 
 	@Test
-	void publicApiMatchesCoreCompatibilityClass() {
-		PublicApiParity.assertParity(io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode.class,
-				KnowledgeRetrievalNode.class);
-	}
-
-	@Test
-	void disabledRankerRetrievesAndAugmentsPromptWithDefaultOutputKeysLikeCore() throws Exception {
+	void disabledRankerRetrievesAndAugmentsPromptWithDefaultOutputKeys() throws Exception {
 		Filter.Expression filter = filter("kind", "guide");
 		List<Document> documents = List.of(document("doc-1", "alpha"), document("doc-2", "beta"));
 
-		Invocation core = invokeCore(builder -> builder.userPrompt("query")
-			.topK(3)
-			.similarityThreshold(0.72)
-			.filterExpression(filter)
-			.enableRanker(false), new OverAllState(), documents, List.of("doc-2", "doc-1"));
 		Invocation extension = invokeExtension(builder -> builder.userPrompt("query")
 			.topK(3)
 			.similarityThreshold(0.72)
 			.filterExpression(filter)
 			.enableRanker(false), new OverAllState(), documents, List.of("doc-2", "doc-1"));
 
-		assertSearchRequestsEqual(core.vectorStore().lastSearchRequest(), extension.vectorStore().lastSearchRequest());
 		assertEquals("query", extension.vectorStore().lastSearchRequest().getQuery());
 		assertEquals(3, extension.vectorStore().lastSearchRequest().getTopK());
 		assertEquals(0.72, extension.vectorStore().lastSearchRequest().getSimilarityThreshold());
 		assertEquals(filter, extension.vectorStore().lastSearchRequest().getFilterExpression());
 		assertEquals(List.of("doc-1", "doc-2"), documentIds(extension.output(), "output"));
 		assertEquals("queryDocument: \n\nalpha\nDocument: \n\nbeta\n", extension.output().get("user_prompt"));
-		assertEquals(core.output(), extension.output());
-		assertNull(core.rerankModel().lastRequest());
 		assertNull(extension.rerankModel().lastRequest());
 	}
 
 	@Test
-	void stateKeysOverridePresetValuesAndEnabledRankerMatchesCore() throws Exception {
+	void stateKeysOverridePresetValuesAndEnableRanker() throws Exception {
 		Filter.Expression presetFilter = filter("kind", "preset");
 		Filter.Expression stateFilter = filter("kind", "state");
 		CapturingRerankOptions presetOptions = new CapturingRerankOptions("preset-rerank", 1);
@@ -91,32 +77,6 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 		stateData.put("filter_key", stateFilter);
 		stateData.put("enable_ranker_key", true);
 		stateData.put("rerank_options_key", stateOptions);
-
-		CapturingVectorStore coreStateVectorStore = new CapturingVectorStore(stateDocuments);
-		CapturingRerankModel coreStateRerankModel = new CapturingRerankModel(List.of("doc-2", "doc-1"));
-		Map<String, Object> coreStateData = new HashMap<>(stateData);
-		coreStateData.put("rerank_model_key", coreStateRerankModel);
-		coreStateData.put("vector_store_key", coreStateVectorStore);
-		io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode.Builder coreBuilder = io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode
-			.builder()
-			.vectorStore(new CapturingVectorStore(presetDocuments))
-			.rerankModel(new CapturingRerankModel(List.of("doc-1")))
-			.userPromptKey("prompt_key")
-			.userPrompt("preset query")
-			.topKKey("top_k_key")
-			.topK(7)
-			.similarityThresholdKey("similarity_key")
-			.similarityThreshold(0.91)
-			.filterExpressionKey("filter_key")
-			.filterExpression(presetFilter)
-			.enableRankerKey("enable_ranker_key")
-			.enableRanker(false)
-			.rerankModelKey("rerank_model_key")
-			.rerankOptionsKey("rerank_options_key")
-			.rerankOptions(presetOptions)
-			.vectorStoreKey("vector_store_key");
-		Invocation core = new Invocation(coreBuilder.build().apply(new OverAllState(coreStateData)), coreStateVectorStore,
-				coreStateRerankModel);
 
 		CapturingVectorStore extensionStateVectorStore = new CapturingVectorStore(stateDocuments);
 		CapturingRerankModel extensionStateRerankModel = new CapturingRerankModel(List.of("doc-2", "doc-1"));
@@ -143,22 +103,19 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 		Invocation extension = new Invocation(extensionBuilder.build().apply(new OverAllState(extensionStateData)),
 				extensionStateVectorStore, extensionStateRerankModel);
 
-		assertSearchRequestsEqual(core.vectorStore().lastSearchRequest(), extension.vectorStore().lastSearchRequest());
 		assertEquals("state query", extension.vectorStore().lastSearchRequest().getQuery());
 		assertEquals(1, extension.vectorStore().lastSearchRequest().getTopK());
 		assertEquals(0.51, extension.vectorStore().lastSearchRequest().getSimilarityThreshold());
 		assertEquals(stateFilter, extension.vectorStore().lastSearchRequest().getFilterExpression());
-		assertRerankRequestsEqual(core.rerankModel().lastRequest(), extension.rerankModel().lastRequest());
 		assertEquals("state query", extension.rerankModel().lastRequest().getQuery());
 		assertEquals(stateDocuments, extension.rerankModel().lastRequest().getInstructions());
 		assertSame(stateOptions, extension.rerankModel().lastRequest().getOptions());
 		assertEquals(List.of("doc-2", "doc-1"), documentIds(extension.output(), "output"));
 		assertEquals("state queryDocument: \n\nbeta\nDocument: \n\nalpha\n", extension.output().get("prompt_key"));
-		assertEquals(core.output(), extension.output());
 	}
 
 	@Test
-	void presetValuesWinWhenKeyFirstIsFalseAndConfiguredOutputKeysMatchCore() throws Exception {
+	void presetValuesWinWhenKeyFirstIsFalseAndConfiguredOutputKeysAreUsed() throws Exception {
 		Filter.Expression presetFilter = filter("kind", "preset");
 		Filter.Expression stateFilter = filter("kind", "state");
 		List<Document> presetDocuments = List.of(document("doc-1", "alpha"), document("doc-2", "beta"));
@@ -173,19 +130,6 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 		stateData.put("rerank_options_key", new CapturingRerankOptions("state-rerank", 1));
 		stateData.put("vector_store_key", stateVectorStore);
 
-		Invocation core = invokeCore(builder -> builder.userPromptKey("prompt_key")
-			.userPrompt("preset query")
-			.topKKey("top_k_key")
-			.topK(4)
-			.similarityThresholdKey("similarity_key")
-			.similarityThreshold(0.81)
-			.filterExpressionKey("filter_key")
-			.filterExpression(presetFilter)
-			.enableRankerKey("enable_ranker_key")
-			.enableRanker(false)
-			.vectorStoreKey("vector_store_key")
-			.outputKey("documents")
-			.isKeyFirst(false), new OverAllState(stateData), presetDocuments, List.of("doc-2", "doc-1"));
 		Invocation extension = invokeExtension(builder -> builder.userPromptKey("prompt_key")
 			.userPrompt("preset query")
 			.topKKey("top_k_key")
@@ -200,7 +144,6 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 			.outputKey("documents")
 			.isKeyFirst(false), new OverAllState(stateData), presetDocuments, List.of("doc-2", "doc-1"));
 
-		assertSearchRequestsEqual(core.vectorStore().lastSearchRequest(), extension.vectorStore().lastSearchRequest());
 		assertEquals("preset query", extension.vectorStore().lastSearchRequest().getQuery());
 		assertEquals(4, extension.vectorStore().lastSearchRequest().getTopK());
 		assertEquals(0.81, extension.vectorStore().lastSearchRequest().getSimilarityThreshold());
@@ -208,32 +151,21 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 		assertEquals(List.of("doc-1", "doc-2"), documentIds(extension.output(), "documents"));
 		assertEquals("preset queryDocument: \n\nalpha\nDocument: \n\nbeta\n", extension.output().get("prompt_key"));
 		assertFalse(extension.output().containsKey("output"));
-		assertEquals(core.output(), extension.output());
 		assertEquals(0, stateVectorStore.searchCount());
 	}
 
 	@Test
-	void missingVectorStoreFailsLikeCore() {
-		Throwable core = thrownBy(
-				() -> io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode.builder().userPrompt("query").build()
-					.apply(new OverAllState()));
+	void missingVectorStoreFails() {
 		Throwable extension = thrownBy(() -> KnowledgeRetrievalNode.builder().userPrompt("query").build()
 			.apply(new OverAllState()));
 
-		assertNotNull(core);
 		assertNotNull(extension);
-		assertEquals(core.getClass(), extension.getClass());
-		assertMessageContains(core, extension, "vectorStore");
+		assertNotNull(extension.getMessage());
+		assertTrue(extension.getMessage().contains("vectorStore"), extension.getMessage());
 	}
 
 	@Test
-	void invalidTopKFailsLikeCore() {
-		Throwable core = thrownBy(() -> io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode.builder()
-			.userPrompt("query")
-			.topK(0)
-			.vectorStore(new CapturingVectorStore(List.of(document("doc-1", "alpha"))))
-			.build()
-			.apply(new OverAllState()));
+	void invalidTopKFails() {
 		Throwable extension = thrownBy(() -> KnowledgeRetrievalNode.builder()
 			.userPrompt("query")
 			.topK(0)
@@ -241,22 +173,9 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 			.build()
 			.apply(new OverAllState()));
 
-		assertNotNull(core);
 		assertNotNull(extension);
-		assertEquals(core.getClass(), extension.getClass());
-		assertMessageContains(core, extension, "topK");
-	}
-
-	private static Invocation invokeCore(CoreBuilderConfigurer configurer, OverAllState state, List<Document> documents,
-			List<String> rerankedIds) throws Exception {
-		CapturingVectorStore vectorStore = new CapturingVectorStore(documents);
-		CapturingRerankModel rerankModel = new CapturingRerankModel(rerankedIds);
-		io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode.Builder builder = io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode
-			.builder()
-			.vectorStore(vectorStore)
-			.rerankModel(rerankModel);
-		configurer.configure(builder);
-		return new Invocation(builder.build().apply(state), vectorStore, rerankModel);
+		assertNotNull(extension.getMessage());
+		assertTrue(extension.getMessage().contains("topK"), extension.getMessage());
 	}
 
 	private static Invocation invokeExtension(ExtensionBuilderConfigurer configurer, OverAllState state,
@@ -268,30 +187,6 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 			.rerankModel(rerankModel);
 		configurer.configure(builder);
 		return new Invocation(builder.build().apply(state), vectorStore, rerankModel);
-	}
-
-	private static void assertSearchRequestsEqual(SearchRequest expected, SearchRequest actual) {
-		assertNotNull(expected);
-		assertNotNull(actual);
-		assertEquals(expected.getQuery(), actual.getQuery());
-		assertEquals(expected.getTopK(), actual.getTopK());
-		assertEquals(expected.getSimilarityThreshold(), actual.getSimilarityThreshold());
-		assertEquals(expected.getFilterExpression(), actual.getFilterExpression());
-	}
-
-	private static void assertRerankRequestsEqual(RerankRequest expected, RerankRequest actual) {
-		assertNotNull(expected);
-		assertNotNull(actual);
-		assertEquals(expected.getQuery(), actual.getQuery());
-		assertEquals(expected.getInstructions(), actual.getInstructions());
-		assertEquals(expected.getOptions(), actual.getOptions());
-	}
-
-	private static void assertMessageContains(Throwable core, Throwable extension, String fragment) {
-		assertNotNull(core.getMessage());
-		assertNotNull(extension.getMessage());
-		assertEquals(core.getMessage(), extension.getMessage());
-		assertTrue(extension.getMessage().contains(fragment), extension.getMessage());
 	}
 
 	private static Throwable thrownBy(ThrowingRunnable runnable) {
@@ -321,13 +216,6 @@ class KnowledgeRetrievalNodeCompatibilityTests {
 
 	private static DocumentWithScore scored(Document document, double score) {
 		return DocumentWithScore.builder().withDocument(document).withScore(score).build();
-	}
-
-	@FunctionalInterface
-	private interface CoreBuilderConfigurer {
-
-		void configure(io.github.agentic.spring.ai.graph.node.KnowledgeRetrievalNode.Builder builder);
-
 	}
 
 	@FunctionalInterface

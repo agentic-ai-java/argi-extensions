@@ -93,8 +93,8 @@
 
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-model</artifactId>
-                <version>${agentic-spring-ai.version}</version>
+                <artifactId>agentic-spring-ai-extensions-model</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>

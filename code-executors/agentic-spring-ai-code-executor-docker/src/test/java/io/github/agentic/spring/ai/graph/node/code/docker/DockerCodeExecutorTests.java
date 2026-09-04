@@ -67,15 +67,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Observable compatibility contract for the Core and Extensions Docker code
- * executors.
+ * Regression contract for the Extensions Docker code executor.
  */
-class DockerCodeExecutorCompatibilityTests {
+class DockerCodeExecutorTests {
 
 	private static Stream<Arguments> executors() {
-		return Stream.of(
-				Arguments.of("core", (Supplier<CodeExecutor>) io.github.agentic.spring.ai.graph.node.code.DockerCodeExecutor::new),
-				Arguments.of("extension", (Supplier<CodeExecutor>) DockerCodeExecutor::new));
+		return Stream.of(Arguments.of("extension", (Supplier<CodeExecutor>) DockerCodeExecutor::new));
 	}
 
 	private static Stream<Arguments> languageTemplates() {

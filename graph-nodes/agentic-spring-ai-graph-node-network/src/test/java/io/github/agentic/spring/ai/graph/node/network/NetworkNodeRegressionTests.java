@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class NetworkNodeCompatibilityTests {
+class NetworkNodeRegressionTests {
 
 	private final List<MockWebServer> servers = new java.util.ArrayList<>();
 
@@ -70,10 +70,7 @@ class NetworkNodeCompatibilityTests {
 	}
 
 	@Test
-	void publicApiMatchesCoreCompatibilityClasses() {
-		PublicApiParity.assertParity(io.github.agentic.spring.ai.graph.node.HttpNode.class, HttpNode.class);
-		PublicApiParity.assertParity(io.github.agentic.spring.ai.graph.node.DocumentExtractorNode.class,
-				DocumentExtractorNode.class);
+	void networkAccessPolicyRemainsPackagePrivate() {
 		assertFalse(Modifier.isPublic(NetworkAccessPolicy.class.getModifiers()));
 	}
 
@@ -565,10 +562,7 @@ class NetworkNodeCompatibilityTests {
 	}
 
 	private static Stream<NetworkNodeFactory> nodeFactories() {
-		return Stream.of(
-				new NetworkNodeFactory("Core", io.github.agentic.spring.ai.graph.node.HttpNode.class,
-						io.github.agentic.spring.ai.graph.node.DocumentExtractorNode.class),
-				new NetworkNodeFactory("Extension", HttpNode.class, DocumentExtractorNode.class));
+		return Stream.of(new NetworkNodeFactory("Extension", HttpNode.class, DocumentExtractorNode.class));
 	}
 
 	@SuppressWarnings("unchecked")

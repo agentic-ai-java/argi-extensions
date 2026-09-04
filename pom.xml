@@ -48,6 +48,8 @@
     </developers>
 
     <modules>
+        <module>agentic-spring-ai-extensions-model</module>
+
         <!-- document-parsers modules -->
         <module>document-parsers/agentic-spring-ai-starter-document-parser-apache-pdfbox</module>
         <module>document-parsers/agentic-spring-ai-starter-document-parser-bibtex</module>
@@ -353,8 +355,8 @@
         <dependencies>
             <dependency>
                 <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-model</artifactId>
-                <version>${agentic-spring-ai.version}</version>
+                <artifactId>agentic-spring-ai-extensions-model</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>

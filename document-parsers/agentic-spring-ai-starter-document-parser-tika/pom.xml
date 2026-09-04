@@ -58,7 +58,7 @@
     <dependencies>
         <dependency>
             <groupId>io.github.agentic-spring-ai</groupId>
-            <artifactId>agentic-spring-ai-model</artifactId>
+            <artifactId>agentic-spring-ai-extensions-model</artifactId>
         </dependency>
 
         <dependency>

@@ -54,6 +54,7 @@ mvn -DskipTests install
 
 | 领域 | 目录 |
 | --- | --- |
+| 模型与文档契约 | [`agentic-spring-ai-extensions-model`](agentic-spring-ai-extensions-model) |
 | 模型 | [`models`](models) |
 | MCP | [`mcp`](mcp) |
 | 工具调用 | [`tool-calls`](tool-calls) |
