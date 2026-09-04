@@ -19,7 +19,7 @@ inputs:
   ref:
     description: Agentic Spring AI git ref
     required: false
-    default: 07190ef1e40a666c41d9f0a71e7b85998a45ed90
+    default: e36b9cd175ec8de497c370ac30ae3b2ecbdd5817
 runs:
   using: composite
   steps:
@@ -33,5 +33,5 @@ runs:
       run: |
         target/agentic-spring-ai/mvnw -B \
           -f target/agentic-spring-ai/pom.xml \
-          -pl :agentic-spring-ai-bom,:agentic-spring-ai-model,:agentic-spring-ai-graph-core,:agentic-spring-ai-agent-framework,:agentic-spring-ai-studio,:agentic-spring-ai-starter-builtin-nodes \
+          -pl :agentic-spring-ai-bom,:agentic-spring-ai-graph-core,:agentic-spring-ai-agent-framework,:agentic-spring-ai-studio,:agentic-spring-ai-starter-builtin-nodes \
           -am -DskipTests install
