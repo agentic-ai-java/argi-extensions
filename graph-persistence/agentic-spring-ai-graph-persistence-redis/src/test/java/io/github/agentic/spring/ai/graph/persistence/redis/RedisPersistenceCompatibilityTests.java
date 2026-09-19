@@ -113,6 +113,53 @@ class RedisPersistenceCompatibilityTests {
 		assertRedisKeysAndSerializedContent(threadName, checkpoint);
 	}
 
+	@Test
+	void extensionRedisSaverRetainsLatestCheckpoints() throws Exception {
+		var saver = RedisSaver.builder().redisson(redisson).stateSerializer(STATE_SERIALIZER).build();
+		String threadName = "redis-retention-" + UUID.randomUUID();
+		RunnableConfig config = RunnableConfig.builder()
+			.threadId(threadName)
+			.checkpointsNumRetained(2)
+			.build();
+
+		Checkpoint checkpoint1 = checkpointWithId("cp1", 1);
+		Checkpoint checkpoint2 = checkpointWithId("cp2", 2);
+		Checkpoint checkpoint3 = checkpointWithId("cp3", 3);
+
+		saver.put(config, checkpoint1);
+		saver.put(config, checkpoint2);
+		saver.put(config, checkpoint3);
+
+		assertThat(saver.list(config)).extracting(Checkpoint::getId).containsExactly("cp3", "cp2");
+		assertThat(saver.get(RunnableConfig.builder(config).checkPointId("cp1").build())).isEmpty();
+	}
+
+	@Test
+	void extensionRedisSaverRetainsLatestCheckpointsAfterUpdate() throws Exception {
+		var saver = RedisSaver.builder().redisson(redisson).stateSerializer(STATE_SERIALIZER).build();
+		String threadName = "redis-retention-update-" + UUID.randomUUID();
+		RunnableConfig config = RunnableConfig.builder().threadId(threadName).build();
+
+		saver.put(config, checkpointWithId("cp1", 1));
+		saver.put(config, checkpointWithId("cp2", 2));
+		saver.put(config, checkpointWithId("cp3", 3));
+
+		RunnableConfig updateConfig = RunnableConfig.builder(config)
+			.checkPointId("cp2")
+			.checkpointsNumRetained(2)
+			.build();
+		Checkpoint updatedCheckpoint = checkpointWithId("cp2", 20);
+
+		saver.put(updateConfig, updatedCheckpoint);
+
+		assertThat(saver.list(config)).extracting(Checkpoint::getId).containsExactly("cp3", "cp2");
+		assertThat(saver.get(updateConfig)).hasValueSatisfying(actual -> {
+			assertThat(actual.getId()).isEqualTo("cp2");
+			assertThat(actual.getState()).containsEntry("version", 20);
+		});
+		assertThat(saver.get(RunnableConfig.builder(config).checkPointId("cp1").build())).isEmpty();
+	}
+
 	private static void assertRoundTrip(BaseCheckpointSaver writer, BaseCheckpointSaver reader, String threadName,
 			Checkpoint checkpoint) throws Exception {
 		RunnableConfig config = RunnableConfig.builder().threadId(threadName).build();
@@ -160,6 +207,15 @@ class RedisPersistenceCompatibilityTests {
 			.nodeId("node-" + writerName)
 			.nextNodeId("next")
 			.state(Map.of("writer", writerName, "dialect", "redis", "sequence", 1, "tags", List.of("compat", "redis")))
+			.build();
+	}
+
+	private static Checkpoint checkpointWithId(String id, int version) {
+		return Checkpoint.builder()
+			.id(id)
+			.nodeId("node-" + id)
+			.nextNodeId("next-" + id)
+			.state(Map.of("version", version))
 			.build();
 	}
 
