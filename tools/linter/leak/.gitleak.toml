@@ -1,5 +1,5 @@
 [[allowlists]]
 description = "Skip for unit test"
 paths = [
-    '''memories/agentic-spring-ai-starter-memory-redis/src/test/resources/ssl/key.pem''',
+    '''memory-repository/agentic-ai-model-chat-memory-repository-redis/src/test/resources/ssl/key.pem''',
 ]

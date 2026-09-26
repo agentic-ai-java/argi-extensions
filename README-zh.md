@@ -1,11 +1,11 @@
-# [Agentic Spring AI Extensions](https://agentic-spring-ai.github.io/website/)
+# [Agentic AI Extensions](https://agentic-spring-ai.github.io/website/)
 
 [English](README.md) | [简体中文](README-zh.md)
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1.0--dev-blue)](https://github.com/agentic-spring-ai/agentic-spring-ai-extensions)
 
-Agentic Spring AI Extensions 为 Spring AI 提供模型、MCP、工具调用、向量存储、聊天记忆、检索增强生成（RAG）、文档处理、提示词管理和可观测性扩展。开发者可以直接在 Spring AI 中使用这些模块，也可以配合 [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai) 框架构建智能体应用。
+Agentic AI Extensions 为 Spring AI 提供模型、MCP、工具调用、向量存储、聊天记忆、检索增强生成（RAG）、文档处理、提示词管理和可观测性扩展。开发者可以直接在 Spring AI 中使用这些模块，也可以配合 [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai) 框架构建智能体应用。
 
 ## 核心能力
 
@@ -32,8 +32,8 @@ mvn -DskipTests install
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.github.agentic-spring-ai</groupId>
-      <artifactId>agentic-spring-ai-extensions-bom</artifactId>
+      <groupId>io.github.agentic-ai</groupId>
+      <artifactId>agentic-ai-extensions-bom</artifactId>
       <version>2.1.0-dev</version>
       <type>pom</type>
       <scope>import</scope>
@@ -43,8 +43,8 @@ mvn -DskipTests install
 
 <dependencies>
   <dependency>
-    <groupId>io.github.agentic-spring-ai</groupId>
-    <artifactId>agentic-spring-ai-starter-dashscope</artifactId>
+    <groupId>io.github.agentic-ai</groupId>
+    <artifactId>agentic-ai-starter-dashscope</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -67,7 +67,7 @@ mvn -DskipTests install
 
 - [聊天模型集成](https://agentic-spring-ai.github.io/website/integration/chatmodels/comparison)
 - [ChatClient](https://agentic-spring-ai.github.io/website/integration/chatclient)
-- [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
+- [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
 
 ## 参与贡献
 

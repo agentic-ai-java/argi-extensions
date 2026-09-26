@@ -1,7 +1,7 @@
 .git
 .idea
-./agentic-spring-ai-jmanus/src/main/resources/static
-./agentic-spring-ai-jmanus/src/main/resources/static_legacy
+./agentic-ai-jmanus/src/main/resources/static
+./agentic-ai-jmanus/src/main/resources/static_legacy
 **/node_modules/**
 **/target/**
 **/build/**

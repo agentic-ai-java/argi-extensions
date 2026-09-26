@@ -1,11 +1,11 @@
-# [Agentic Spring AI Extensions](https://agentic-spring-ai.github.io/website/en/)
+# [Agentic AI Extensions](https://agentic-spring-ai.github.io/website/en/)
 
 [English](README.md) | [简体中文](README-zh.md)
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.1.0--dev-blue)](https://github.com/agentic-spring-ai/agentic-spring-ai-extensions)
 
-Agentic Spring AI Extensions provides Spring AI integrations for models, MCP, tool calling, vector stores, chat memory, RAG, document processing, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai) framework.
+Agentic AI Extensions provides Spring AI integrations for models, MCP, tool calling, vector stores, chat memory, RAG, document processing, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai) framework.
 
 ## Features
 
@@ -32,8 +32,8 @@ Import the BOM and add the extensions you need:
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.github.agentic-spring-ai</groupId>
-      <artifactId>agentic-spring-ai-extensions-bom</artifactId>
+      <groupId>io.github.agentic-ai</groupId>
+      <artifactId>agentic-ai-extensions-bom</artifactId>
       <version>2.1.0-dev</version>
       <type>pom</type>
       <scope>import</scope>
@@ -43,8 +43,8 @@ Import the BOM and add the extensions you need:
 
 <dependencies>
   <dependency>
-    <groupId>io.github.agentic-spring-ai</groupId>
-    <artifactId>agentic-spring-ai-starter-dashscope</artifactId>
+    <groupId>io.github.agentic-ai</groupId>
+    <artifactId>agentic-ai-starter-dashscope</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -67,7 +67,7 @@ Import the BOM and add the extensions you need:
 
 - [Chat model integrations](https://agentic-spring-ai.github.io/website/en/integration/chatmodels/comparison)
 - [ChatClient](https://agentic-spring-ai.github.io/website/en/integration/chatclient)
-- [Agentic Spring AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
+- [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai)
 
 ## Contributing
 
@@ -75,4 +75,4 @@ Issues and pull requests are welcome. Report problems and suggestions through [G
 
 ## License
 
-Agentic Spring AI Extensions is available under the [Apache License 2.0](LICENSE).
+Agentic AI Extensions is available under the [Apache License 2.0](LICENSE).
