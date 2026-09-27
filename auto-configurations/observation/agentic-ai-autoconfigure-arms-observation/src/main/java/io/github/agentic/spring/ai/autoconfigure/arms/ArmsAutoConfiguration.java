@@ -19,7 +19,7 @@ import io.github.agentic.spring.ai.observation.client.prompt.PromptMetadataAware
 import io.github.agentic.spring.ai.observation.model.ChatModelInputObservationHandler;
 import io.github.agentic.spring.ai.observation.model.ChatModelOutputObservationHandler;
 import io.github.agentic.spring.ai.observation.model.PromptMetadataAwareChatModelObservationConvention;
-import io.github.agentic.spring.ai.tool.ObservableToolCallingManager;
+import io.github.agentic.spring.ai.observation.tool.ObservableToolCallingManager;
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
 import org.springframework.ai.chat.model.ChatModel;

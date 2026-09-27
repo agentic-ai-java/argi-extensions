@@ -4,7 +4,7 @@
   </a>
   <h1>Agentic AI Extensions</h1>
   <p><strong>Spring AI integrations and ecosystem extensions for Java applications.</strong></p>
-  <p>Models · MCP · Tool calling · Vector stores · Chat memory · RAG · Observability</p>
+  <p>MCP · Vector stores · Chat memory · RAG · Observability</p>
   <p>
     <a href="https://agentic-spring-ai.github.io/website/en/">Documentation</a> ·
     <a href="https://agentic-spring-ai.github.io/website/en/integration/chatclient">Quick Start</a> ·
@@ -20,15 +20,13 @@
 
 ---
 
-Agentic AI Extensions provides Spring AI integrations for models, MCP, tool calling, vector stores, chat memory, RAG, document processing, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai) framework.
+Agentic AI Extensions provides Spring AI integrations for MCP, vector stores, chat memory, RAG, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai) framework.
 
 ## Features
 
-- **Models**: DashScope chat, image, embedding, speech, and transcription implementations.
 - **MCP**: registry, router, distributed service, and gateway modules.
-- **Tool calling**: integrations for search, translation, maps, storage, collaboration, and other services.
 - **Data and memory**: vector stores and chat memory repositories for common databases and cloud services.
-- **RAG and documents**: reusable RAG components, document parsers, and document readers.
+- **RAG**: reusable retrieval-augmented generation components.
 - **Operations**: Nacos prompt management and ARMS observation integration.
 
 ## Quick Start
@@ -59,7 +57,7 @@ Import the Extensions BOM and add the starters you need to your project:
 <dependencies>
   <dependency>
     <groupId>io.github.agentic-ai</groupId>
-    <artifactId>agentic-ai-starter-dashscope</artifactId>
+    <artifactId>agentic-ai-starter-mcp-registry</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -68,14 +66,10 @@ Import the Extensions BOM and add the starters you need to your project:
 
 | Module | Description |
 | --- | --- |
-| [Models](models) | DashScope chat, image, embedding, and multimodal model integrations |
 | [MCP](mcp) | Model Context Protocol registry, router, gateway, and discovery integrations |
-| [Tool Calling](tool-calls) | Starters for search, translation, map, weather, office, and developer tools |
 | [Vector Stores](vector-stores) | AnalyticDB, OceanBase, OpenSearch, TableStore, and Tair vector stores |
 | [Memory Repository](memory-repository) | Chat memory implementations for Redis, MongoDB, Elasticsearch, Memcached, TableStore, and Mem0 |
 | [RAG](rag) | Reusable retrieval-augmented generation components |
-| [Document Parsers](document-parsers) | PDF, Markdown, Tika, Office POI, YAML, BibTeX, and multimodal document parsers |
-| [Document Readers](document-readers) | Readers for GitHub, GitLab, Notion, Yuque, CSDN, Obsidian, Elasticsearch, and object storage |
 | [Starters](starters) | Spring Boot starters for convenient dependency management |
 | [Auto-Configurations](auto-configurations) | Spring Boot auto-configuration modules |
 | [Prompt](prompt) | Dynamic prompt management with Nacos integration |
@@ -84,7 +78,6 @@ Import the Extensions BOM and add the starters you need to your project:
 ## Documentation
 
 - [Overview](https://agentic-spring-ai.github.io/website/en/)
-- [Chat model integrations](https://agentic-spring-ai.github.io/website/en/integration/chatmodels/comparison)
 - [ChatClient](https://agentic-spring-ai.github.io/website/en/integration/chatclient)
 - [Agentic AI Framework](https://github.com/agentic-spring-ai/agentic-spring-ai)
 - [Examples](https://github.com/agentic-spring-ai/examples/tree/main/examples)

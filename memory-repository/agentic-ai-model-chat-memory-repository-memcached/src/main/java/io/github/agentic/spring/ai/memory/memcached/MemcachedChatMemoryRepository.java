@@ -16,8 +16,8 @@
 package io.github.agentic.spring.ai.memory.memcached;
 
 import io.github.agentic.spring.ai.memory.memcached.serializer.MessageDeserializer;
-import io.github.agentic.spring.ai.toolcalling.memcached.MemcachedService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import net.spy.memcached.MemcachedClient;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.module.SimpleModule;
 import org.slf4j.Logger;
@@ -36,7 +36,7 @@ public class MemcachedChatMemoryRepository implements ChatMemoryRepository, Auto
 
 	private static final Logger logger = LoggerFactory.getLogger(MemcachedChatMemoryRepository.class);
 
-	private final MemcachedService memcachedService;
+	private final MemcachedClient memcachedClient;
 
 	private final JsonMapper jsonMapper;
 
@@ -44,76 +44,93 @@ public class MemcachedChatMemoryRepository implements ChatMemoryRepository, Auto
 
 	private static final String DEFAULT_KEY_PREFIX = "spring_ai_alibaba_chat_memory:";
 
-	public MemcachedChatMemoryRepository(MemcachedService memcachedService) {
-		this.memcachedService = memcachedService;
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(Message.class, new MessageDeserializer());
-        this.jsonMapper = JsonMapper.builder()
-                .changeDefaultVisibility(vc -> vc.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
-                        .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
-                        .withFieldVisibility(JsonAutoDetect.Visibility.ANY))
-                .addModule(module)
-                .build();
+	public MemcachedChatMemoryRepository(MemcachedClient memcachedClient) {
+		this.memcachedClient = memcachedClient;
+		SimpleModule module = new SimpleModule();
+		module.addDeserializer(Message.class, new MessageDeserializer());
+		this.jsonMapper = JsonMapper.builder()
+				.changeDefaultVisibility(vc -> vc.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+						.withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+						.withFieldVisibility(JsonAutoDetect.Visibility.ANY))
+				.addModule(module)
+				.build();
 	}
 
 	@Override
 	public void close() {
-		this.memcachedService.close();
+		if (this.memcachedClient != null) {
+			this.memcachedClient.shutdown();
+		}
 	}
 
 	@Override
 	public List<String> findConversationIds() {
-		Object result = this.memcachedService.getter()
-			.apply(new MemcachedService.MemcachedServiceGetter.Request(DEFAULT_CONVERSATION));
-		if (result instanceof List<?> conversationIds) {
-			return conversationIds.stream().filter(String.class::isInstance).map(String.class::cast).toList();
+		try {
+			Object result = this.memcachedClient.get(DEFAULT_CONVERSATION);
+			if (result instanceof List<?> conversationIds) {
+				return conversationIds.stream().filter(String.class::isInstance).map(String.class::cast).toList();
+			}
+		}
+		catch (Exception e) {
+			logger.error("Get conversation IDs from memcached failed: {}", e.getMessage(), e);
 		}
 		return List.of();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public List<Message> findByConversationId(String conversationId) {
-		Object apply = this.memcachedService.getter()
-			.apply(new MemcachedService.MemcachedServiceGetter.Request(DEFAULT_KEY_PREFIX + conversationId));
-		if (apply != null) {
-			List<String> messageList = (List<String>) apply;
-			return messageList.stream().map(messageStr ->
-                    jsonMapper.readValue(messageStr, Message.class)).toList();
+		try {
+			Object apply = this.memcachedClient.get(DEFAULT_KEY_PREFIX + conversationId);
+			if (apply instanceof List<?> messageList) {
+				return messageList.stream()
+						.filter(String.class::isInstance)
+						.map(String.class::cast)
+						.map(messageStr -> jsonMapper.readValue(messageStr, Message.class))
+						.toList();
+			}
+		}
+		catch (Exception e) {
+			logger.error("Get messages for conversation {} failed: {}", conversationId, e.getMessage(), e);
 		}
 		return List.of();
 	}
 
 	@Override
 	public void saveAll(String conversationId, List<Message> messages) {
-		List<String> conversationIds = new ArrayList<>(findConversationIds());
-		// 保障消息顺序
-		conversationIds.remove(conversationId);
-		conversationIds.add(conversationId);
-		this.memcachedService.setter()
-			.apply(new MemcachedService.MemcachedServiceSetter.Request(DEFAULT_CONVERSATION, conversationIds, 0));
-		List<String> serializingMessage = messages.stream().map(this.jsonMapper::writeValueAsString).toList();
-		this.memcachedService.setter()
-			.apply(new MemcachedService.MemcachedServiceSetter.Request(DEFAULT_KEY_PREFIX + conversationId,
-					serializingMessage, 0));
+		try {
+			List<String> conversationIds = new ArrayList<>(findConversationIds());
+			conversationIds.remove(conversationId);
+			conversationIds.add(conversationId);
+			this.memcachedClient.set(DEFAULT_CONVERSATION, 0, conversationIds);
+			List<String> serializingMessage = messages.stream().map(this.jsonMapper::writeValueAsString).toList();
+			this.memcachedClient.set(DEFAULT_KEY_PREFIX + conversationId, 0, serializingMessage);
+		}
+		catch (Exception e) {
+			logger.error("Save messages for conversation {} failed: {}", conversationId, e.getMessage(), e);
+		}
 	}
 
 	@Override
 	public void deleteByConversationId(String conversationId) {
-		List<String> conversationIds = new ArrayList<>(findConversationIds());
-		conversationIds.remove(conversationId);
-		this.memcachedService.setter()
-			.apply(new MemcachedService.MemcachedServiceSetter.Request(DEFAULT_CONVERSATION, conversationIds, 0));
-		this.memcachedService.deleter()
-			.apply(new MemcachedService.MemcachedServiceDeleter.Request(DEFAULT_KEY_PREFIX + conversationId));
+		try {
+			List<String> conversationIds = new ArrayList<>(findConversationIds());
+			conversationIds.remove(conversationId);
+			this.memcachedClient.set(DEFAULT_CONVERSATION, 0, conversationIds);
+			this.memcachedClient.delete(DEFAULT_KEY_PREFIX + conversationId);
+		}
+		catch (Exception e) {
+			logger.error("Delete conversation {} failed: {}", conversationId, e.getMessage(), e);
+		}
 	}
 
 	public void clearOverLimit(String conversationId, int maxLimit, int deleteSize) {
-		final int finalDeleteSize = deleteSize > maxLimit ? maxLimit : deleteSize;
+		final int finalDeleteSize = Math.min(deleteSize, maxLimit);
 		List<Message> messages = findByConversationId(conversationId);
 		List<Message> lastMessages = new ArrayList<>();
 		AtomicInteger index = new AtomicInteger(0);
 		if (messages.size() >= maxLimit) {
-			messages.stream().forEach(message -> {
+			messages.forEach(message -> {
 				if (index.get() >= finalDeleteSize) {
 					lastMessages.add(message);
 				}

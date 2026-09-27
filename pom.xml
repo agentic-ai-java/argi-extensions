@@ -48,42 +48,6 @@
     </developers>
 
     <modules>
-        <!-- document-parsers modules -->
-        <module>document-parsers/agentic-ai-starter-document-parser-apache-pdfbox</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-bibtex</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-bshtml</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-directory</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-markdown</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-multi-modality</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-pdf-tables</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-tika</module>
-        <module>document-parsers/agentic-ai-starter-document-parser-yaml</module>
-
-        <!-- document-readers modules -->
-        <module>document-readers/agentic-ai-starter-document-reader-archive</module>
-        <module>document-readers/agentic-ai-starter-document-reader-arxiv</module>
-        <module>document-readers/agentic-ai-starter-document-reader-bilibili</module>
-        <module>document-readers/agentic-ai-starter-document-reader-csdn</module>
-        <module>document-readers/agentic-ai-starter-document-reader-chatgpt-data</module>
-        <module>document-readers/agentic-ai-starter-document-reader-elasticsearch</module>
-        <module>document-readers/agentic-ai-starter-document-reader-email</module>
-        <module>document-readers/agentic-ai-starter-document-reader-gitbook</module>
-        <module>document-readers/agentic-ai-starter-document-reader-github</module>
-        <module>document-readers/agentic-ai-starter-document-reader-gitlab</module>
-        <module>document-readers/agentic-ai-starter-document-reader-gpt-repo</module>
-        <module>document-readers/agentic-ai-starter-document-reader-huggingface-fs</module>
-        <module>document-readers/agentic-ai-starter-document-reader-larksuite</module>
-        <module>document-readers/agentic-ai-starter-document-reader-mbox</module>
-        <module>document-readers/agentic-ai-starter-document-reader-mongodb</module>
-        <module>document-readers/agentic-ai-starter-document-reader-mysql</module>
-        <module>document-readers/agentic-ai-starter-document-reader-notion</module>
-        <module>document-readers/agentic-ai-starter-document-reader-obsidian</module>
-        <module>document-readers/agentic-ai-starter-document-reader-poi</module>
-        <module>document-readers/agentic-ai-starter-document-reader-sqlite</module>
-        <module>document-readers/agentic-ai-starter-document-reader-tencent-cos</module>
-        <module>document-readers/agentic-ai-starter-document-reader-youtube</module>
-        <module>document-readers/agentic-ai-starter-document-reader-yuque</module>
-
         <!-- memory modules -->
         <module>memory-repository/agentic-ai-model-chat-memory-repository-elasticsearch</module>
         <module>memory-repository/agentic-ai-model-chat-memory-repository-jdbc</module>
@@ -94,16 +58,14 @@
         <module>memory-repository/agentic-ai-model-chat-memory-repository-tablestore</module>
 
         <!-- auto-configurations modules -->
-        <module>auto-configurations/models/agentic-ai-autoconfigure-dashscope</module>
-        <module>auto-configurations/models/agentic-ai-autoconfigure-dashscope-sdk</module>
-        <module>auto-configurations/models/chat/memory/agentic-ai-autoconfigure-model-chat-memory</module>
-        <module>auto-configurations/models/chat/memory/agentic-ai-autoconfigure-model-chat-memory-mem0</module>
-        <module>auto-configurations/models/chat/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-elasticsearch</module>
-        <module>auto-configurations/models/chat/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-jdbc</module>
-        <module>auto-configurations/models/chat/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-memcached</module>
-        <module>auto-configurations/models/chat/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-mongodb</module>
-        <module>auto-configurations/models/chat/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-redis</module>
-        <module>auto-configurations/models/chat/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-tablestore</module>
+        <module>auto-configurations/memory/agentic-ai-autoconfigure-model-chat-memory</module>
+        <module>auto-configurations/memory/agentic-ai-autoconfigure-model-chat-memory-mem0</module>
+        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-elasticsearch</module>
+        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-jdbc</module>
+        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-memcached</module>
+        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-mongodb</module>
+        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-redis</module>
+        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-tablestore</module>
 
         <module>auto-configurations/prompt/agentic-ai-autoconfigure-nacos-prompt</module>
         <module>auto-configurations/observation/agentic-ai-autoconfigure-arms-observation</module>
@@ -120,8 +82,6 @@
         <module>auto-configurations/vector-stores/agentic-ai-autoconfigure-vector-store-tair</module>
 
         <!-- spring-boot-starters modules -->
-        <module>starters/agentic-ai-starter-dashscope</module>
-        <module>starters/agentic-ai-starter-dashscope-sdk</module>
         <module>starters/agentic-ai-starter-model-chat-memory</module>
         <module>starters/agentic-ai-starter-model-chat-memory-mem0</module>
         <module>starters/agentic-ai-starter-model-chat-memory-repository-elasticsearch</module>
@@ -145,51 +105,6 @@
         <module>starters/agentic-ai-starter-vector-store-tablestore</module>
         <module>starters/agentic-ai-starter-vector-store-tair</module>
 
-        <!-- tool-calls modules -->
-        <module>tool-calls/agentic-ai-starter-tool-calling-alitranslate</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-aliyunaisearch</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-amap</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-baidumap</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-baidusearch</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-baidutranslate</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-bravesearch</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-common</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-dingtalk</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-duckduckgo</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-firecrawl</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-githubtoolkit</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-googlescholar</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-googletranslate</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-googletrends</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-jinacrawler</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-jsonprocessor</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-kuaidi100</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-larksuite</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-memcached</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-metaso</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-microsofttranslate</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-minio</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-ollamasearchmodel</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-openalex</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-opentripmap</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-regex</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-sensitivefilter</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-serpapi</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-sinanews</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-tavilysearch</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-tencentmap</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-time</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-toutiaonews</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-tripadvisor</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-tushare</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-weather</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-wikipedia</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-worldbankdata</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-youdaotranslate</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-yuque</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-python</module>
-        <module>tool-calls/agentic-ai-starter-tool-calling-agentbay</module>
-
         <!-- vector-stores modules -->
         <module>vector-stores/agentic-ai-analyticdb-store</module>
         <module>vector-stores/agentic-ai-oceanbase-store</module>
@@ -205,8 +120,6 @@
 
         <module>prompt/agentic-ai-prompt-nacos</module>
 
-        <module>models/agentic-ai-dashscope</module>
-        <module>models/agentic-ai-dashscope-sdk</module>
         <module>rag/agentic-ai-rag</module>
         <module>observation/agentic-ai-observation</module>
         <module>agentic-ai-extensions-bom</module>
@@ -237,9 +150,6 @@
 
         <!-- MCP -->
         <mcp.sdk.version>2.0.0</mcp.sdk.version>
-
-        <!-- DashScope SDK Version -->
-        <dashscope-sdk-java.version>2.15.1</dashscope-sdk-java.version>
 
         <!-- Nacos -->
         <nacos3.version>3.1.0</nacos3.version>
@@ -272,11 +182,6 @@
         <commons-io.version>2.21.0</commons-io.version>
 
         <commons-lang3.version>3.20.0</commons-lang3.version>
-
-        <webdrivermanager.version>6.1.0</webdrivermanager.version>
-
-        <poi.version>5.4.0</poi.version>
-        <tika.version>3.2.3</tika.version>
 
         <opentelemetry.version>1.38.0</opentelemetry.version>
 
@@ -349,21 +254,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>dashscope-sdk-java</artifactId>
-                <version>${dashscope-sdk-java.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-simple</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
@@ -382,13 +272,6 @@
                 <groupId>io.modelcontextprotocol.sdk</groupId>
                 <artifactId>mcp-bom</artifactId>
                 <version>${mcp.sdk.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.tika</groupId>
-                <artifactId>tika-bom</artifactId>
-                <version>${tika.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

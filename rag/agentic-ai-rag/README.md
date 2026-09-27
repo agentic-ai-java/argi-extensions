@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Based on the Spring AI Rag framework and integrated with Alibaba Cloud DashScope AI service, it provides out-of-the-box RAG (Retrieval-Augmented Generation) capabilities
+Based on the Spring AI RAG framework, it provides out-of-the-box RAG (Retrieval-Augmented Generation) capabilities
 
 ## Features
 
@@ -13,8 +13,6 @@ Based on the Spring AI Rag framework and integrated with Alibaba Cloud DashScope
 - **Hypothetical Document Embedding (HyDE)** : Enhances retrieval performance by generating hypothetical documents
 
 - Multiple mainstream RAG modes are supported by advisor
-
-- Built-in rerank post-retrieval processing based on the DashScope platform
 
 - Built-in pre-retrieval converter
 
@@ -237,13 +235,7 @@ public class TestController {
 
 HyDeTransformer implements `org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer` and can be used as a RAG pre-retrieval processor
 
-### 2. Post-retrieval Processing
-
-- DashScopeRerankPostProcessor: A rerank post-retrieval processor based on the DashScope platform
-
-DashScopeRerankPostProcessor implements `org.springframework.ai.rag.postretrieval.document.DocumentPostProcessor` and can be used as a RAG post-retrieval processor
-
-### 3. RAG Mode Advisors
+### 2. RAG Mode Advisors
 
 - HybridSearchAdvisor: A RAG advisor based on Hybrid Search
 ```

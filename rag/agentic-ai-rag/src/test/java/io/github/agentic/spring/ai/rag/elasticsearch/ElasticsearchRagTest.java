@@ -23,8 +23,6 @@ import java.util.Map;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
-import io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeChatAutoConfiguration;
-import io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeEmbeddingAutoConfiguration;
 import io.github.agentic.spring.ai.rag.retrieval.search.HybridElasticsearchRetriever;
 import io.github.agentic.spring.ai.rag.retrieval.search.RetrieverType;
 import jakarta.annotation.Resource;
@@ -61,13 +59,20 @@ import org.testcontainers.utility.DockerImageName;
 @ImportAutoConfiguration(classes = {
         ElasticsearchVectorStoreAutoConfiguration.class,
         ElasticsearchClientAutoConfiguration.class,
-        DashScopeChatAutoConfiguration.class,
-        ElasticsearchRestClientAutoConfiguration.class,
-        DashScopeEmbeddingAutoConfiguration.class
+        ElasticsearchRestClientAutoConfiguration.class
 })
 @SpringBootTest(classes = ElasticsearchRagTest.class)
 @Testcontainers
 public class ElasticsearchRagTest {
+
+    @org.springframework.boot.test.context.TestConfiguration
+    static class TestConfig {
+        @org.springframework.context.annotation.Bean
+        public EmbeddingModel embeddingModel() {
+            return org.mockito.Mockito.mock(EmbeddingModel.class);
+        }
+    }
+
 
     private static final Logger logger = LoggerFactory.getLogger(ElasticsearchRagTest.class);
 
@@ -94,10 +99,6 @@ public class ElasticsearchRagTest {
         // spring es properties
         String uris = "http://" + elasticsearchContainer.getHost() + ":" + elasticsearchContainer.getMappedPort(9200);
         registry.add("spring.elasticsearch.uris", () -> uris);
-        // dashscope
-        registry.add("spring.ai.dashscope.api-key", () -> System.getenv("AI_DASHSCOPE_API_KEY"));
-        registry.add("spring.ai.dashscope.chat.options.model", () -> "qwen3-235b-a22b");
-        registry.add("spring.ai.dashscope.embedding.options.model", () -> "text-embedding-v1");
     }
 
     @Resource

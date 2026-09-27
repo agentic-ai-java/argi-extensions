@@ -16,7 +16,6 @@
 
 package io.github.agentic.spring.ai.rag.advisor;
 
-import io.github.agentic.spring.ai.rag.postretrieval.DashScopeRerankPostProcessor;
 import io.github.agentic.spring.ai.rag.preretrieval.transformation.HyDeTransformer;
 import io.github.agentic.spring.ai.rag.retrieval.search.HybridDocumentRetriever;
 import org.springframework.ai.chat.client.ChatClientRequest;
@@ -66,14 +65,11 @@ public class HybridSearchAdvisor implements BaseAdvisor {
 
     private final @Nullable HyDeTransformer hyDeTransformer;
 
-    private final @Nullable DashScopeRerankPostProcessor dashScopeRerankPostProcessor;
-
     public HybridSearchAdvisor(List<QueryTransformer> queryTransformers,
                                @Nullable QueryExpander queryExpander,
                                @Nullable HybridDocumentRetriever hybridDocumentRetriever,
                                List<DocumentPostProcessor> documentPostProcessors, @Nullable QueryAugmenter queryAugmenter,
-                               @Nullable HyDeTransformer hyDeTransformer,
-                               @Nullable DashScopeRerankPostProcessor dashScopeRerankPostProcessor, Integer order) {
+                               @Nullable HyDeTransformer hyDeTransformer, Integer order) {
         Assert.notNull(hybridDocumentRetriever, "hybridDocumentRetriever must not be null");
         this.queryTransformers = queryTransformers;
         this.queryExpander = queryExpander;
@@ -81,7 +77,6 @@ public class HybridSearchAdvisor implements BaseAdvisor {
         this.documentPostProcessors = documentPostProcessors;
         this.queryAugmenter = queryAugmenter != null ? queryAugmenter : ContextualQueryAugmenter.builder().build();
         this.hyDeTransformer = hyDeTransformer;
-        this.dashScopeRerankPostProcessor = dashScopeRerankPostProcessor;
         this.order = order != null ? order : 0;
     }
 
@@ -115,9 +110,6 @@ public class HybridSearchAdvisor implements BaseAdvisor {
         // 4. Post-process the documents.
         List<Document> resultDocuments = new ArrayList<>();
         if (!CollectionUtils.isEmpty(documentPostProcessors)) {
-            if (dashScopeRerankPostProcessor != null) {
-                this.documentPostProcessors.add(dashScopeRerankPostProcessor);
-            }
             for (var documentPostProcessor : this.documentPostProcessors) {
                 resultDocuments = documentPostProcessor.process(originalQuery, allRetrievedDocuments);
             }
@@ -172,8 +164,6 @@ public class HybridSearchAdvisor implements BaseAdvisor {
 
         private @Nullable HyDeTransformer hyDeTransformer;
 
-        private @Nullable DashScopeRerankPostProcessor dashScopeRerankPostProcessor;
-
         private Builder() {
         }
 
@@ -213,14 +203,9 @@ public class HybridSearchAdvisor implements BaseAdvisor {
             return this;
         }
 
-        public Builder dashScopeRerankPostProcessor(DashScopeRerankPostProcessor dashScopeRerankPostProcessor) {
-            this.dashScopeRerankPostProcessor = dashScopeRerankPostProcessor;
-            return this;
-        }
-
         public HybridSearchAdvisor build() {
             return new HybridSearchAdvisor(queryTransformers, queryExpander, hybridDocumentRetriever,
-                    documentPostProcessors, queryAugmenter, hyDeTransformer, dashScopeRerankPostProcessor, order);
+                    documentPostProcessors, queryAugmenter, hyDeTransformer, order);
         }
     }
 }

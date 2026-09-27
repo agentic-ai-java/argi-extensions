@@ -95,12 +95,6 @@
         </dependency>
         <dependency>
             <groupId>io.github.agentic-ai</groupId>
-            <artifactId>agentic-ai-dashscope</artifactId>
-            <version>${project.parent.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>io.github.agentic-ai</groupId>
             <artifactId>agentic-ai-mcp-common</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

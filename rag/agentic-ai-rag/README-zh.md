@@ -4,13 +4,12 @@
 
 ## 简介
 
-基于Spring AI Rag框架，集成阿里云DashScope AI服务，提供开箱即用的RAG（Retrieval-Augmented Generation）能力
+基于 Spring AI RAG 框架，提供开箱即用的 RAG（检索增强生成）能力
 
 ## 功能特性
 - **Hybrid Search**：结合BM25和KNN向量搜索, 支持Reciprocal Rank Fusion (RRF) 排序
 - **Hypothetical Document Embedding (HyDE)** : 通过生成假设性文档来增强检索效果
 - 多种主流RAG模式 advisor支持
-- 内置基于DashScope平台的重排序后置检索处理
 - 内置前置检索转化器
 
 ## 快速开始
@@ -243,9 +242,7 @@ HyDeTransformer实现了org.springframework.ai.rag.preretrieval.query.transforma
 
 ### 2. 检索后处理
 
-- DashScopeRerankPostProcessor: 基于DashScope平台的重排序后置检索处理器
 
-DashScopeRerankPostProcessor实现了org.springframework.ai.rag.postretrieval.document.DocumentPostProcessor，可作为RAG检索后处理器使用
 
 ### 3. RAG模式的Advisors
 

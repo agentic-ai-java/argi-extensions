@@ -16,8 +16,7 @@
 package memcached;
 
 import io.github.agentic.spring.ai.memory.memcached.MemcachedChatMemoryRepository;
-import io.github.agentic.spring.ai.toolcalling.memcached.MemcachedAutoConfiguration;
-import io.github.agentic.spring.ai.toolcalling.memcached.MemcachedService;
+import net.spy.memcached.MemcachedClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -26,7 +25,6 @@ import org.springframework.ai.chat.messages.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -35,6 +33,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,8 +63,8 @@ class MemcachedChatMemoryRepositoryTest {
 	 */
 	@DynamicPropertySource
 	static void registerProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.ai.alibaba.toolcalling.memcached.ip", memcachedContainer::getHost);
-		registry.add("spring.ai.alibaba.toolcalling.memcached.port",
+		registry.add("spring.ai.chat.memory.repository.memcached.host", memcachedContainer::getHost);
+		registry.add("spring.ai.chat.memory.repository.memcached.port",
 				() -> memcachedContainer.getMappedPort(MEMCACHED_PORT));
 	}
 
@@ -165,15 +164,12 @@ class MemcachedChatMemoryRepositoryTest {
 
 		chatMemoryRepository.saveAll(conversationId, messages);
 
-		// 验证所有消息都已保存
 		var savedMessages = chatMemoryRepository.findByConversationId(conversationId);
 		assertThat(savedMessages.size()).isEqualTo(messages.size());
 
-		// 执行清理操作，设置最大限制为3，删除数量为2
-		MemcachedChatMemoryRepository mongoDBChatMemoryRepository = (MemcachedChatMemoryRepository) chatMemoryRepository;
-		mongoDBChatMemoryRepository.clearOverLimit(conversationId, 3, 2);
+		MemcachedChatMemoryRepository memcachedChatMemoryRepository = (MemcachedChatMemoryRepository) chatMemoryRepository;
+		memcachedChatMemoryRepository.clearOverLimit(conversationId, 3, 2);
 
-		// 验证只保留了后3个消息
 		savedMessages = chatMemoryRepository.findByConversationId(conversationId);
 		assertThat(savedMessages.size()).isEqualTo(3);
 		assertThat(savedMessages.get(0).getText()).isEqualTo(messages.get(2).getText());
@@ -184,12 +180,16 @@ class MemcachedChatMemoryRepositoryTest {
 }
 
 @ContextConfiguration
-@Import(MemcachedAutoConfiguration.class)
 class MemcachedTestConfiguration {
 
 	@Bean
-	ChatMemoryRepository chatMemoryRepository(MemcachedService memcachedService) {
-		return new MemcachedChatMemoryRepository(memcachedService);
+	MemcachedClient memcachedClient() throws Exception {
+		return new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
+	}
+
+	@Bean
+	ChatMemoryRepository chatMemoryRepository(MemcachedClient memcachedClient) {
+		return new MemcachedChatMemoryRepository(memcachedClient);
 	}
 
 }

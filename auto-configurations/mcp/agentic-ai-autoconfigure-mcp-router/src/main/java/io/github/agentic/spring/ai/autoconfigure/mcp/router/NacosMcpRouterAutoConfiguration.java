@@ -16,9 +16,6 @@
 
 package io.github.agentic.spring.ai.autoconfigure.mcp.router;
 
-import io.github.agentic.spring.ai.dashscope.api.DashScopeApi;
-import io.github.agentic.spring.ai.dashscope.embedding.text.DashScopeEmbeddingModel;
-import io.github.agentic.spring.ai.dashscope.embedding.text.DashScopeEmbeddingOptions;
 import io.github.agentic.spring.ai.mcp.nacos.NacosMcpProperties;
 import io.github.agentic.spring.ai.mcp.nacos.service.NacosMcpOperationService;
 import io.github.agentic.spring.ai.mcp.router.config.McpRouterProperties;
@@ -33,15 +30,12 @@ import io.github.agentic.spring.ai.mcp.router.service.McpRouterService;
 import com.alibaba.nacos.api.exception.NacosException;
 import jakarta.annotation.PostConstruct;
 import java.util.Properties;
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerProperties;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,20 +55,6 @@ public class NacosMcpRouterAutoConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(NacosMcpRouterAutoConfiguration.class);
 
-	@Value("${spring.ai.dashscope.api-key:default_api_key}")
-	private @Nullable String apiKey;
-
-	@Bean
-	@ConditionalOnMissingBean
-	public EmbeddingModel embeddingModel() {
-		if (apiKey == null || apiKey.isEmpty() || "default_api_key".equals(apiKey)) {
-			throw new IllegalArgumentException("Environment variable AI_DASHSCOPE_API_KEY is not set.");
-		}
-		DashScopeApi dashScopeApi = DashScopeApi.builder().apiKey(apiKey).build();
-
-		return new DashScopeEmbeddingModel(dashScopeApi, MetadataMode.EMBED,
-				DashScopeEmbeddingOptions.builder().model("text-embedding-v2").build());
-	}
 
 	@Bean
 	@ConditionalOnMissingBean(NacosMcpOperationService.class)

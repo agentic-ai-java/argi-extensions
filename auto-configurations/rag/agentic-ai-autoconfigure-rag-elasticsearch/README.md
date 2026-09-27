@@ -34,9 +34,9 @@ spring:
     username: test
     password: test  
   ai:
-    # dashscope configuration
-    dashscope:
-      api-key: ${DASHSCOPE_API_KEY}
+    # model configuration
+    openai:
+      api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: qwen-plus-2025-04-28
@@ -66,9 +66,9 @@ spring:
     username: test
     password: test
   ai:
-    # dashscope configuration
-    dashscope:
-      api-key: ${DASHSCOPE_API_KEY}
+    # model configuration
+    openai:
+      api-key: ${OPENAI_API_KEY}
       chat:
         options:
           model: qwen-plus-2025-04-28

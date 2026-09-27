@@ -200,8 +200,8 @@ spring:
 ```yaml
 spring:
   ai:
-    dashscope:
-      api-key: your-dashscope-api-key
+    openai:
+      api-key: your-api-key
 
   cloud:
     nacos:
@@ -284,8 +284,6 @@ curl http://localhost:18080/api/mcp-router/statistics
 ```yaml
 spring:
   ai:
-    dashscope:
-      api-key: your-api-key
     openai:
       api-key: your-openai-api-key
       base-url: https://api.openai.com

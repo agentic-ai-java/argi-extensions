@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeChatAutoConfiguration;
-import io.github.agentic.spring.ai.autoconfigure.dashscope.DashScopeEmbeddingAutoConfiguration;
 import io.github.agentic.spring.ai.rag.preretrieval.transformation.HyDeTransformer;
 import io.github.agentic.spring.ai.rag.retrieval.search.HyDeRetriever;
 import jakarta.annotation.Resource;
@@ -34,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.model.chat.client.autoconfigure.ChatClientAutoConfiguration;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.vectorstore.elasticsearch.ElasticsearchVectorStore;
 import org.springframework.ai.vectorstore.elasticsearch.autoconfigure.ElasticsearchVectorStoreAutoConfiguration;
@@ -59,14 +56,28 @@ import org.testcontainers.utility.DockerImageName;
 @ImportAutoConfiguration(classes = {
         ElasticsearchVectorStoreAutoConfiguration.class,
         ElasticsearchClientAutoConfiguration.class,
-        DashScopeChatAutoConfiguration.class,
-        ElasticsearchRestClientAutoConfiguration.class,
-        DashScopeEmbeddingAutoConfiguration.class,
-        ChatClientAutoConfiguration.class
+        ElasticsearchRestClientAutoConfiguration.class
 })
 @SpringBootTest(classes = HyDeRagTest.class)
 @Testcontainers
 public class HyDeRagTest {
+
+    @org.springframework.boot.test.context.TestConfiguration
+    static class TestConfig {
+        @org.springframework.context.annotation.Bean
+        public org.springframework.ai.embedding.EmbeddingModel embeddingModel() {
+            return org.mockito.Mockito.mock(org.springframework.ai.embedding.EmbeddingModel.class);
+        }
+        @org.springframework.context.annotation.Bean
+        public org.springframework.ai.chat.model.ChatModel chatModel() {
+            return org.mockito.Mockito.mock(org.springframework.ai.chat.model.ChatModel.class);
+        }
+        @org.springframework.context.annotation.Bean
+        public ChatClient.Builder chatClientBuilder(org.springframework.ai.chat.model.ChatModel chatModel) {
+            return ChatClient.builder(chatModel);
+        }
+    }
+
 
     private static final Logger logger = LoggerFactory.getLogger(HyDeRagTest.class);
 
@@ -93,11 +104,6 @@ public class HyDeRagTest {
         // spring es properties
         String uris = "http://" + elasticsearchContainer.getHost() + ":" + elasticsearchContainer.getMappedPort(9200);
         registry.add("spring.elasticsearch.uris", () -> uris);
-        // dashscope
-        registry.add("spring.ai.dashscope.api-key", () -> System.getenv("AI_DASHSCOPE_API_KEY"));
-        registry.add("spring.ai.dashscope.chat.options.model", () -> "qwen-plus-2025-07-28");
-        registry.add("spring.ai.dashscope.embedding.options.model", () -> "text-embedding-v1");
-        registry.add("spring.ai.dashscope.chat.options.incremental-output", () -> false);
     }
 
     @Resource

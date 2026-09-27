@@ -88,32 +88,10 @@
     <dependencyManagement>
         <dependencies>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-dashscope</artifactId>
-                <version>${project.version}</version>
-                <optional>true</optional>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-dashscope-sdk</artifactId>
-                <version>${project.version}</version>
-                <optional>true</optional>
-            </dependency>
 
             <!-- Agentic AI Starter -->
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-dashscope</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-dashscope-sdk</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>io.github.agentic-ai</groupId>
@@ -158,17 +136,7 @@
             </dependency>
 
             <!-- Agentic AI Autoconfiguration  -->
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-autoconfigure-dashscope</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-autoconfigure-dashscope-sdk</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>io.github.agentic-ai</groupId>
@@ -264,264 +232,47 @@
 
             <!-- Agentic AI Community -->
 
-            <!-- Agentic AI Community Tool Call Plugins -->
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-alitranslate</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-amap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-aliyunaisearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-openalex</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-baidumap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-baidusearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-baidutranslate</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-bravesearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-jinacrawler</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-firecrawl</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-dingtalk</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-duckduckgo</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-githubtoolkit</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-googletranslate</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-googletrends</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-googlescholar</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-jsonprocessor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-kuaidi100</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-larksuite</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-microsofttranslate</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-metaso</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-regex</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-sensitivefilter</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-serpapi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-sinanews</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-time</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-tencentmap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-toutiaonews</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-tushare</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-opentripmap</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-weather</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-youdaotranslate</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-tripadvisor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-wikipedia</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-yuque</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-tavilysearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-ollamasearchmodel</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-minio</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-worldbankdata</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-memcached</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-python</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-tool-calling-agentbay</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
 
             <!-- Agentic AI Vector Stores -->
@@ -724,193 +475,34 @@
             </dependency>
 
 
-            <!-- Agentic AI Document Parsers -->
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-apache-pdfbox</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-bibtex</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-bshtml</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-directory</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-markdown</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-multi-modality</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-pdf-tables</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-tika</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-parser-yaml</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <!-- Agentic AI Document Readers -->
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-archive</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-arxiv</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-bilibili</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-chatgpt-data</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-elasticsearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-email</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-github</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-gitbook</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-gitlab</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-gpt-repo</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-huggingface-fs</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-larksuite</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-mbox</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-mongodb</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-mysql</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-notion</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-obsidian</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-poi</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-sqlite</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-tencent-cos</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-youtube</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-starter-document-reader-yuque</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
         </dependencies>
 

@@ -44,36 +44,16 @@
       - any-glob-to-any-file:
           - "mcp/**/*"
           - "auto-configurations/mcp/**/*"
-"area/models":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "models/**/*"
-          - "auto-configurations/models/**/*"
 "area/vector-stores":
   - changed-files:
       - any-glob-to-any-file:
           - "vector-stores/**/*"
           - "auto-configurations/vector-stores/**/*"
-"area/tools":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "tool-calls/**/*"
-          - "community/tool-calls/**/*"
-"area/document-reader":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "document-readers/**/*"
-          - "community/document-readers/**/*"
-"area/document-parser":
-  - changed-files:
-      - any-glob-to-any-file:
-          - "document-parsers/**/*"
-          - "community/document-parser/**/*"
 "area/memory":
   - changed-files:
       - any-glob-to-any-file:
           - "memory-repository/**/*"
-          - "community/memories/**/*"
+          - "auto-configurations/memory/**/*"
 "area/rag":
   - changed-files:
       - any-glob-to-any-file:

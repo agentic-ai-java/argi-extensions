@@ -53,12 +53,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.github.agentic-ai</groupId>
-            <artifactId>agentic-ai-starter-dashscope</artifactId>
-            <version>${project.parent.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-rag</artifactId>
         </dependency>
