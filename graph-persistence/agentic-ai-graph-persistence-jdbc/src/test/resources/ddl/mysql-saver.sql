@@ -1,0 +1,59 @@
+DROP TABLE IF EXISTS GRAPH_CHECKPOINT
+
+-- statement-boundary
+
+DROP TABLE IF EXISTS GRAPH_THREAD
+
+-- statement-boundary
+
+CREATE TABLE IF NOT EXISTS GRAPH_THREAD (
+   thread_id VARCHAR(36) PRIMARY KEY,
+   thread_name VARCHAR(255),
+   is_released BOOLEAN DEFAULT FALSE NOT NULL,
+   active_thread_name VARCHAR(255) GENERATED ALWAYS AS (
+       CASE WHEN is_released = FALSE THEN thread_name ELSE NULL END
+   ) STORED
+)
+
+-- statement-boundary
+
+CREATE TABLE IF NOT EXISTS GRAPH_CHECKPOINT (
+   checkpoint_seq BIGINT NOT NULL AUTO_INCREMENT UNIQUE,
+   checkpoint_id VARCHAR(36) PRIMARY KEY,
+   thread_id VARCHAR(36) NOT NULL,
+   node_id VARCHAR(255),
+   next_node_id VARCHAR(255),
+   state_data JSON NOT NULL,
+   saved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+   CONSTRAINT GRAPH_FK_THREAD
+       FOREIGN KEY(thread_id)
+       REFERENCES GRAPH_THREAD(thread_id)
+       ON DELETE CASCADE
+)
+
+-- statement-boundary
+
+ALTER TABLE GRAPH_THREAD
+ADD COLUMN active_thread_name VARCHAR(255) GENERATED ALWAYS AS (
+    CASE WHEN is_released = FALSE THEN thread_name ELSE NULL END
+) STORED
+
+-- statement-boundary
+
+ALTER TABLE GRAPH_CHECKPOINT
+ADD COLUMN checkpoint_seq BIGINT NOT NULL AUTO_INCREMENT UNIQUE
+
+-- statement-boundary
+
+DROP INDEX IDX_GRAPH_THREAD_NAME_RELEASED ON GRAPH_THREAD
+
+-- statement-boundary
+
+CREATE UNIQUE INDEX IDX_GRAPH_THREAD_ACTIVE_NAME
+  ON GRAPH_THREAD(active_thread_name)
+
+-- statement-boundary
+
+CREATE INDEX IDX_GRAPH_CHECKPOINT_THREAD_SEQUENCE
+  ON GRAPH_CHECKPOINT(thread_id, checkpoint_seq)

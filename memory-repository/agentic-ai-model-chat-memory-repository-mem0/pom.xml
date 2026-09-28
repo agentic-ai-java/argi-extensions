@@ -28,7 +28,7 @@
     <packaging>jar</packaging>
     <name>Agentic AI Mem0 Chat Memory</name>
     <description>Agentic AI Mem0 Chat Memory implementation</description>
-    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
+    <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
 
     <licenses>
         <license>
@@ -51,9 +51,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
-        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
-        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
+        <connection>git://github.com/agentic-ai-java/agentic-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-ai-java/agentic-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
     </scm>
 
     <properties>
@@ -64,6 +64,10 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.agentic-ai</groupId>
+            <artifactId>agentic-ai-extensions-model</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.ai</groupId>

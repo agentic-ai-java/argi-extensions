@@ -13,7 +13,7 @@
   </p>
   <p>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg" alt="License"></a>
-    <a href="https://github.com/agentic-spring-ai/agentic-spring-ai-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
+    <a href="https://github.com/agentic-ai-java/agentic-ai-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
     <img src="https://img.shields.io/badge/Java-17%2B-f59e0b" alt="Java 17+">
   </p>
 </div>
@@ -34,7 +34,7 @@ Agentic AI Extensions 为 Spring AI 提供 MCP、向量存储、聊天记忆、�
 环境要求：JDK 17 或更高版本、Maven 3.9.1 或更高版本。通过 Maven 安装当前开发版本：
 
 ```shell
-git clone --depth=1 https://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git
+git clone --depth=1 https://github.com/agentic-ai-java/agentic-ai-extensions.git
 cd agentic-spring-ai-extensions
 mvn -DskipTests install
 ```
@@ -85,10 +85,10 @@ mvn -DskipTests install
 
 ## 参与贡献
 
-欢迎提交 Issue 和 Pull Request。问题和建议可通过 [GitHub Issues](https://github.com/agentic-spring-ai/agentic-spring-ai-extensions/issues) 反馈。
+欢迎提交 Issue 和 Pull Request。问题和建议可通过 [GitHub Issues](https://github.com/agentic-ai-java/agentic-ai-extensions/issues) 反馈。
 
-<a href="https://github.com/agentic-spring-ai/agentic-spring-ai-extensions/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=agentic-spring-ai/agentic-spring-ai-extensions&max=500&columns=18&anon=1" alt="contributors"/>
+<a href="https://github.com/agentic-ai-java/agentic-ai-extensions/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agentic-ai-java/agentic-ai-extensions&max=500&columns=18&anon=1" alt="contributors"/>
 </a>
 
 ## 许可证

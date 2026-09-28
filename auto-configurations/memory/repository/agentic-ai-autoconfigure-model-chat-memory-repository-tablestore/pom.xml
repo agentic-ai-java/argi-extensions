@@ -26,12 +26,12 @@
     <artifactId>agentic-ai-autoconfigure-model-chat-memory-repository-tablestore</artifactId>
     <name>Agentic AI Tablestore Chat Memory Auto Configuration</name>
     <description>Agentic AI Tablestore Chat Memory Auto Configuration</description>
-    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
+    <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
 
     <scm>
-        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
-        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
-        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
+        <connection>git://github.com/agentic-ai-java/agentic-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-ai-java/agentic-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
     </scm>
 
     <dependencies>

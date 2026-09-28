@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS spring_ai_store (pk_id BIGINT AUTO_INCREMENT PRIMARY KEY, id TEXT NOT NULL, id_hash CHAR(64) NOT NULL UNIQUE, namespace TEXT, key_name VARCHAR(500), value_json TEXT, created_at TIMESTAMP, updated_at TIMESTAMP)

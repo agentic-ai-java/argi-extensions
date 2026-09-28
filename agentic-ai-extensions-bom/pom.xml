@@ -24,23 +24,23 @@
     <packaging>pom</packaging>
 
     <name>Agentic AI Extensions Bom</name>
-    <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
+    <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
     <description>Bill of Materials POM (BOM) for the Agentic AI modules</description>
 
 
     <scm>
-        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions</url>
-        <connection>git://github.com/agentic-spring-ai/agentic-spring-ai-extensions.git</connection>
-        <developerConnection>git@github.com:agentic-spring-ai/agentic-spring-ai-extensions.git</developerConnection>
+        <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
+        <connection>git://github.com/agentic-ai-java/agentic-ai-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-ai-java/agentic-ai-extensions.git</developerConnection>
     </scm>
 
     <issueManagement>
         <system>Github Issues</system>
-        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions/issues</url>
+        <url>https://github.com/agentic-ai-java/agentic-ai-extensions/issues</url>
     </issueManagement>
     <ciManagement>
         <system>Github Actions</system>
-        <url>https://github.com/agentic-spring-ai/agentic-spring-ai-extensions/actions</url>
+        <url>https://github.com/agentic-ai-java/agentic-ai-extensions/actions</url>
     </ciManagement>
     <licenses>
         <license>
