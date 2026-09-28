@@ -36,14 +36,14 @@ target/
 **/node_modules
 
 # Generated Files
-agentic-spring-ai-examples/playground-flight-booking/frontend/generated/
-agentic-spring-ai-examples/playground-flight-booking/src/main/bundles/
-/agentic-spring-ai-examples/playground-flight-booking-example/
-**/agentic-spring-ai-jmanus/extensions/*
+agentic-ai-examples/playground-flight-booking/frontend/generated/
+agentic-ai-examples/playground-flight-booking/src/main/bundles/
+/agentic-ai-examples/playground-flight-booking-example/
+**/agentic-ai-jmanus/extensions/*
 **/venv/*
-**/agentic-spring-ai-jmanus/h2-data/*
+**/agentic-ai-jmanus/h2-data/*
 **/playwright/*
-agentic-spring-ai-jmanus/ui-vue3/pnpm-lock.yaml
+agentic-ai-jmanus/ui-vue3/pnpm-lock.yaml
 
 
 # windows os
@@ -67,14 +67,14 @@ modified_mcp_config.json
 .idea/LocalCodeIndex/
 
 
-/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/elasticsearch/*
-!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/elasticsearch/data/
-!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/elasticsearch/data/.gitkeep
+/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/elasticsearch/*
+!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/elasticsearch/data/
+!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/elasticsearch/data/.gitkeep
 
-/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/kibana/*
-!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/kibana/data/
-!/agentic-spring-ai-studio/agentic-spring-ai-studio-server/docker/middleware/kibana/data/.gitkeep
-/agentic-spring-ai-studio/ui/
+/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/kibana/*
+!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/kibana/data/
+!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/kibana/data/.gitkeep
+/agentic-ai-studio/ui/
 
 .claude
 
