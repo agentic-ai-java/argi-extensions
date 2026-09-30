@@ -14,10 +14,10 @@
 # limitations under the License.
 #
 name: setup-core
-description: Install the Agentic Spring AI core artifacts required by extensions
+description: Install the ARGI core artifacts required by extensions
 inputs:
   ref:
-    description: Agentic Spring AI git ref
+    description: ARGI git ref
     required: false
     default: e36b9cd175ec8de497c370ac30ae3b2ecbdd5817
 runs:
@@ -25,13 +25,13 @@ runs:
   steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
-        repository: agentic-spring-ai/agentic-spring-ai
+        repository: agentic-ai-java/argi
         ref: ${{ inputs.ref }}
-        path: target/agentic-spring-ai
+        path: target/argi
     - name: Install core artifacts
       shell: bash
       run: |
-        target/agentic-spring-ai/mvnw -B \
-          -f target/agentic-spring-ai/pom.xml \
-          -pl :agentic-spring-ai-bom,:agentic-spring-ai-graph-core,:agentic-spring-ai-agent-framework,:agentic-spring-ai-studio,:agentic-spring-ai-starter-builtin-nodes \
+        target/argi/mvnw -B \
+          -f target/argi/pom.xml \
+          -pl :argi-bom,:argi-graph-core,:argi-agent-framework,:argi-studio,:argi-starter-builtin-nodes \
           -am -DskipTests install

@@ -18,13 +18,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.agentic-ai</groupId>
-    <artifactId>agentic-ai-extensions</artifactId>
+    <artifactId>argi-extensions</artifactId>
     <version>${revision}</version>
 
     <packaging>pom</packaging>
-    <name>Agentic AI Extensions</name>
-    <description>Extensions of Spring AI core concepts and components.</description>
-    <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
+    <name>ARGI Extensions</name>
+    <description>Extensions for Agent Runtime and Graph Intelligence.</description>
+    <url>https://github.com/agentic-ai-java/argi-extensions</url>
 
     <licenses>
         <license>
@@ -48,113 +48,113 @@
     </developers>
 
     <modules>
-        <module>agentic-ai-extensions-model</module>
+        <module>argi-extensions-model</module>
 
         <!-- graph-persistence modules -->
-        <module>graph-persistence/agentic-ai-graph-persistence-jdbc</module>
-        <module>graph-persistence/agentic-ai-graph-persistence-mongodb</module>
-        <module>graph-persistence/agentic-ai-graph-persistence-redis</module>
+        <module>graph-persistence/argi-graph-persistence-jdbc</module>
+        <module>graph-persistence/argi-graph-persistence-mongodb</module>
+        <module>graph-persistence/argi-graph-persistence-redis</module>
 
         <!-- code-executors modules -->
-        <module>code-executors/agentic-ai-code-executor-docker</module>
+        <module>code-executors/argi-code-executor-docker</module>
 
         <!-- graph-nodes modules -->
-        <module>graph-nodes/agentic-ai-graph-node-rag</module>
-        <module>graph-nodes/agentic-ai-graph-node-network</module>
+        <module>graph-nodes/argi-graph-node-rag</module>
+        <module>graph-nodes/argi-graph-node-network</module>
 
         <!-- memory modules -->
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-elasticsearch</module>
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-jdbc</module>
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-mem0</module>
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-memcached</module>
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-mongodb</module>
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-redis</module>
-        <module>memory-repository/agentic-ai-model-chat-memory-repository-tablestore</module>
+        <module>memory-repository/argi-model-chat-memory-repository-elasticsearch</module>
+        <module>memory-repository/argi-model-chat-memory-repository-jdbc</module>
+        <module>memory-repository/argi-model-chat-memory-repository-mem0</module>
+        <module>memory-repository/argi-model-chat-memory-repository-memcached</module>
+        <module>memory-repository/argi-model-chat-memory-repository-mongodb</module>
+        <module>memory-repository/argi-model-chat-memory-repository-redis</module>
+        <module>memory-repository/argi-model-chat-memory-repository-tablestore</module>
 
         <!-- auto-configurations modules -->
-        <module>auto-configurations/memory/agentic-ai-autoconfigure-model-chat-memory</module>
-        <module>auto-configurations/memory/agentic-ai-autoconfigure-model-chat-memory-mem0</module>
-        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-elasticsearch</module>
-        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-jdbc</module>
-        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-memcached</module>
-        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-mongodb</module>
-        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-redis</module>
-        <module>auto-configurations/memory/repository/agentic-ai-autoconfigure-model-chat-memory-repository-tablestore</module>
+        <module>auto-configurations/memory/argi-autoconfigure-model-chat-memory</module>
+        <module>auto-configurations/memory/argi-autoconfigure-model-chat-memory-mem0</module>
+        <module>auto-configurations/memory/repository/argi-autoconfigure-model-chat-memory-repository-elasticsearch</module>
+        <module>auto-configurations/memory/repository/argi-autoconfigure-model-chat-memory-repository-jdbc</module>
+        <module>auto-configurations/memory/repository/argi-autoconfigure-model-chat-memory-repository-memcached</module>
+        <module>auto-configurations/memory/repository/argi-autoconfigure-model-chat-memory-repository-mongodb</module>
+        <module>auto-configurations/memory/repository/argi-autoconfigure-model-chat-memory-repository-redis</module>
+        <module>auto-configurations/memory/repository/argi-autoconfigure-model-chat-memory-repository-tablestore</module>
 
-        <module>auto-configurations/prompt/agentic-ai-autoconfigure-nacos-prompt</module>
-        <module>auto-configurations/observation/agentic-ai-autoconfigure-arms-observation</module>
-        <module>auto-configurations/mcp/agentic-ai-autoconfigure-mcp-registry</module>
-        <module>auto-configurations/mcp/agentic-ai-autoconfigure-mcp-router</module>
-        <module>auto-configurations/rag/agentic-ai-autoconfigure-rag-elasticsearch</module>
-        <module>auto-configurations/mcp/agentic-ai-autoconfigure-mcp-distributed</module>
-        <module>auto-configurations/mcp/agentic-ai-autoconfigure-mcp-gateway</module>
+        <module>auto-configurations/prompt/argi-autoconfigure-nacos-prompt</module>
+        <module>auto-configurations/observation/argi-autoconfigure-arms-observation</module>
+        <module>auto-configurations/mcp/argi-autoconfigure-mcp-registry</module>
+        <module>auto-configurations/mcp/argi-autoconfigure-mcp-router</module>
+        <module>auto-configurations/rag/argi-autoconfigure-rag-elasticsearch</module>
+        <module>auto-configurations/mcp/argi-autoconfigure-mcp-distributed</module>
+        <module>auto-configurations/mcp/argi-autoconfigure-mcp-gateway</module>
 
-        <module>auto-configurations/vector-stores/agentic-ai-autoconfigure-vector-store-analyticdb</module>
-        <module>auto-configurations/vector-stores/agentic-ai-autoconfigure-vector-store-oceanbase</module>
-        <module>auto-configurations/vector-stores/agentic-ai-autoconfigure-vector-store-opensearch</module>
-        <module>auto-configurations/vector-stores/agentic-ai-autoconfigure-vector-store-tablestore</module>
-        <module>auto-configurations/vector-stores/agentic-ai-autoconfigure-vector-store-tair</module>
+        <module>auto-configurations/vector-stores/argi-autoconfigure-vector-store-analyticdb</module>
+        <module>auto-configurations/vector-stores/argi-autoconfigure-vector-store-oceanbase</module>
+        <module>auto-configurations/vector-stores/argi-autoconfigure-vector-store-opensearch</module>
+        <module>auto-configurations/vector-stores/argi-autoconfigure-vector-store-tablestore</module>
+        <module>auto-configurations/vector-stores/argi-autoconfigure-vector-store-tair</module>
 
         <!-- spring-boot-starters modules -->
-        <module>starters/agentic-ai-starter-agentscope</module>
-        <module>starters/agentic-ai-starter-a2a-nacos</module>
-        <module>starters/agentic-ai-starter-config-nacos</module>
+        <module>starters/argi-starter-agentscope</module>
+        <module>starters/argi-starter-a2a-nacos</module>
+        <module>starters/argi-starter-config-nacos</module>
 
-        <module>starters/agentic-ai-starter-model-chat-memory</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-mem0</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-repository-elasticsearch</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-repository-jdbc</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-repository-memcached</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-repository-mongodb</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-repository-redis</module>
-        <module>starters/agentic-ai-starter-model-chat-memory-repository-tablestore</module>
+        <module>starters/argi-starter-model-chat-memory</module>
+        <module>starters/argi-starter-model-chat-memory-mem0</module>
+        <module>starters/argi-starter-model-chat-memory-repository-elasticsearch</module>
+        <module>starters/argi-starter-model-chat-memory-repository-jdbc</module>
+        <module>starters/argi-starter-model-chat-memory-repository-memcached</module>
+        <module>starters/argi-starter-model-chat-memory-repository-mongodb</module>
+        <module>starters/argi-starter-model-chat-memory-repository-redis</module>
+        <module>starters/argi-starter-model-chat-memory-repository-tablestore</module>
 
-        <module>starters/agentic-ai-starter-nacos-prompt</module>
-        <module>starters/agentic-ai-starter-arms-observation</module>
-        <module>starters/agentic-ai-starter-mcp-registry</module>
-        <module>starters/agentic-ai-starter-mcp-router</module>
-        <module>starters/agentic-ai-starter-rag</module>
-        <module>starters/agentic-ai-starter-mcp-distributed</module>
-        <module>starters/agentic-ai-starter-mcp-gateway</module>
+        <module>starters/argi-starter-nacos-prompt</module>
+        <module>starters/argi-starter-arms-observation</module>
+        <module>starters/argi-starter-mcp-registry</module>
+        <module>starters/argi-starter-mcp-router</module>
+        <module>starters/argi-starter-rag</module>
+        <module>starters/argi-starter-mcp-distributed</module>
+        <module>starters/argi-starter-mcp-gateway</module>
 
-        <module>starters/agentic-ai-starter-vector-store-analyticdb</module>
-        <module>starters/agentic-ai-starter-vector-store-oceanbase</module>
-        <module>starters/agentic-ai-starter-vector-store-opensearch</module>
-        <module>starters/agentic-ai-starter-vector-store-tablestore</module>
-        <module>starters/agentic-ai-starter-vector-store-tair</module>
+        <module>starters/argi-starter-vector-store-analyticdb</module>
+        <module>starters/argi-starter-vector-store-oceanbase</module>
+        <module>starters/argi-starter-vector-store-opensearch</module>
+        <module>starters/argi-starter-vector-store-tablestore</module>
+        <module>starters/argi-starter-vector-store-tair</module>
 
         <!-- vector-stores modules -->
-        <module>vector-stores/agentic-ai-analyticdb-store</module>
-        <module>vector-stores/agentic-ai-oceanbase-store</module>
-        <module>vector-stores/agentic-ai-opensearch-store</module>
-        <module>vector-stores/agentic-ai-tablestore-store</module>
-        <module>vector-stores/agentic-ai-tair-store</module>
+        <module>vector-stores/argi-analyticdb-store</module>
+        <module>vector-stores/argi-oceanbase-store</module>
+        <module>vector-stores/argi-opensearch-store</module>
+        <module>vector-stores/argi-tablestore-store</module>
+        <module>vector-stores/argi-tair-store</module>
 
-        <module>mcp/agentic-ai-mcp-common</module>
-        <module>mcp/agentic-ai-mcp-registry</module>
-        <module>mcp/agentic-ai-mcp-router</module>
-        <module>mcp/agentic-ai-mcp-distributed</module>
-        <module>mcp/agentic-ai-mcp-gateway</module>
+        <module>mcp/argi-mcp-common</module>
+        <module>mcp/argi-mcp-registry</module>
+        <module>mcp/argi-mcp-router</module>
+        <module>mcp/argi-mcp-distributed</module>
+        <module>mcp/argi-mcp-gateway</module>
 
-        <module>prompt/agentic-ai-prompt-nacos</module>
+        <module>prompt/argi-prompt-nacos</module>
 
-        <module>rag/agentic-ai-rag</module>
-        <module>observation/agentic-ai-observation</module>
-        <module>sandbox/agentic-ai-sandbox</module>
-        <module>agentic-ai-extensions-bom</module>
+        <module>rag/argi-rag</module>
+        <module>observation/argi-observation</module>
+        <module>sandbox/argi-sandbox</module>
+        <module>argi-extensions-bom</module>
     </modules>
 
     <scm>
-        <connection>git://github.com/agentic-ai-java/agentic-ai-extensions.git</connection>
-        <developerConnection>git@github.com:agentic-ai-java/agentic-ai-extensions.git</developerConnection>
-        <url>https://github.com/agentic-ai-java/agentic-ai-extensions</url>
+        <connection>git://github.com/agentic-ai-java/argi-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-ai-java/argi-extensions.git</developerConnection>
+        <url>https://github.com/agentic-ai-java/argi-extensions</url>
     </scm>
 
     <properties>
 
-        <!-- Agentic AI Version -->
+        <!-- ARGI Version -->
         <revision>2.1.0-dev</revision>
-        <agentic-spring-ai.version>2.1.0-dev</agentic-spring-ai.version>
+        <argi.version>2.1.0-dev</argi.version>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
@@ -261,37 +261,37 @@
         <dependencies>
             <dependency>
                 <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-extensions-model</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-graph-core</artifactId>
-                <version>${agentic-spring-ai.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-spring-ai</groupId>
-                <artifactId>agentic-spring-ai-agent-framework</artifactId>
-                <version>${agentic-spring-ai.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-sandbox</artifactId>
+                <artifactId>argi-extensions-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-mcp-common</artifactId>
+                <artifactId>argi-graph-core</artifactId>
+                <version>${argi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-ai</groupId>
+                <artifactId>argi-agent-framework</artifactId>
+                <version>${argi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-ai</groupId>
+                <artifactId>argi-sandbox</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.github.agentic-ai</groupId>
-                <artifactId>agentic-ai-observation</artifactId>
+                <artifactId>argi-mcp-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-ai</groupId>
+                <artifactId>argi-observation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
