@@ -1,7 +1,7 @@
 .git
 .idea
-./agentic-ai-jmanus/src/main/resources/static
-./agentic-ai-jmanus/src/main/resources/static_legacy
+./argi-jmanus/src/main/resources/static
+./argi-jmanus/src/main/resources/static_legacy
 **/node_modules/**
 **/target/**
 **/build/**

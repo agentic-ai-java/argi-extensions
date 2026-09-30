@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.agentic-ai</groupId>
+        <artifactId>argi-extensions</artifactId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>argi-sandbox</artifactId>
+
+    <name>ARGI Sandbox</name>
+    <description>Built-in sandbox tools for ARGI Extensions</description>
+    <url>https://github.com/agentic-ai-java/argi-extensions</url>
+    <scm>
+        <connection>git://github.com/agentic-ai-java/argi-extensions.git</connection>
+        <developerConnection>git@github.com:agentic-ai-java/argi-extensions.git</developerConnection>
+        <url>https://github.com/agentic-ai-java/argi-extensions</url>
+    </scm>
+
+    <properties>
+        <agentscope-runtime.version>1.0.2</agentscope-runtime.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.agentscope</groupId>
+            <artifactId>agentscope-runtime-sandbox-core</artifactId>
+            <version>${agentscope-runtime.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.agentic-ai</groupId>
+            <artifactId>argi-graph-core</artifactId>
+            <version>${argi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.agentic-ai</groupId>
+            <artifactId>argi-agent-framework</artifactId>
+            <version>${argi.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

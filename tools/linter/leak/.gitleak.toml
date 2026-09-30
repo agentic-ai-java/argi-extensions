@@ -1,5 +1,5 @@
 [[allowlists]]
 description = "Skip for unit test"
 paths = [
-    '''memory-repository/agentic-ai-model-chat-memory-repository-redis/src/test/resources/ssl/key.pem''',
+    '''memory-repository/argi-model-chat-memory-repository-redis/src/test/resources/ssl/key.pem''',
 ]

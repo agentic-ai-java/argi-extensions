@@ -1,26 +1,26 @@
 <div align="center">
-  <a href="https://agentic-spring-ai.github.io/website/">
-    <img src="asset/images/logo.svg" alt="Agentic AI Extensions logo" width="180">
+  <a href="https://agentic-ai-java.github.io/argi-website/">
+    <img src="asset/images/logo.svg" alt="ARGI Extensions logo" width="180">
   </a>
-  <h1>Agentic AI Extensions</h1>
+  <h1>ARGI Extensions</h1>
   <p><strong>面向 Java 应用的 Spring AI 集成与生态扩展。</strong></p>
   <p>MCP · 向量存储 · 聊天记忆 · RAG · 可观测性</p>
   <p>
-    <a href="https://agentic-spring-ai.github.io/website/">文档</a> ·
-    <a href="https://agentic-spring-ai.github.io/website/integration/chatclient">快速开始</a> ·
-    <a href="https://github.com/agentic-spring-ai/agentic-spring-ai">Agentic AI</a> ·
+    <a href="https://agentic-ai-java.github.io/argi-website/">文档</a> ·
+    <a href="https://agentic-ai-java.github.io/argi-website/integration/chatclient">快速开始</a> ·
+    <a href="https://github.com/agentic-ai-java/argi">ARGI</a> ·
     <a href="README.md">English</a>
   </p>
   <p>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg" alt="License"></a>
-    <a href="https://github.com/agentic-ai-java/agentic-ai-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
+    <a href="https://github.com/agentic-ai-java/argi-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
     <img src="https://img.shields.io/badge/Java-17%2B-f59e0b" alt="Java 17+">
   </p>
 </div>
 
 ---
 
-Agentic AI Extensions 为 Spring AI 提供 MCP、向量存储、聊天记忆、检索增强生成（RAG）、提示词管理和可观测性扩展。开发者可以直接在 Spring AI 中使用这些模块，也可以配合 [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai) 框架构建智能体应用。
+ARGI 是 **Agent Runtime and Graph Intelligence** 的缩写，读作 **“AR-jee”**（`/ˈɑːr.dʒiː/`）。ARGI Extensions 为 Spring AI 提供 MCP、向量存储、聊天记忆、检索增强生成（RAG）、提示词管理和可观测性扩展。开发者可以直接在 Spring AI 中使用这些模块，也可以配合 [ARGI](https://github.com/agentic-ai-java/argi) 框架构建智能体应用。
 
 ## 核心能力
 
@@ -34,8 +34,8 @@ Agentic AI Extensions 为 Spring AI 提供 MCP、向量存储、聊天记忆、�
 环境要求：JDK 17 或更高版本、Maven 3.9.1 或更高版本。通过 Maven 安装当前开发版本：
 
 ```shell
-git clone --depth=1 https://github.com/agentic-ai-java/agentic-ai-extensions.git
-cd agentic-spring-ai-extensions
+git clone --depth=1 https://github.com/agentic-ai-java/argi-extensions.git
+cd argi-extensions
 mvn -DskipTests install
 ```
 
@@ -46,7 +46,7 @@ mvn -DskipTests install
   <dependencies>
     <dependency>
       <groupId>io.github.agentic-ai</groupId>
-      <artifactId>agentic-ai-extensions-bom</artifactId>
+      <artifactId>argi-extensions-bom</artifactId>
       <version>2.1.0-dev</version>
       <type>pom</type>
       <scope>import</scope>
@@ -57,7 +57,7 @@ mvn -DskipTests install
 <dependencies>
   <dependency>
     <groupId>io.github.agentic-ai</groupId>
-    <artifactId>agentic-ai-starter-mcp-registry</artifactId>
+    <artifactId>argi-starter-mcp-registry</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -77,18 +77,18 @@ mvn -DskipTests install
 
 ## 文档
 
-- [项目概览](https://agentic-spring-ai.github.io/website/docs/overview)
-- [快速开始](https://agentic-spring-ai.github.io/website/docs/quick-start)
-- [ChatClient](https://agentic-spring-ai.github.io/website/integration/chatclient)
-- [Agentic AI 核心框架](https://github.com/agentic-spring-ai/agentic-spring-ai)
-- [示例项目](https://github.com/agentic-spring-ai/examples/tree/main/examples)
+- [项目概览](https://agentic-ai-java.github.io/argi-website/docs/overview)
+- [快速开始](https://agentic-ai-java.github.io/argi-website/docs/quick-start)
+- [ChatClient](https://agentic-ai-java.github.io/argi-website/integration/chatclient)
+- [ARGI 核心框架](https://github.com/agentic-ai-java/argi)
+- [示例项目](https://github.com/agentic-ai-java/argi-examples/tree/main/examples)
 
 ## 参与贡献
 
-欢迎提交 Issue 和 Pull Request。问题和建议可通过 [GitHub Issues](https://github.com/agentic-ai-java/agentic-ai-extensions/issues) 反馈。
+欢迎提交 Issue 和 Pull Request。问题和建议可通过 [GitHub Issues](https://github.com/agentic-ai-java/argi-extensions/issues) 反馈。
 
-<a href="https://github.com/agentic-ai-java/agentic-ai-extensions/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=agentic-ai-java/agentic-ai-extensions&max=500&columns=18&anon=1" alt="contributors"/>
+<a href="https://github.com/agentic-ai-java/argi-extensions/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agentic-ai-java/argi-extensions&max=500&columns=18&anon=1" alt="contributors"/>
 </a>
 
 ## 许可证

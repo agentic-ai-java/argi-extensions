@@ -36,14 +36,14 @@ target/
 **/node_modules
 
 # Generated Files
-agentic-ai-examples/playground-flight-booking/frontend/generated/
-agentic-ai-examples/playground-flight-booking/src/main/bundles/
-/agentic-ai-examples/playground-flight-booking-example/
-**/agentic-ai-jmanus/extensions/*
+argi-examples/playground-flight-booking/frontend/generated/
+argi-examples/playground-flight-booking/src/main/bundles/
+/argi-examples/playground-flight-booking-example/
+**/argi-jmanus/extensions/*
 **/venv/*
-**/agentic-ai-jmanus/h2-data/*
+**/argi-jmanus/h2-data/*
 **/playwright/*
-agentic-ai-jmanus/ui-vue3/pnpm-lock.yaml
+argi-jmanus/ui-vue3/pnpm-lock.yaml
 
 
 # windows os
@@ -67,14 +67,14 @@ modified_mcp_config.json
 .idea/LocalCodeIndex/
 
 
-/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/elasticsearch/*
-!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/elasticsearch/data/
-!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/elasticsearch/data/.gitkeep
+/argi-studio/argi-studio-server/docker/middleware/elasticsearch/*
+!/argi-studio/argi-studio-server/docker/middleware/elasticsearch/data/
+!/argi-studio/argi-studio-server/docker/middleware/elasticsearch/data/.gitkeep
 
-/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/kibana/*
-!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/kibana/data/
-!/agentic-ai-studio/agentic-ai-studio-server/docker/middleware/kibana/data/.gitkeep
-/agentic-ai-studio/ui/
+/argi-studio/argi-studio-server/docker/middleware/kibana/*
+!/argi-studio/argi-studio-server/docker/middleware/kibana/data/
+!/argi-studio/argi-studio-server/docker/middleware/kibana/data/.gitkeep
+/argi-studio/ui/
 
 .claude
 

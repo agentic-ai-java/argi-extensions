@@ -1,26 +1,26 @@
 <div align="center">
-  <a href="https://agentic-spring-ai.github.io/website/en/">
-    <img src="asset/images/logo.svg" alt="Agentic AI Extensions logo" width="180">
+  <a href="https://agentic-ai-java.github.io/argi-website/en/">
+    <img src="asset/images/logo.svg" alt="ARGI Extensions logo" width="180">
   </a>
-  <h1>Agentic AI Extensions</h1>
+  <h1>ARGI Extensions</h1>
   <p><strong>Spring AI integrations and ecosystem extensions for Java applications.</strong></p>
   <p>MCP · Vector stores · Chat memory · RAG · Observability</p>
   <p>
-    <a href="https://agentic-spring-ai.github.io/website/en/">Documentation</a> ·
-    <a href="https://agentic-spring-ai.github.io/website/en/integration/chatclient">Quick Start</a> ·
-    <a href="https://github.com/agentic-spring-ai/agentic-spring-ai">Agentic AI</a> ·
+    <a href="https://agentic-ai-java.github.io/argi-website/en/">Documentation</a> ·
+    <a href="https://agentic-ai-java.github.io/argi-website/en/integration/chatclient">Quick Start</a> ·
+    <a href="https://github.com/agentic-ai-java/argi">ARGI</a> ·
     <a href="README-zh.md">简体中文</a>
   </p>
   <p>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg" alt="License"></a>
-    <a href="https://github.com/agentic-ai-java/agentic-ai-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
+    <a href="https://github.com/agentic-ai-java/argi-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
     <img src="https://img.shields.io/badge/Java-17%2B-f59e0b" alt="Java 17+">
   </p>
 </div>
 
 ---
 
-Agentic AI Extensions provides Spring AI integrations for MCP, vector stores, chat memory, RAG, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [Agentic AI](https://github.com/agentic-spring-ai/agentic-spring-ai) framework.
+ARGI stands for **Agent Runtime and Graph Intelligence** and is pronounced **"AR-jee"** (`/ˈɑːr.dʒiː/`). ARGI Extensions provides Spring AI integrations for MCP, vector stores, chat memory, RAG, prompt management, and observability. Use these modules directly with Spring AI or combine them with the [ARGI](https://github.com/agentic-ai-java/argi) framework.
 
 ## Features
 
@@ -34,8 +34,8 @@ Agentic AI Extensions provides Spring AI integrations for MCP, vector stores, ch
 Requirements: JDK 17 or later and Maven 3.9.1 or later. Install the local development modules with Maven:
 
 ```shell
-git clone --depth=1 https://github.com/agentic-ai-java/agentic-ai-extensions.git
-cd agentic-spring-ai-extensions
+git clone --depth=1 https://github.com/agentic-ai-java/argi-extensions.git
+cd argi-extensions
 mvn -DskipTests install
 ```
 
@@ -46,7 +46,7 @@ Import the Extensions BOM and add the starters you need to your project:
   <dependencies>
     <dependency>
       <groupId>io.github.agentic-ai</groupId>
-      <artifactId>agentic-ai-extensions-bom</artifactId>
+      <artifactId>argi-extensions-bom</artifactId>
       <version>2.1.0-dev</version>
       <type>pom</type>
       <scope>import</scope>
@@ -57,7 +57,7 @@ Import the Extensions BOM and add the starters you need to your project:
 <dependencies>
   <dependency>
     <groupId>io.github.agentic-ai</groupId>
-    <artifactId>agentic-ai-starter-mcp-registry</artifactId>
+    <artifactId>argi-starter-mcp-registry</artifactId>
   </dependency>
 </dependencies>
 ```
@@ -77,19 +77,19 @@ Import the Extensions BOM and add the starters you need to your project:
 
 ## Documentation
 
-- [Overview](https://agentic-spring-ai.github.io/website/en/)
-- [ChatClient](https://agentic-spring-ai.github.io/website/en/integration/chatclient)
-- [Agentic AI Framework](https://github.com/agentic-spring-ai/agentic-spring-ai)
-- [Examples](https://github.com/agentic-spring-ai/examples/tree/main/examples)
+- [Overview](https://agentic-ai-java.github.io/argi-website/en/)
+- [ChatClient](https://agentic-ai-java.github.io/argi-website/en/integration/chatclient)
+- [ARGI Framework](https://github.com/agentic-ai-java/argi)
+- [Examples](https://github.com/agentic-ai-java/argi-examples/tree/main/examples)
 
 ## Contributing
 
-Issues and pull requests are welcome. Report problems and suggestions through [GitHub Issues](https://github.com/agentic-ai-java/agentic-ai-extensions/issues).
+Issues and pull requests are welcome. Report problems and suggestions through [GitHub Issues](https://github.com/agentic-ai-java/argi-extensions/issues).
 
-<a href="https://github.com/agentic-ai-java/agentic-ai-extensions/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=agentic-ai-java/agentic-ai-extensions&max=500&columns=18&anon=1" alt="contributors"/>
+<a href="https://github.com/agentic-ai-java/argi-extensions/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=agentic-ai-java/argi-extensions&max=500&columns=18&anon=1" alt="contributors"/>
 </a>
 
 ## License
 
-Agentic AI Extensions is available under the [Apache License 2.0](LICENSE).
+ARGI Extensions is available under the [Apache License 2.0](LICENSE).
