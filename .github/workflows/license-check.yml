@@ -17,6 +17,7 @@
 name: 🗒️ License Check
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
