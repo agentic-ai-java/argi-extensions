@@ -51,7 +51,7 @@ class MemcachedChatMemoryRepositoryTest {
 
 	// Define and start Memcached container
 	@Container
-	private static final GenericContainer memcachedContainer = new GenericContainer(
+	private static final GenericContainer<?> memcachedContainer = new GenericContainer<>(
 			DockerImageName.parse("memcached:1.6.38"))
 		.withExposedPorts(MEMCACHED_PORT);
 
@@ -63,9 +63,24 @@ class MemcachedChatMemoryRepositoryTest {
 	 */
 	@DynamicPropertySource
 	static void registerProperties(DynamicPropertyRegistry registry) {
-		registry.add("argi.chat.memory.repository.memcached.host", memcachedContainer::getHost);
-		registry.add("argi.chat.memory.repository.memcached.port",
-				() -> memcachedContainer.getMappedPort(MEMCACHED_PORT));
+		registry.add("argi.chat.memory.repository.memcached.host", MemcachedChatMemoryRepositoryTest::memcachedHost);
+		registry.add("argi.chat.memory.repository.memcached.port", MemcachedChatMemoryRepositoryTest::memcachedPort);
+	}
+
+	static String memcachedHost() {
+		ensureMemcachedStarted();
+		return memcachedContainer.getHost();
+	}
+
+	static int memcachedPort() {
+		ensureMemcachedStarted();
+		return memcachedContainer.getMappedPort(MEMCACHED_PORT);
+	}
+
+	private static void ensureMemcachedStarted() {
+		if (!memcachedContainer.isRunning()) {
+			memcachedContainer.start();
+		}
 	}
 
 	@Test
@@ -184,7 +199,9 @@ class MemcachedTestConfiguration {
 
 	@Bean
 	MemcachedClient memcachedClient() throws Exception {
-		return new MemcachedClient(new InetSocketAddress("127.0.0.1", 11211));
+		return new MemcachedClient(
+				new InetSocketAddress(MemcachedChatMemoryRepositoryTest.memcachedHost(),
+						MemcachedChatMemoryRepositoryTest.memcachedPort()));
 	}
 
 	@Bean

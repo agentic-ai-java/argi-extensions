@@ -19,7 +19,7 @@ inputs:
   ref:
     description: ARGI git ref
     required: false
-    default: e36b9cd175ec8de497c370ac30ae3b2ecbdd5817
+    default: a49eed1c4e5c08acc035c5e0a9713116bbdae5e7
 runs:
   using: composite
   steps:
