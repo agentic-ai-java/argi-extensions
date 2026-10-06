@@ -32,6 +32,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.RedisException;
 import org.redisson.config.Config;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -113,6 +114,19 @@ class RedisSaverReadFailureTest {
 	}
 
 	@Test
+	void interruptedGetDoesNotMaskReadFailureWithOwnershipLookup() throws Exception {
+		RedisSaver saver = saverWithLock(interruptedLockWithFailingOwnershipLookup());
+		RunnableConfig config = RunnableConfig.builder().threadId("interrupted-get-masked").build();
+
+		assertThatThrownBy(() -> saver.get(config))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("Interrupted acquiring Redis checkpoint read lock")
+			.hasCauseInstanceOf(InterruptedException.class);
+
+		assertThat(Thread.currentThread().isInterrupted()).isTrue();
+	}
+
+	@Test
 	void interruptedListRestoresInterruptFlagAndThrows() throws Exception {
 		RedisSaver saver = saverWithLock(interruptedLock());
 		RunnableConfig config = RunnableConfig.builder().threadId("interrupted-list").build();
@@ -120,6 +134,19 @@ class RedisSaverReadFailureTest {
 		assertThatThrownBy(() -> saver.list(config))
 			.isInstanceOf(IllegalStateException.class)
 			.hasMessageContaining("Interrupted acquiring Redis checkpoint read lock");
+
+		assertThat(Thread.currentThread().isInterrupted()).isTrue();
+	}
+
+	@Test
+	void interruptedListDoesNotMaskReadFailureWithOwnershipLookup() throws Exception {
+		RedisSaver saver = saverWithLock(interruptedLockWithFailingOwnershipLookup());
+		RunnableConfig config = RunnableConfig.builder().threadId("interrupted-list-masked").build();
+
+		assertThatThrownBy(() -> saver.list(config))
+			.isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("Interrupted acquiring Redis checkpoint read lock")
+			.hasCauseInstanceOf(InterruptedException.class);
 
 		assertThat(Thread.currentThread().isInterrupted()).isTrue();
 	}
@@ -180,6 +207,13 @@ class RedisSaverReadFailureTest {
 		RLock lock = mock(RLock.class);
 		when(lock.tryLock(500, TimeUnit.MILLISECONDS)).thenThrow(new InterruptedException("interrupted"));
 		when(lock.isHeldByCurrentThread()).thenReturn(false);
+		return lock;
+	}
+
+	private static RLock interruptedLockWithFailingOwnershipLookup() throws InterruptedException {
+		RLock lock = mock(RLock.class);
+		when(lock.tryLock(500, TimeUnit.MILLISECONDS)).thenThrow(new InterruptedException("interrupted"));
+		when(lock.isHeldByCurrentThread()).thenThrow(new RedisException("masked ownership lookup"));
 		return lock;
 	}
 
