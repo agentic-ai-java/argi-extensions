@@ -68,9 +68,51 @@ These scans are not cross-item snapshot transactions; `clear()` requires
 quiescent writers for a complete purge. Tombstone reclamation needs a future
 retention design.
 
+## RedisVersionedSaver
+
+`RedisVersionedSaver` is the Redis implementation of Core's
+`VersionedCheckpointSaver` contract for checkpoint compare-and-set execution.
+It is an explicit new-format saver; it does not read, migrate, update, or delete
+the legacy `RedisSaver` keys.
+
+```java
+import io.github.agentic.ai.graph.persistence.redis.RedisVersionedSaver;
+
+var saver = RedisVersionedSaver.builder()
+    .redisson(redisson)
+    .stateSerializer(StateGraph.DEFAULT_JACKSON_SERIALIZER)
+    .build();
+```
+
+The builder requires a caller-owned `RedissonClient`, accepts the same
+`StateSerializer` style as `RedisSaver`, and can be isolated with
+`storageKey(String)`. The default Redis hash key is
+`argi:checkpoint:versioned:v1`.
+
+Each checkpoint namespace is one `RedisStore` item:
+
+- Store namespace: `["checkpoints"]`;
+- Store key: `BaseCheckpointSaver.checkpointThreadId(config)`;
+- Store value: `content`, a Base64 checkpoint-history payload written with
+  `CheckPointSerializer`.
+
+Versioned writes and releases use `RedisStore.putItemIfVersion` against the
+single Store envelope. A stale conditional mutation throws
+`CheckpointConflictException` and does not fall back to an unconditional write.
+Successful puts and releases advance the Store version exactly once. Release
+writes an empty history item, including release of a never-written namespace, so
+the positive tombstone revision is retained and stale version-zero writers
+cannot recreate the namespace.
+
+Plain `put` and `release` remain compatibility methods and use bounded CAS
+reload/retry loops. Graph runtime paths use `putIfVersion` and
+`releaseIfVersion` through Core's versioned scope.
+
 ## Boundaries
 
 This module does not change legacy in-memory Redis-like Store classes in Core,
 does not add Redis dependencies elsewhere, and does not provide Worker failover
-or graph checkpoint recovery guarantees. Checkpoint-executor CAS, leases,
-fencing, durable scheduling, and automatic recovery remain separate milestones.
+or graph checkpoint recovery guarantees. It also does not provide message-queue
+delivery, leases, fencing, exactly-once side-effect execution, automatic
+failover, TTL management, or legacy checkpoint migration. Durable scheduling,
+side-effect coordination, and tombstone reclamation remain separate milestones.
