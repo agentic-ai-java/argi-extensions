@@ -19,9 +19,15 @@ Checkpoint reads now distinguish a missing checkpoint from Redis lock contention
 ## RedisStore
 
 `RedisStore` is the adopted Redis implementation of the Core `VersionedStore`
-contract. It requires a caller-owned `RedissonClient`:
+contract. It requires a caller-owned `RedissonClient` and a matching Core build
+that contains `VersionedStore` and `VersionedStoreItem`; older Core main
+artifacts without those contracts cannot consume this implementation. Import the
+Extensions Redis Store explicitly because Core still has a legacy class with the
+same simple name:
 
 ```java
+import io.github.agentic.ai.graph.persistence.redis.RedisStore;
+
 RedisStore store = new RedisStore(redisson);
 RedisStore isolated = new RedisStore(redisson, "my:store:hash");
 ```
@@ -40,6 +46,18 @@ Conditional writes use Redisson's atomic `putIfAbsent` and exact-value
 `replace` operations against the complete serialized envelope. Version arithmetic
 uses Java `Math.addExact`, so overflow fails before mutation. Negative expected
 versions are rejected.
+
+Adopt conditional writes by reading the current version, preparing the next
+`StoreItem`, then writing only if that version is still current:
+
+```java
+long version = store.getVersionedItem(namespace, key).version();
+StoreItem next = StoreItem.of(namespace, key, value);
+
+if (!store.putItemIfVersion(next, version)) {
+    // Another writer changed the item. Reload and re-plan instead of overwriting.
+}
+```
 
 Deletes and `clear()` retain persistent tombstones. A deleted key keeps its
 positive version so stale writers cannot recreate it with expected version zero.
