@@ -53,31 +53,31 @@ class RedisStoreTest {
 	private static final GenericContainer<?> REDIS = new GenericContainer<>(DockerImageName.parse("valkey/valkey:8.1.2"))
 		.withExposedPorts(6379);
 
-	private static RedissonClient clientA;
+	private static RedissonClient primaryClient;
 
-	private static RedissonClient clientB;
+	private static RedissonClient secondaryClient;
 
 	@BeforeAll
 	static void setup() {
-		clientA = newClient();
-		clientB = newClient();
+		primaryClient = newClient();
+		secondaryClient = newClient();
 	}
 
 	@AfterAll
 	static void tearDown() {
-		if (clientA != null) {
-			clientA.shutdown();
+		if (primaryClient != null) {
+			primaryClient.shutdown();
 		}
-		if (clientB != null) {
-			clientB.shutdown();
+		if (secondaryClient != null) {
+			secondaryClient.shutdown();
 		}
 	}
 
 	@Test
 	void versionedWritesAreSharedAcrossClientsAndTombstonesPreventStaleRecreate() {
 		String storageKey = uniqueStorageKey();
-		RedisStore a = new RedisStore(clientA, storageKey);
-		RedisStore b = new RedisStore(clientB, storageKey);
+		RedisStore a = new RedisStore(primaryClient, storageKey);
+		RedisStore b = new RedisStore(secondaryClient, storageKey);
 		List<String> namespace = List.of("agent", "memory");
 		StoreItem item = item(namespace, "profile", Map.of("name", "Ada", "marker", "first"));
 		StoreItem otherItem = item(namespace, "profile", Map.of("name", "Grace", "marker", "second"));
@@ -99,8 +99,8 @@ class RedisStoreTest {
 	@Test
 	void onlyOneConditionalWriterWinsForTheSameExpectedVersion() throws Exception {
 		String storageKey = uniqueStorageKey();
-		RedisStore a = new RedisStore(clientA, storageKey);
-		RedisStore b = new RedisStore(clientB, storageKey);
+		RedisStore a = new RedisStore(primaryClient, storageKey);
+		RedisStore b = new RedisStore(secondaryClient, storageKey);
 		List<String> namespace = List.of("race", "conditional");
 		CountDownLatch ready = new CountDownLatch(2);
 		CountDownLatch start = new CountDownLatch(1);
@@ -129,8 +129,8 @@ class RedisStoreTest {
 	@Test
 	void ordinaryContendedPutsRetryAndIncrementOncePerMutation() throws Exception {
 		String storageKey = uniqueStorageKey();
-		RedisStore storeA = new RedisStore(clientA, storageKey);
-		RedisStore storeB = new RedisStore(clientB, storageKey);
+		RedisStore storeA = new RedisStore(primaryClient, storageKey);
+		RedisStore storeB = new RedisStore(secondaryClient, storageKey);
 		List<String> namespace = List.of("race", "ordinary");
 		int writers = 8;
 		CountDownLatch ready = new CountDownLatch(writers);
@@ -161,7 +161,7 @@ class RedisStoreTest {
 	@Test
 	void searchNamespaceListingAndScopedClearExcludeTombstones() {
 		String storageKey = uniqueStorageKey();
-		RedisStore store = new RedisStore(clientA, storageKey);
+		RedisStore store = new RedisStore(primaryClient, storageKey);
 		store.putItem(item(List.of("users", "u1", "prefs"), "theme",
 				Map.of("type", "preference", "rank", 3, "text", "dark nested marker")));
 		store.putItem(item(List.of("users", "u1", "prefs"), "locale",
@@ -208,8 +208,8 @@ class RedisStoreTest {
 		List<String> namespace = List.of("json", "nested");
 		StoreItem nested = item(namespace, "payload",
 				Map.of("marker", "business-json", "nested", Map.of("flag", true, "items", List.of("a", "b"))));
-		new RedisStore(clientA, sharedKey).putItem(nested);
-		new RedisStore(clientA, isolatedKey).putItem(item(namespace, "payload", Map.of("marker", "isolated")));
+		new RedisStore(primaryClient, sharedKey).putItem(nested);
+		new RedisStore(primaryClient, isolatedKey).putItem(item(namespace, "payload", Map.of("marker", "isolated")));
 
 		RedissonClient reconstructed = newClient();
 		try {
@@ -231,7 +231,7 @@ class RedisStoreTest {
 	@Test
 	void negativeExpectedVersionIsRejectedAndOverflowFailsBeforeMutation() {
 		String storageKey = uniqueStorageKey();
-		RedisStore store = new RedisStore(clientA, storageKey);
+		RedisStore store = new RedisStore(primaryClient, storageKey);
 		List<String> namespace = List.of("overflow");
 		StoreItem item = item(namespace, "max", Map.of("marker", "overflow"));
 
@@ -239,7 +239,7 @@ class RedisStoreTest {
 		assertThatThrownBy(() -> store.deleteItemIfVersion(namespace, "max", -1))
 			.isInstanceOf(IllegalArgumentException.class);
 
-		RMap<String, String> hash = clientA.getMap(storageKey, StringCodec.INSTANCE);
+		RMap<String, String> hash = primaryClient.getMap(storageKey, StringCodec.INSTANCE);
 		String field = storeKeyForTests(namespace, "max");
 		String maxEnvelope = "{\"version\":9223372036854775807,\"deleted\":false,\"item\":{\"namespace\":[\"overflow\"],"
 				+ "\"key\":\"max\",\"value\":{\"marker\":\"overflow\"},\"createdAt\":10,\"updatedAt\":20}}";
