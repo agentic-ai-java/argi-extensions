@@ -1,0 +1,586 @@
+/*
+ * Copyright 2025-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.github.agentic.ai.graph.persistence.redis;
+
+import io.github.agentic.ai.graph.CompileConfig;
+import io.github.agentic.ai.graph.CompiledGraph;
+import io.github.agentic.ai.graph.NodeOutput;
+import io.github.agentic.ai.graph.OverAllState;
+import io.github.agentic.ai.graph.RunnableConfig;
+import io.github.agentic.ai.graph.StateGraph;
+import io.github.agentic.ai.graph.checkpoint.BaseCheckpointSaver;
+import io.github.agentic.ai.graph.checkpoint.Checkpoint;
+import io.github.agentic.ai.graph.checkpoint.CheckpointSnapshot;
+import io.github.agentic.ai.graph.checkpoint.config.SaverConfig;
+import io.github.agentic.ai.graph.checkpoint.lease.ExecutionLease;
+import io.github.agentic.ai.graph.checkpoint.lease.LeaseBusyException;
+import io.github.agentic.ai.graph.checkpoint.lease.LeaseLostException;
+import io.github.agentic.ai.graph.checkpoint.lease.LeaseOptions;
+import io.github.agentic.ai.graph.checkpoint.lease.LeaseRequiredException;
+import io.github.agentic.ai.graph.serializer.Serializer;
+import io.github.agentic.ai.graph.serializer.StateSerializer;
+import io.github.agentic.ai.graph.serializer.check_point.CheckPointSerializer;
+import io.github.agentic.ai.graph.serializer.plain_text.jackson.SpringAIJacksonStateSerializer;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.redisson.Redisson;
+import org.redisson.api.RScript;
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.config.Config;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+
+import static io.github.agentic.ai.graph.StateGraph.END;
+import static io.github.agentic.ai.graph.StateGraph.START;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@Testcontainers(disabledWithoutDocker = true)
+class RedisLeasedCheckpointSaverTest {
+
+	private static final StateSerializer STATE_SERIALIZER = new SpringAIJacksonStateSerializer(OverAllState::new);
+
+	private static final Serializer<Checkpoint> CHECKPOINT_SERIALIZER = new CheckPointSerializer(STATE_SERIALIZER);
+
+	private static final String OWNER = "owner";
+
+	private static final String FENCE = "fence";
+
+	private static final String EXPIRES = "expires";
+
+	private static final String REVISION = "revision";
+
+	private static final String HISTORY = "history";
+
+	private static final String LEGACY_CHECKPOINT_PREFIX = "graph:checkpoint:content:";
+
+	private static final String VERSIONED_STORAGE_KEY_PREFIX = "argi:test:checkpoint:versioned:";
+
+	@Container
+	private static final GenericContainer<?> VALKEY = new GenericContainer<>(DockerImageName.parse("valkey/valkey:8.1.2"))
+		.withExposedPorts(6379);
+
+	private static RedissonClient primaryClient;
+
+	private static RedissonClient secondaryClient;
+
+	@BeforeAll
+	static void setup() {
+		primaryClient = newClient();
+		secondaryClient = newClient();
+	}
+
+	@AfterAll
+	static void tearDown() {
+		if (primaryClient != null) {
+			primaryClient.shutdown();
+		}
+		if (secondaryClient != null) {
+			secondaryClient.shutdown();
+		}
+	}
+
+	@Test
+	void busyLeaseStopsSecondGraphBeforeAnyNodeRuns() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saverA = saver(primaryClient, prefix);
+		RedisLeasedCheckpointSaver saverB = saver(secondaryClient, prefix);
+		RunnableConfig config = config("busy-before-node");
+		CountDownLatch firstEntered = new CountDownLatch(1);
+		CountDownLatch releaseFirst = new CountDownLatch(1);
+		AtomicInteger firstCalls = new AtomicInteger();
+		AtomicInteger secondCalls = new AtomicInteger();
+		CompiledGraph firstGraph = graph(saverA, "first", firstCalls, firstEntered, releaseFirst, false);
+		CompiledGraph secondGraph = graph(saverB, "second", secondCalls);
+
+		CompletableFuture<List<NodeOutput>> firstRun = firstGraph.stream(Map.of("request", "first"), config)
+			.collectList()
+			.toFuture();
+		assertThat(firstEntered.await(5, TimeUnit.SECONDS)).isTrue();
+
+		assertThatThrownBy(() -> secondGraph.invoke(Map.of("request", "second"), config))
+			.isInstanceOf(LeaseBusyException.class);
+		releaseFirst.countDown();
+		assertThat(firstRun.get(5, TimeUnit.SECONDS)).isNotEmpty();
+
+		assertThat(firstCalls).hasValue(1);
+		assertThat(secondCalls).hasValue(0);
+	}
+
+	@Test
+	void expiredOwnerCannotReleaseOrMutateAfterIndependentClientReacquiresAtUnchangedRevision() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saverA = saver(primaryClient, prefix);
+		RedisLeasedCheckpointSaver saverB = saver(secondaryClient, prefix);
+		RunnableConfig config = config("expired-stale-owner");
+		ExecutionLease oldLease = saverA.acquireLease(config, UUID.randomUUID());
+		saverA.putIfLeasedVersion(config, checkpoint("seed"), 0, oldLease);
+		expireLease(prefix, config);
+
+		ExecutionLease winner = saverB.acquireLease(config, UUID.randomUUID());
+
+		assertThat(winner.fencingToken()).isGreaterThan(oldLease.fencingToken());
+		assertThat(saverB.getVersioned(config).revision()).isEqualTo(1);
+		assertThatThrownBy(() -> saverA.releaseIfLeasedVersion(config, 1, oldLease))
+			.isInstanceOf(LeaseLostException.class);
+		assertThatThrownBy(() -> saverA.putIfLeasedVersion(config, checkpoint("stale"), 1, oldLease))
+			.isInstanceOf(LeaseLostException.class);
+		assertThat(saverA.releaseLease(config, oldLease)).isFalse();
+		assertThat(saverB.getVersioned(config).revision()).isEqualTo(1);
+		assertThat(saverB.releaseLease(config, winner)).isTrue();
+	}
+
+	@Test
+	void exactInt64CountersRoundTripAboveDoublePrecisionAndOverflowFailsBeforeMutation() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = saver(primaryClient, prefix);
+		RunnableConfig config = config("large-counters");
+		RMap<String, String> hash = leasedHash(prefix, config);
+		hash.put(FENCE, "9007199254740992");
+		hash.put(REVISION, "9007199254740993");
+		hash.put(HISTORY, serializeCheckpoints(List.of(checkpointWithId("large", 1))));
+
+		ExecutionLease lease = saver.acquireLease(config, UUID.randomUUID());
+		CheckpointSnapshot snapshot = saver.getVersioned(config);
+		BaseCheckpointSaver.Tag tag = saver.releaseIfLeasedVersion(config, 9007199254740993L, lease);
+
+		assertThat(lease.fencingToken()).isEqualTo(9007199254740993L);
+		assertThat(snapshot.revision()).isEqualTo(9007199254740993L);
+		assertThat(tag.checkpoints()).extracting(Checkpoint::getId).containsExactly("large");
+		assertThat(saver.getVersioned(config).revision()).isEqualTo(9007199254740994L);
+
+		RunnableConfig fenceOverflow = config("fence-overflow");
+		RMap<String, String> fenceOverflowHash = leasedHash(prefix, fenceOverflow);
+		fenceOverflowHash.put(FENCE, Long.toString(Long.MAX_VALUE));
+		Map<String, String> beforeFenceOverflow = fenceOverflowHash.readAllMap();
+		assertThatThrownBy(() -> saver.acquireLease(fenceOverflow, UUID.randomUUID()))
+			.isInstanceOf(ArithmeticException.class);
+		assertThat(fenceOverflowHash.readAllMap()).isEqualTo(beforeFenceOverflow);
+
+		RunnableConfig revisionOverflow = config("revision-overflow");
+		ExecutionLease overflowLease = saver.acquireLease(revisionOverflow, UUID.randomUUID());
+		RMap<String, String> revisionOverflowHash = leasedHash(prefix, revisionOverflow);
+		revisionOverflowHash.put(REVISION, Long.toString(Long.MAX_VALUE));
+		revisionOverflowHash.put(HISTORY, serializeCheckpoints(List.of(checkpoint("max"))));
+		Map<String, String> beforeRevisionOverflow = revisionOverflowHash.readAllMap();
+		assertThatThrownBy(() -> saver.putIfLeasedVersion(revisionOverflow, checkpoint("overflow"), Long.MAX_VALUE,
+				overflowLease)).isInstanceOf(ArithmeticException.class);
+		assertThat(revisionOverflowHash.readAllMap()).isEqualTo(beforeRevisionOverflow);
+	}
+
+	@Test
+	void malformedCountersAndFieldPairsFailBeforeLeaseMutation() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = saver(primaryClient, prefix);
+		RunnableConfig malformedFence = config("malformed-fence");
+		RMap<String, String> malformedFenceHash = leasedHash(prefix, malformedFence);
+		malformedFenceHash.put(FENCE, "01");
+		malformedFenceHash.put(REVISION, "0");
+		malformedFenceHash.put(HISTORY, serializeCheckpoints(List.of()));
+		Map<String, String> beforeFence = malformedFenceHash.readAllMap();
+
+		assertThatThrownBy(() -> saver.acquireLease(malformedFence, UUID.randomUUID()))
+			.isInstanceOf(IllegalStateException.class);
+		assertThat(malformedFenceHash.readAllMap()).isEqualTo(beforeFence);
+
+		RunnableConfig missingHistory = config("missing-history");
+		RMap<String, String> missingHistoryHash = leasedHash(prefix, missingHistory);
+		missingHistoryHash.put(REVISION, "1");
+		Map<String, String> beforeMissingHistory = missingHistoryHash.readAllMap();
+		assertThatThrownBy(() -> saver.getVersioned(missingHistory)).isInstanceOf(IllegalStateException.class);
+		assertThatThrownBy(() -> saver.acquireLease(missingHistory, UUID.randomUUID()))
+			.isInstanceOf(IllegalStateException.class);
+		assertThat(missingHistoryHash.readAllMap()).isEqualTo(beforeMissingHistory);
+	}
+
+	@Test
+	void renewAndReleaseOnlyAffectLeaseFieldsAndNeverReviveExpiredOwnership() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = saver(primaryClient, prefix);
+		RunnableConfig config = config("renew-isolation");
+		ExecutionLease lease = saver.acquireLease(config, UUID.randomUUID());
+		saver.putIfLeasedVersion(config, checkpoint("first"), 0, lease);
+		Map<String, String> beforeRenew = leasedHash(prefix, config).readAllMap();
+
+		ExecutionLease renewed = saver.renewLease(config, lease);
+		Map<String, String> afterRenew = leasedHash(prefix, config).readAllMap();
+		expireLease(prefix, config);
+
+		assertThat(renewed.fencingToken()).isEqualTo(lease.fencingToken());
+		assertThat(afterRenew).containsEntry(REVISION, beforeRenew.get(REVISION)).containsEntry(HISTORY,
+				beforeRenew.get(HISTORY));
+		assertThat(afterRenew.get(EXPIRES)).isNotEqualTo(beforeRenew.get(EXPIRES));
+		assertThatThrownBy(() -> saver.renewLease(config, renewed)).isInstanceOf(LeaseLostException.class);
+		assertThat(saver.getVersioned(config).revision()).isEqualTo(1);
+	}
+
+	@Test
+	void wrongOwnerOrFenceCannotRenewUnlockMutateOrReleaseCheckpoints() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = saver(primaryClient, prefix);
+		RunnableConfig config = config("wrong-credentials");
+		ExecutionLease lease = saver.acquireLease(config, UUID.randomUUID());
+		saver.putIfLeasedVersion(config, checkpoint("first"), 0, lease);
+		ExecutionLease wrongOwner = new ExecutionLease(lease.namespace(), UUID.randomUUID(), lease.fencingToken(),
+				lease.expiresAtMillis());
+		ExecutionLease wrongFence = new ExecutionLease(lease.namespace(), lease.ownerId(), lease.fencingToken() + 1,
+				lease.expiresAtMillis());
+
+		assertThatThrownBy(() -> saver.renewLease(config, wrongOwner)).isInstanceOf(LeaseLostException.class);
+		assertThatThrownBy(() -> saver.renewLease(config, wrongFence)).isInstanceOf(LeaseLostException.class);
+		assertThat(saver.releaseLease(config, wrongOwner)).isFalse();
+		assertThat(saver.releaseLease(config, wrongFence)).isFalse();
+		assertThatThrownBy(() -> saver.putIfLeasedVersion(config, checkpoint("wrong-owner"), 1, wrongOwner))
+			.isInstanceOf(LeaseLostException.class);
+		assertThatThrownBy(() -> saver.putIfLeasedVersion(config, checkpoint("wrong-fence"), 1, wrongFence))
+			.isInstanceOf(LeaseLostException.class);
+		assertThatThrownBy(() -> saver.releaseIfLeasedVersion(config, 1, wrongFence))
+			.isInstanceOf(LeaseLostException.class);
+		assertThat(saver.getVersioned(config).revision()).isEqualTo(1);
+		assertThat(saver.releaseLease(config, lease)).isTrue();
+	}
+
+	@Test
+	void retentionSerializationAndOlderRedisKeyspacesStayIsolated() throws Exception {
+		String prefix = uniquePrefix();
+		String versionedStorageKey = VERSIONED_STORAGE_KEY_PREFIX + UUID.randomUUID();
+		RedisLeasedCheckpointSaver saver = saver(primaryClient, prefix);
+		RedisSaver legacy = RedisSaver.builder().redisson(primaryClient).stateSerializer(STATE_SERIALIZER).build();
+		RedisVersionedSaver versioned = RedisVersionedSaver.builder()
+			.redisson(primaryClient)
+			.stateSerializer(STATE_SERIALIZER)
+			.storageKey(versionedStorageKey)
+			.build();
+		RunnableConfig config = RunnableConfig.builder()
+			.threadId("retention-" + UUID.randomUUID())
+			.checkpointsNumRetained(2)
+			.build();
+		legacy.put(config, checkpoint("legacy"));
+		versioned.putIfVersion(config, checkpoint("versioned"), 0);
+		String legacyKey = legacyContentKey(config);
+		Map<String, String> oldVersionedBefore = primaryClient.<String, String>getMap(versionedStorageKey,
+				StringCodec.INSTANCE).readAllMap();
+
+		ExecutionLease lease = saver.acquireLease(config, UUID.randomUUID());
+		saver.putIfLeasedVersion(config, checkpointWithId("cp1", 1), 0, lease);
+		saver.putIfLeasedVersion(config, checkpointWithId("cp2", 2), 1, lease);
+		saver.putIfLeasedVersion(config, checkpointWithId("cp3", 3), 2, lease);
+		RedissonClient reconstructed = newClient();
+		try {
+			RedisLeasedCheckpointSaver restored = saver(reconstructed, prefix);
+
+			assertThat(restored.list(config)).extracting(Checkpoint::getId).containsExactly("cp3", "cp2");
+			assertThat(restored.getVersioned(config).revision()).isEqualTo(3);
+		}
+		finally {
+			reconstructed.shutdown();
+		}
+		assertThat(primaryClient.getBucket(legacyKey).get()).isNotNull();
+		assertThat(primaryClient.<String, String>getMap(versionedStorageKey, StringCodec.INSTANCE).readAllMap())
+			.isEqualTo(oldVersionedBefore);
+	}
+
+	@Test
+	void runtimeInvokeStreamManualUpdateReleaseAndOwnerlessSpyGuardUseLeasedMutations() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = spy(saver(primaryClient, prefix));
+		doThrow(new AssertionError("runtime must not call ownerless putIfVersion"))
+			.when(saver)
+			.putIfVersion(any(RunnableConfig.class), any(Checkpoint.class), anyLong());
+		doThrow(new AssertionError("runtime must not call ownerless releaseIfVersion"))
+			.when(saver)
+			.releaseIfVersion(any(RunnableConfig.class), anyLong());
+		CompiledGraph graph = simpleGraph(saver);
+		RunnableConfig invokeConfig = config("leased-invoke");
+		RunnableConfig streamConfig = config("leased-stream");
+		RunnableConfig updateConfig = config("leased-update");
+		RunnableConfig releaseConfig = config("leased-release");
+
+		assertThat(graph.invoke(Map.of("request", "invoke"), invokeConfig)).isPresent();
+		assertThat(saver.getVersioned(invokeConfig).revision()).isEqualTo(2);
+		assertThat(graph.stream(Map.of("request", "stream"), streamConfig).last().block(Duration.ofSeconds(5)))
+			.isNotNull();
+		ExecutionLease updateSeedLease = saver.acquireLease(updateConfig, UUID.randomUUID());
+		RunnableConfig seeded = saver.putIfLeasedVersion(updateConfig,
+				Checkpoint.builder().state(Map.of("result", "seed")).nodeId(START).nextNodeId("write").build(), 0,
+				updateSeedLease);
+		assertThat(saver.releaseLease(updateConfig, updateSeedLease)).isTrue();
+		assertThat(graph.updateState(seeded, Map.of("request", "manual"), START).checkPointId()).isPresent();
+		assertThat(simpleGraph(saver, true).invoke(Map.of("request", "release"), releaseConfig)).isPresent();
+
+		verify(saver, never()).putIfVersion(any(RunnableConfig.class), any(Checkpoint.class), anyLong());
+		verify(saver, never()).releaseIfVersion(any(RunnableConfig.class), anyLong());
+		RedisLeasedCheckpointSaver ownerlessSaver = saver(secondaryClient, uniquePrefix());
+		assertThatThrownBy(() -> ownerlessSaver.putIfVersion(config("ownerless-put"), checkpoint("ownerless"), 0))
+			.isInstanceOf(LeaseRequiredException.class);
+		assertThatThrownBy(() -> ownerlessSaver.releaseIfVersion(config("ownerless-release"), 0))
+			.isInstanceOf(LeaseRequiredException.class);
+	}
+
+	@Test
+	void graphLeaseLossDuringNodeRejectsLateResultAtUnchangedRevisionAfterNewOwnerAcquires() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver staleSaver = saver(primaryClient, prefix);
+		RedisLeasedCheckpointSaver winnerSaver = saver(secondaryClient, prefix);
+		CountDownLatch staleNodeEntered = new CountDownLatch(1);
+		CountDownLatch allowStaleToFinish = new CountDownLatch(1);
+		AtomicInteger staleCalls = new AtomicInteger();
+		CompiledGraph staleGraph = graph(staleSaver, "stale", staleCalls, staleNodeEntered, allowStaleToFinish, false);
+		RunnableConfig config = config("unchanged-revision-loss");
+
+		CompletableFuture<List<NodeOutput>> staleRun = staleGraph.stream(Map.of("request", "stale"), config)
+			.collectList()
+			.toFuture();
+		assertThat(staleNodeEntered.await(5, TimeUnit.SECONDS)).isTrue();
+		expireLease(prefix, config);
+		ExecutionLease winner = winnerSaver.acquireLease(config, UUID.randomUUID());
+		assertThat(winnerSaver.getVersioned(config).revision()).isEqualTo(1);
+		allowStaleToFinish.countDown();
+
+		assertThatThrownBy(() -> staleRun.get(5, TimeUnit.SECONDS)).satisfies(RedisLeasedCheckpointSaverTest::assertLeaseLoss);
+		assertThat(staleCalls).hasValue(1);
+		assertThat(winnerSaver.getVersioned(config).revision()).isEqualTo(1);
+		assertThat(winnerSaver.getVersioned(config).checkpoint()).hasValueSatisfying(
+				actual -> assertThat(actual.getNodeId()).isEqualTo(START));
+		assertThat(winnerSaver.releaseLease(config, winner)).isTrue();
+	}
+
+	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	void scriptTransportFailurePropagatesWithoutOwnerlessFallback() {
+		RedissonClient redisson = mock(RedissonClient.class);
+		RScript script = mock(RScript.class);
+		RuntimeException transportFailure = new RuntimeException("script transport failed");
+		when(redisson.getScript(StringCodec.INSTANCE)).thenReturn(script);
+		when(script.eval(any(RScript.Mode.class), anyString(), any(RScript.ReturnType.class), any(List.class),
+				any(Object[].class))).thenThrow(transportFailure);
+		RedisLeasedCheckpointSaver saver = RedisLeasedCheckpointSaver.builder()
+			.redisson(redisson)
+			.stateSerializer(STATE_SERIALIZER)
+			.build();
+
+		assertThatThrownBy(() -> saver.acquireLease(config("transport-acquire"), UUID.randomUUID()))
+			.isSameAs(transportFailure);
+	}
+
+	@Test
+	void staleGraphLosesLeaseAtUnchangedRevisionAndDoesNotMergeLateResult() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver staleSaver = saver(primaryClient, prefix);
+		RedisLeasedCheckpointSaver winnerSaver = saver(secondaryClient, prefix);
+		CountDownLatch staleNodeEntered = new CountDownLatch(1);
+		CountDownLatch allowStaleToFinish = new CountDownLatch(1);
+		AtomicInteger staleCalls = new AtomicInteger();
+		AtomicInteger winnerCalls = new AtomicInteger();
+		CompiledGraph staleGraph = graph(staleSaver, "stale", staleCalls, staleNodeEntered, allowStaleToFinish, false);
+		CompiledGraph winnerGraph = graph(winnerSaver, "winner", winnerCalls);
+		RunnableConfig config = config("stale-graph");
+
+		CompletableFuture<List<NodeOutput>> staleRun = staleGraph.stream(Map.of("request", "stale"), config)
+			.collectList()
+			.toFuture();
+		assertThat(staleNodeEntered.await(5, TimeUnit.SECONDS)).isTrue();
+		expireLease(prefix, config);
+
+		NodeOutput winner = winnerGraph.stream(Map.of("request", "winner"), config)
+			.last()
+			.block(Duration.ofSeconds(5));
+		allowStaleToFinish.countDown();
+
+		assertThatThrownBy(() -> staleRun.get(5, TimeUnit.SECONDS)).satisfies(RedisLeasedCheckpointSaverTest::assertLeaseLoss);
+		assertThat(winner.state().value("result")).contains("winner");
+		assertThat(staleCalls).hasValue(1);
+		assertThat(winnerCalls).hasValue(1);
+		assertThat(winnerSaver.getVersioned(config).checkpoint()).hasValueSatisfying(
+				actual -> assertThat(actual.getState()).containsEntry("result", "winner"));
+	}
+
+	private static CompiledGraph simpleGraph(RedisLeasedCheckpointSaver saver) throws Exception {
+		return simpleGraph(saver, false);
+	}
+
+	private static CompiledGraph simpleGraph(RedisLeasedCheckpointSaver saver, boolean releaseThread) throws Exception {
+		return graph(saver, null, new AtomicInteger(), null, null, releaseThread);
+	}
+
+	private static CompiledGraph graph(RedisLeasedCheckpointSaver saver, String fixedResult, AtomicInteger calls)
+			throws Exception {
+		return graph(saver, fixedResult, calls, null, null, false);
+	}
+
+	private static CompiledGraph graph(RedisLeasedCheckpointSaver saver, String fixedResult, AtomicInteger calls,
+			CountDownLatch entered, CountDownLatch proceed, boolean releaseThread) throws Exception {
+		return new StateGraph()
+			.addNode("write", (state, config) -> {
+				calls.incrementAndGet();
+				if (entered != null) {
+					entered.countDown();
+				}
+				Object result = fixedResult != null ? fixedResult : state.value("request").orElse("missing");
+				if (proceed == null) {
+					return CompletableFuture.completedFuture(Map.of("result", result));
+				}
+				return CompletableFuture.supplyAsync(() -> {
+					await(proceed);
+					return Map.of("result", result);
+				});
+			})
+			.addEdge(START, "write")
+			.addEdge("write", END)
+			.compile(CompileConfig.builder()
+				.saverConfig(SaverConfig.builder().register(saver).build())
+				.releaseThread(releaseThread)
+				.build());
+	}
+
+	private static RedisLeasedCheckpointSaver saver(RedissonClient redisson, String prefix) {
+		return RedisLeasedCheckpointSaver.builder()
+			.redisson(redisson)
+			.stateSerializer(STATE_SERIALIZER)
+			.leaseOptions(new LeaseOptions(Duration.ofSeconds(2), Duration.ofMillis(250)))
+			.storageKeyPrefix(prefix)
+			.build();
+	}
+
+	private static RunnableConfig config(String name) {
+		return RunnableConfig.builder().threadId(name + "-" + UUID.randomUUID()).build();
+	}
+
+	private static Checkpoint checkpoint(String result) {
+		return Checkpoint.builder()
+			.id("checkpoint-" + result + "-" + UUID.randomUUID())
+			.nodeId("node-" + result)
+			.nextNodeId(END)
+			.state(Map.of("result", result))
+			.build();
+	}
+
+	private static Checkpoint checkpointWithId(String id, int version) {
+		return Checkpoint.builder()
+			.id(id)
+			.nodeId("node-" + id)
+			.nextNodeId(END)
+			.state(Map.of("version", version))
+			.build();
+	}
+
+	private static void expireLease(String prefix, RunnableConfig config) {
+		leasedHash(prefix, config).put(EXPIRES, "1");
+	}
+
+	private static RMap<String, String> leasedHash(String prefix, RunnableConfig config) {
+		return primaryClient.getMap(leasedKey(prefix, config.threadId().orElseThrow()), StringCodec.INSTANCE);
+	}
+
+	private static String leasedKey(String prefix, String namespace) {
+		return prefix + ":{"
+				+ Base64.getUrlEncoder().withoutPadding().encodeToString(namespace.getBytes(StandardCharsets.UTF_8))
+				+ "}";
+	}
+
+	private static String legacyContentKey(RunnableConfig config) {
+		String threadName = config.threadId().orElseThrow();
+		RMap<String, String> meta = primaryClient.getMap("graph:thread:meta:" + threadName);
+		return LEGACY_CHECKPOINT_PREFIX + meta.get("thread_id");
+	}
+
+	private static String serializeCheckpoints(Collection<Checkpoint> checkpoints) throws Exception {
+		try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+			oos.writeInt(checkpoints.size());
+			for (Checkpoint checkpoint : checkpoints) {
+				CHECKPOINT_SERIALIZER.write(checkpoint, oos);
+			}
+			oos.flush();
+			return Base64.getEncoder().encodeToString(baos.toByteArray());
+		}
+	}
+
+	private static LinkedList<Checkpoint> deserializeCheckpoints(String content) throws Exception {
+		byte[] bytes = Base64.getDecoder().decode(content);
+		try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+				ObjectInputStream ois = new ObjectInputStream(bais)) {
+			int size = ois.readInt();
+			LinkedList<Checkpoint> checkpoints = new LinkedList<>();
+			for (int i = 0; i < size; i++) {
+				checkpoints.add(CHECKPOINT_SERIALIZER.read(ois));
+			}
+			return checkpoints;
+		}
+	}
+
+	private static void assertLeaseLoss(Throwable failure) {
+		Throwable current = failure;
+		while ((current instanceof ExecutionException || current.getCause() != null) && current.getCause() != null) {
+			current = current.getCause();
+		}
+		assertThat(current).isInstanceOf(LeaseLostException.class);
+	}
+
+	private static void await(CountDownLatch latch) {
+		try {
+			latch.await();
+		}
+		catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			throw new IllegalStateException(ex);
+		}
+	}
+
+	private static RedissonClient newClient() {
+		Config config = new Config();
+		config.useSingleServer().setAddress("redis://" + VALKEY.getHost() + ":" + VALKEY.getMappedPort(6379));
+		return Redisson.create(config);
+	}
+
+	private static String uniquePrefix() {
+		return "argi:test:checkpoint:leased:" + UUID.randomUUID();
+	}
+
+}
