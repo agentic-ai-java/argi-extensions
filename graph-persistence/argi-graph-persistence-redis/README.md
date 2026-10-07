@@ -108,6 +108,64 @@ Plain `put` and `release` remain compatibility methods and use bounded CAS
 reload/retry loops. Graph runtime paths use `putIfVersion` and
 `releaseIfVersion` through Core's versioned scope.
 
+## RedisLeasedCheckpointSaver
+
+`RedisLeasedCheckpointSaver` is the opt-in Redis implementation of Core's
+`LeasedCheckpointSaver` contract. It adds distributed admission plus checkpoint
+fencing for leased graph execution. Applications must select it explicitly:
+
+```java
+import io.github.agentic.ai.graph.persistence.redis.RedisLeasedCheckpointSaver;
+
+var saver = RedisLeasedCheckpointSaver.builder()
+    .redisson(redisson)
+    .stateSerializer(StateGraph.DEFAULT_JACKSON_SERIALIZER)
+    .leaseOptions(LeaseOptions.defaults())
+    .build();
+```
+
+The builder requires a caller-owned `RedissonClient`, accepts the same
+`StateSerializer` style as the other savers, and can be isolated with
+`storageKeyPrefix(String)`. The default key prefix is
+`argi:checkpoint:leased:v1`. Physical keys are one Redis hash per resolved
+checkpoint namespace:
+
+```text
+<prefix>:{<Base64 URL without padding of checkpointThreadId(config)>}
+```
+
+Each hash stores only the leased saver fields:
+
+- `owner`, the current lease owner UUID;
+- `fence`, the retained decimal int64 fencing token;
+- `expires`, the Redis server epoch millisecond expiry;
+- `revision`, the decimal int64 checkpoint revision;
+- `history`, the Base64 checkpoint-history payload written with
+  `CheckPointSerializer`.
+
+This keyspace is separate from both `RedisSaver` legacy keys and
+`RedisVersionedSaver` store envelopes. It does not read, migrate, update, or
+delete either older format. Switching an existing conversation to the leased
+saver therefore requires explicit migration or a new namespace.
+
+Lease acquire, renew, release, versioned reads, fenced puts, and fenced releases
+use Redisson `RScript` with `StringCodec` and `READ_WRITE` routing to the
+primary. The Lua scripts receive exactly one key, use Redis `TIME` for expiry,
+validate counters and field pairs before writes, keep counters as exact decimal
+strings, and retain the fence and checkpoint revision without whole-key TTLs.
+
+`put`, `release`, `putIfVersion`, and `releaseIfVersion` remain ownerless Core
+compatibility methods and fail with `LeaseRequiredException`. Runtime graph
+paths acquire a lease first and then call the leased mutation methods. Reads
+remain available without a lease.
+
+Redis or Valkey failover is not a consensus fencing system. The saver assumes one
+authoritative retained hash history; asynchronous HA failover, backup restore, or
+data rollback can roll back owner/fence/checkpoint state. Leases also do not
+provide message queues, worker recovery, tool receipt tracking, or exactly-once
+side-effect execution. External side effects still need their own idempotency or
+receipt protocol.
+
 ## Boundaries
 
 This module does not change legacy in-memory Redis-like Store classes in Core,
