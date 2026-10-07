@@ -26,6 +26,7 @@ import io.github.agentic.ai.graph.checkpoint.Checkpoint;
 import io.github.agentic.ai.graph.checkpoint.CheckpointSnapshot;
 import io.github.agentic.ai.graph.checkpoint.config.SaverConfig;
 import io.github.agentic.ai.graph.checkpoint.lease.ExecutionLease;
+import io.github.agentic.ai.graph.checkpoint.lease.ExecutionLeaseScope;
 import io.github.agentic.ai.graph.checkpoint.lease.LeaseBusyException;
 import io.github.agentic.ai.graph.checkpoint.lease.LeaseLostException;
 import io.github.agentic.ai.graph.checkpoint.lease.LeaseOptions;
@@ -41,6 +42,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -49,9 +52,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -66,6 +69,8 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 
 import static io.github.agentic.ai.graph.StateGraph.END;
 import static io.github.agentic.ai.graph.StateGraph.START;
@@ -74,10 +79,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -364,6 +372,137 @@ class RedisLeasedCheckpointSaverTest {
 	}
 
 	@Test
+	void sameNamespaceNestedScopeReusesOneRedisLeaseOwnerAcquireAndRelease() {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = spy(saver(primaryClient, prefix));
+		RunnableConfig config = config("nested-same");
+		AtomicReference<ExecutionLeaseScope> outerScope = new AtomicReference<>();
+		AtomicReference<ExecutionLeaseScope> innerScope = new AtomicReference<>();
+		AtomicReference<UUID> owner = new AtomicReference<>();
+
+		String value = ExecutionLeaseScope.withLease(saver, config, outer -> {
+			outerScope.set(outer);
+			owner.set(outer.lease().ownerId());
+			return ExecutionLeaseScope.withLease(saver, config, inner -> {
+				innerScope.set(inner);
+				return Flux.just(inner.lease().ownerId().toString());
+			});
+		}).single().block(Duration.ofSeconds(5));
+
+		assertThat(value).isEqualTo(owner.get().toString());
+		assertThat(innerScope.get()).isSameAs(outerScope.get());
+		verify(saver, times(1)).acquireLease(any(RunnableConfig.class), any(UUID.class));
+		verify(saver, times(1)).releaseLease(any(RunnableConfig.class), any(ExecutionLease.class));
+		assertThat(leasedHash(prefix, config).readAllMap()).doesNotContainKey(OWNER).doesNotContainKey(EXPIRES);
+	}
+
+	@Test
+	void differentNamespaceNestedScopesKeepIndependentRedisOwnership() {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = spy(saver(primaryClient, prefix));
+		RunnableConfig outerConfig = config("nested-outer");
+		RunnableConfig innerConfig = config("nested-inner");
+		AtomicReference<ExecutionLeaseScope> outerScope = new AtomicReference<>();
+		AtomicReference<ExecutionLeaseScope> innerScope = new AtomicReference<>();
+		AtomicReference<ExecutionLease> outerLease = new AtomicReference<>();
+		AtomicReference<ExecutionLease> innerLease = new AtomicReference<>();
+
+		ExecutionLeaseScope.withLease(saver, outerConfig, outer -> {
+			outerScope.set(outer);
+			outerLease.set(outer.lease());
+			return ExecutionLeaseScope.withLease(saver, innerConfig, inner -> {
+				innerScope.set(inner);
+				innerLease.set(inner.lease());
+				return Flux.just("done");
+			});
+		}).single().block(Duration.ofSeconds(5));
+
+		assertThat(innerScope.get()).isNotSameAs(outerScope.get());
+		assertThat(innerLease.get().namespace()).isNotEqualTo(outerLease.get().namespace());
+		assertThat(innerLease.get().ownerId()).isNotEqualTo(outerLease.get().ownerId());
+		verify(saver, times(2)).acquireLease(any(RunnableConfig.class), any(UUID.class));
+		verify(saver, times(2)).releaseLease(any(RunnableConfig.class), any(ExecutionLease.class));
+		assertThat(leasedHash(prefix, outerConfig).readAllMap()).doesNotContainKey(OWNER).doesNotContainKey(EXPIRES);
+		assertThat(leasedHash(prefix, innerConfig).readAllMap()).doesNotContainKey(OWNER).doesNotContainKey(EXPIRES);
+	}
+
+	@Test
+	void coldScopeResubscriptionsUseFreshRedisOwnersAndGuards() {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = spy(saver(primaryClient, prefix));
+		RunnableConfig config = config("cold-scope");
+		List<ExecutionLease> leases = new ArrayList<>();
+		List<Object> guards = new ArrayList<>();
+		List<ExecutionLeaseScope> scopes = new ArrayList<>();
+		Flux<String> flow = ExecutionLeaseScope.withLease(saver, config, scope -> {
+			scopes.add(scope);
+			leases.add(scope.lease());
+			guards.add(scope.guard());
+			return Flux.just(scope.lease().ownerId().toString());
+		});
+
+		String first = flow.single().block(Duration.ofSeconds(5));
+		String second = flow.single().block(Duration.ofSeconds(5));
+
+		assertThat(first).isNotEqualTo(second);
+		assertThat(scopes).hasSize(2);
+		assertThat(scopes.get(0)).isNotSameAs(scopes.get(1));
+		assertThat(leases.get(0).ownerId()).isNotEqualTo(leases.get(1).ownerId());
+		assertThat(guards.get(0)).isNotSameAs(guards.get(1));
+		verify(saver, times(2)).acquireLease(any(RunnableConfig.class), any(UUID.class));
+		verify(saver, times(2)).releaseLease(any(RunnableConfig.class), any(ExecutionLease.class));
+	}
+
+	@Test
+	void cancellationRewindsCheckpointBeforeUnlockingRedisLease() throws Exception {
+		String prefix = uniquePrefix();
+		RedisLeasedCheckpointSaver saver = spy(saver(primaryClient, prefix));
+		RedisLeasedCheckpointSaver reader = saver(secondaryClient, prefix);
+		RunnableConfig config = config("cancel-rewind");
+		List<String> events = new ArrayList<>();
+		CountDownLatch subscribed = new CountDownLatch(1);
+		CountDownLatch rewound = new CountDownLatch(1);
+		CountDownLatch released = new CountDownLatch(1);
+		doAnswer(invocation -> {
+			events.add("release");
+			try {
+				return invocation.callRealMethod();
+			}
+			finally {
+				released.countDown();
+			}
+		}).when(saver).releaseLease(any(RunnableConfig.class), any(ExecutionLease.class));
+
+		Disposable subscription = ExecutionLeaseScope.withLease(saver, config, scope -> {
+			subscribed.countDown();
+			return Flux.never().doFinally(signal -> {
+				try {
+					scope.assertActive();
+					saver.putIfLeasedVersion(config, checkpoint("rewound"), 0, scope.lease());
+					events.add("rewind");
+				}
+				catch (Exception ex) {
+					events.add("failed");
+				}
+				finally {
+					rewound.countDown();
+				}
+			});
+		}).subscribe();
+
+		assertThat(subscribed.await(5, TimeUnit.SECONDS)).isTrue();
+		subscription.dispose();
+
+		assertThat(rewound.await(5, TimeUnit.SECONDS)).isTrue();
+		assertThat(released.await(5, TimeUnit.SECONDS)).isTrue();
+		assertThat(events).containsExactly("rewind", "release");
+		assertThat(reader.getVersioned(config).revision()).isEqualTo(1);
+		assertThat(reader.getVersioned(config).checkpoint()).hasValueSatisfying(
+				actual -> assertThat(actual.getState()).containsEntry("result", "rewound"));
+		assertThat(leasedHash(prefix, config).readAllMap()).doesNotContainKey(OWNER).doesNotContainKey(EXPIRES);
+	}
+
+	@Test
 	void graphLeaseLossDuringNodeRejectsLateResultAtUnchangedRevisionAfterNewOwnerAcquires() throws Exception {
 		String prefix = uniquePrefix();
 		RedisLeasedCheckpointSaver staleSaver = saver(primaryClient, prefix);
@@ -407,6 +546,96 @@ class RedisLeasedCheckpointSaverTest {
 
 		assertThatThrownBy(() -> saver.acquireLease(config("transport-acquire"), UUID.randomUUID()))
 			.isSameAs(transportFailure);
+	}
+
+	@Test
+	void initialSnapshotTransportFailureFailsClosedBeforeNodeDispatchAndReleasesLease() throws Exception {
+		String prefix = uniquePrefix();
+		FaultingRedisLeasedCheckpointSaver faulting = faultingSaver(primaryClient,
+				new LeaseOptions(Duration.ofSeconds(2), Duration.ofMillis(250)), prefix, FaultOperation.SNAPSHOT, 1);
+		RedisLeasedCheckpointSaver reader = saver(secondaryClient, prefix);
+		AtomicInteger nodeCalls = new AtomicInteger();
+		RunnableConfig config = config("snapshot-fault");
+		CompiledGraph graph = graph(faulting, "late", nodeCalls);
+
+		assertThatThrownBy(() -> graph.invoke(Map.of("request", "late"), config))
+			.isSameAs(faulting.failure());
+
+		assertThat(nodeCalls).hasValue(0);
+		assertThat(faulting.ownerlessVersionPutUsed()).isFalse();
+		assertThat(faulting.ownerlessVersionReleaseUsed()).isFalse();
+		assertThat(reader.getVersioned(config).revision()).isZero();
+		assertThat(reader.getVersioned(config).checkpoint()).isEmpty();
+		assertThat(leasedHash(prefix, config).readAllMap()).doesNotContainKey(OWNER).doesNotContainKey(EXPIRES);
+	}
+
+	@Test
+	void renewTransportFailureInvalidatesRuntimeWithoutLateCheckpointMutation() throws Exception {
+		String prefix = uniquePrefix();
+		FaultingRedisLeasedCheckpointSaver faulting = faultingSaver(primaryClient,
+				new LeaseOptions(Duration.ofMillis(500), Duration.ofMillis(50)), prefix, FaultOperation.RENEW, 1);
+		RedisLeasedCheckpointSaver reader = saver(secondaryClient, prefix);
+		RunnableConfig config = config("renew-fault");
+		CountDownLatch nodeEntered = new CountDownLatch(1);
+		CountDownLatch neverFinish = new CountDownLatch(1);
+		AtomicInteger nodeCalls = new AtomicInteger();
+		CompiledGraph graph = graph(faulting, "late", nodeCalls, nodeEntered, neverFinish, false);
+
+		CompletableFuture<List<NodeOutput>> run = graph.stream(Map.of("request", "late"), config)
+			.collectList()
+			.toFuture();
+		assertThat(nodeEntered.await(5, TimeUnit.SECONDS)).isTrue();
+
+		assertThatThrownBy(() -> run.get(5, TimeUnit.SECONDS)).satisfies(RedisLeasedCheckpointSaverTest::assertLeaseLoss);
+		assertThat(nodeCalls).hasValue(1);
+		assertThat(faulting.ownerlessVersionPutUsed()).isFalse();
+		assertThat(faulting.ownerlessVersionReleaseUsed()).isFalse();
+		assertThat(reader.getVersioned(config).revision()).isEqualTo(1);
+		assertThat(reader.getVersioned(config).checkpoint()).hasValueSatisfying(
+				actual -> assertThat(actual.getNodeId()).isEqualTo(START));
+	}
+
+	@Test
+	void fencedPutTransportFailureInvalidatesRuntimeWithoutOwnerlessFallbackOrHistoryMutation() throws Exception {
+		String prefix = uniquePrefix();
+		FaultingRedisLeasedCheckpointSaver faulting = faultingSaver(primaryClient,
+				new LeaseOptions(Duration.ofSeconds(2), Duration.ofMillis(250)), prefix, FaultOperation.FENCED_PUT, 2);
+		RedisLeasedCheckpointSaver reader = saver(secondaryClient, prefix);
+		RunnableConfig config = config("put-fault");
+		AtomicInteger nodeCalls = new AtomicInteger();
+		CompiledGraph graph = graph(faulting, "late", nodeCalls);
+
+		assertThatThrownBy(() -> graph.invoke(Map.of("request", "late"), config))
+			.satisfies(RedisLeasedCheckpointSaverTest::assertLeaseLoss);
+
+		assertThat(nodeCalls).hasValue(1);
+		assertThat(faulting.ownerlessVersionPutUsed()).isFalse();
+		assertThat(faulting.ownerlessVersionReleaseUsed()).isFalse();
+		assertThat(reader.getVersioned(config).revision()).isEqualTo(1);
+		assertThat(reader.getVersioned(config).checkpoint()).hasValueSatisfying(
+				actual -> assertThat(actual.getNodeId()).isEqualTo(START));
+	}
+
+	@Test
+	void fencedReleaseTransportFailureInvalidatesRuntimeAndRetainsLatestCheckpoint() throws Exception {
+		String prefix = uniquePrefix();
+		FaultingRedisLeasedCheckpointSaver faulting = faultingSaver(primaryClient,
+				new LeaseOptions(Duration.ofSeconds(2), Duration.ofMillis(250)), prefix, FaultOperation.FENCED_RELEASE,
+				1);
+		RedisLeasedCheckpointSaver reader = saver(secondaryClient, prefix);
+		RunnableConfig config = config("release-fault");
+		AtomicInteger nodeCalls = new AtomicInteger();
+		CompiledGraph graph = graph(faulting, "retained", nodeCalls, null, null, true);
+
+		assertThatThrownBy(() -> graph.invoke(Map.of("request", "retained"), config))
+			.satisfies(RedisLeasedCheckpointSaverTest::assertLeaseLoss);
+
+		assertThat(nodeCalls).hasValue(1);
+		assertThat(faulting.ownerlessVersionPutUsed()).isFalse();
+		assertThat(faulting.ownerlessVersionReleaseUsed()).isFalse();
+		assertThat(reader.getVersioned(config).revision()).isEqualTo(2);
+		assertThat(reader.getVersioned(config).checkpoint()).hasValueSatisfying(
+				actual -> assertThat(actual.getState()).containsEntry("result", "retained"));
 	}
 
 	@Test
@@ -557,10 +786,14 @@ class RedisLeasedCheckpointSaverTest {
 
 	private static void assertLeaseLoss(Throwable failure) {
 		Throwable current = failure;
-		while ((current instanceof ExecutionException || current.getCause() != null) && current.getCause() != null) {
+		while (current != null) {
+			if (current instanceof LeaseLostException) {
+				assertThat(current).isInstanceOf(LeaseLostException.class);
+				return;
+			}
 			current = current.getCause();
 		}
-		assertThat(current).isInstanceOf(LeaseLostException.class);
+		assertThat(failure).isInstanceOf(LeaseLostException.class);
 	}
 
 	private static void await(CountDownLatch latch) {
@@ -581,6 +814,121 @@ class RedisLeasedCheckpointSaverTest {
 
 	private static String uniquePrefix() {
 		return "argi:test:checkpoint:leased:" + UUID.randomUUID();
+	}
+
+	private enum FaultOperation {
+
+		SNAPSHOT,
+
+		RENEW,
+
+		FENCED_PUT,
+
+		FENCED_RELEASE
+
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static FaultingRedisLeasedCheckpointSaver faultingSaver(RedissonClient delegate, LeaseOptions leaseOptions,
+			String storageKeyPrefix, FaultOperation operation, int failOnMatch) throws Exception {
+		ScriptFault fault = new ScriptFault(operation, failOnMatch, serializeCheckpoints(List.of()));
+		RedissonClient redisson = spy(delegate);
+		RScript script = mock(RScript.class);
+		RScript realScript = delegate.getScript(StringCodec.INSTANCE);
+		when(redisson.getScript(eq(StringCodec.INSTANCE))).thenReturn(script);
+		when(script.eval(any(RScript.Mode.class), anyString(), any(RScript.ReturnType.class), any(List.class),
+				any(Object[].class))).thenAnswer(invocation -> {
+					RScript.Mode mode = invocation.getArgument(0);
+					String scriptText = invocation.getArgument(1);
+					RScript.ReturnType returnType = invocation.getArgument(2);
+					List<Object> keys = invocation.getArgument(3);
+					Object[] args = Arrays.copyOfRange(invocation.getArguments(), 4, invocation.getArguments().length);
+					fault.maybeThrow(scriptText, args);
+					return realScript.eval(mode, scriptText, returnType, keys, args);
+				});
+		return new FaultingRedisLeasedCheckpointSaver(redisson, leaseOptions, storageKeyPrefix, fault);
+	}
+
+	private static final class ScriptFault {
+
+		private final FaultOperation operation;
+
+		private final int failOnMatch;
+
+		private final RuntimeException failure = new RuntimeException("script transport failed");
+
+		private final String emptyHistory;
+
+		private int matches;
+
+		private ScriptFault(FaultOperation operation, int failOnMatch, String emptyHistory) {
+			this.operation = operation;
+			this.failOnMatch = failOnMatch;
+			this.emptyHistory = emptyHistory;
+		}
+
+		private void maybeThrow(String script, Object[] args) {
+			if (matches(script, args) && ++matches >= failOnMatch) {
+				throw failure;
+			}
+		}
+
+		private RuntimeException failure() {
+			return failure;
+		}
+
+		private boolean matches(String script, Object[] args) {
+			return switch (operation) {
+				case SNAPSHOT -> script.contains("return {'OK', state[5], state[6]}");
+				case RENEW -> script.contains("redis.call('HSET', KEYS[1], 'expires', expires)");
+				case FENCED_PUT -> script.contains("'revision', ARGV[4], 'history', ARGV[5]")
+						&& args.length >= 5 && !emptyHistory.equals(String.valueOf(args[4]));
+				case FENCED_RELEASE -> script.contains("'revision', ARGV[4], 'history', ARGV[5]")
+						&& args.length >= 5 && emptyHistory.equals(String.valueOf(args[4]));
+			};
+		}
+
+	}
+
+	private static final class FaultingRedisLeasedCheckpointSaver extends RedisLeasedCheckpointSaver {
+
+		private final ScriptFault fault;
+
+		private boolean ownerlessVersionPutUsed;
+
+		private boolean ownerlessVersionReleaseUsed;
+
+		private FaultingRedisLeasedCheckpointSaver(RedissonClient redisson, LeaseOptions leaseOptions,
+				String storageKeyPrefix, ScriptFault fault) {
+			super(redisson, STATE_SERIALIZER, leaseOptions, storageKeyPrefix);
+			this.fault = fault;
+		}
+
+		@Override
+		public RunnableConfig putIfVersion(RunnableConfig config, Checkpoint checkpoint, long expectedRevision)
+				throws Exception {
+			ownerlessVersionPutUsed = true;
+			return super.putIfVersion(config, checkpoint, expectedRevision);
+		}
+
+		@Override
+		public Tag releaseIfVersion(RunnableConfig config, long expectedRevision) throws Exception {
+			ownerlessVersionReleaseUsed = true;
+			return super.releaseIfVersion(config, expectedRevision);
+		}
+
+		private boolean ownerlessVersionPutUsed() {
+			return ownerlessVersionPutUsed;
+		}
+
+		private boolean ownerlessVersionReleaseUsed() {
+			return ownerlessVersionReleaseUsed;
+		}
+
+		private RuntimeException failure() {
+			return fault.failure();
+		}
+
 	}
 
 }

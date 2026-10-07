@@ -331,7 +331,7 @@ public class RedisLeasedCheckpointSaver implements LeasedCheckpointSaver {
 	@Override
 	public ExecutionLease renewLease(RunnableConfig config, ExecutionLease lease) {
 		requireLeaseForNamespace(config, lease);
-		List<Object> result = eval(RENEW_SCRIPT, redisKey(lease.namespace()), lease.ownerId().toString(),
+		List<Object> result = evalLeased(lease, RENEW_SCRIPT, redisKey(lease.namespace()), lease.ownerId().toString(),
 				Long.toString(lease.fencingToken()), ttlMillis());
 		String status = status(result);
 		return switch (status) {
@@ -346,8 +346,8 @@ public class RedisLeasedCheckpointSaver implements LeasedCheckpointSaver {
 	@Override
 	public boolean releaseLease(RunnableConfig config, ExecutionLease lease) {
 		requireLeaseForNamespace(config, lease);
-		List<Object> result = eval(RELEASE_LEASE_SCRIPT, redisKey(lease.namespace()), lease.ownerId().toString(),
-				Long.toString(lease.fencingToken()));
+		List<Object> result = evalLeased(lease, RELEASE_LEASE_SCRIPT, redisKey(lease.namespace()),
+				lease.ownerId().toString(), Long.toString(lease.fencingToken()));
 		String status = status(result);
 		return switch (status) {
 			case STATUS_OK -> true;
@@ -377,7 +377,7 @@ public class RedisLeasedCheckpointSaver implements LeasedCheckpointSaver {
 			nextHistory.push(cloneCheckpoint(checkpoint));
 		}
 		retainLatestCheckpoints(nextHistory, config);
-		List<Object> result = eval(PUT_SCRIPT, redisKey(lease.namespace()), lease.ownerId().toString(),
+		List<Object> result = evalLeased(lease, PUT_SCRIPT, redisKey(lease.namespace()), lease.ownerId().toString(),
 				Long.toString(lease.fencingToken()), Long.toString(expectedRevision), Long.toString(nextRevision),
 				serializeCheckpoints(nextHistory));
 		handleMutationResult(result, lease, expectedRevision);
@@ -392,9 +392,9 @@ public class RedisLeasedCheckpointSaver implements LeasedCheckpointSaver {
 		long nextRevision = Math.addExact(expectedRevision, 1L);
 		VersionedHistory current = readHistory(config);
 		Tag releaseTag = new Tag(lease.namespace(), current.history());
-		List<Object> result = eval(RELEASE_CHECKPOINT_SCRIPT, redisKey(lease.namespace()), lease.ownerId().toString(),
-				Long.toString(lease.fencingToken()), Long.toString(expectedRevision), Long.toString(nextRevision),
-				serializeCheckpoints(List.of()));
+		List<Object> result = evalLeased(lease, RELEASE_CHECKPOINT_SCRIPT, redisKey(lease.namespace()),
+				lease.ownerId().toString(), Long.toString(lease.fencingToken()), Long.toString(expectedRevision),
+				Long.toString(nextRevision), serializeCheckpoints(List.of()));
 		handleMutationResult(result, lease, expectedRevision);
 		return releaseTag;
 	}
@@ -439,6 +439,15 @@ public class RedisLeasedCheckpointSaver implements LeasedCheckpointSaver {
 	private List<Object> eval(String script, String key, Object... args) {
 		return redisson.getScript(StringCodec.INSTANCE)
 			.eval(RScript.Mode.READ_WRITE, script, RScript.ReturnType.MULTI, List.of(key), args);
+	}
+
+	private List<Object> evalLeased(ExecutionLease lease, String script, String key, Object... args) {
+		try {
+			return eval(script, key, args);
+		}
+		catch (RuntimeException ex) {
+			throw lost(lease, "redis script failed", ex);
+		}
 	}
 
 	private String redisKey(String namespace) {
@@ -490,6 +499,10 @@ public class RedisLeasedCheckpointSaver implements LeasedCheckpointSaver {
 
 	private LeaseLostException lost(ExecutionLease lease, String reason) {
 		return new LeaseLostException(lease.namespace(), lease.ownerId(), lease.fencingToken(), reason);
+	}
+
+	private LeaseLostException lost(ExecutionLease lease, String reason, Throwable cause) {
+		return new LeaseLostException(lease.namespace(), lease.ownerId(), lease.fencingToken(), reason, cause);
 	}
 
 	private LinkedList<Checkpoint> deserializeHistory(String content) {
