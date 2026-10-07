@@ -170,7 +170,9 @@ receipt protocol.
 
 This module does not change legacy in-memory Redis-like Store classes in Core,
 does not add Redis dependencies elsewhere, and does not provide Worker failover
-or graph checkpoint recovery guarantees. It also does not provide message-queue
-delivery, leases, fencing, exactly-once side-effect execution, automatic
-failover, TTL management, or legacy checkpoint migration. Durable scheduling,
-side-effect coordination, and tombstone reclamation remain separate milestones.
+or graph checkpoint recovery guarantees. Except for the explicit
+`RedisLeasedCheckpointSaver` opt-in mode described above, it also does not
+provide message-queue delivery, leases, fencing, exactly-once side-effect
+execution, automatic failover, TTL management, or legacy checkpoint migration.
+Durable scheduling, side-effect coordination, and tombstone reclamation remain
+separate milestones.
