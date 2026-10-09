@@ -59,12 +59,12 @@
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-autoconfigure-model-chat-memory-mem0</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-model-chat-memory-repository-mem0</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

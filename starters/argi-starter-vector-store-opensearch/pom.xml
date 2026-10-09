@@ -43,12 +43,12 @@
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-autoconfigure-vector-store-opensearch</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-opensearch-store</artifactId>
-            <version>${revision}</version>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
