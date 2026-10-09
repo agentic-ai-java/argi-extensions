@@ -25,3 +25,9 @@ python3 tools/scripts/migrate-maven-coordinates.py --write /path/to/application/
 仓库配置修改前保留 tar 备份；发布前可以恢复准备提交及草稿。Central 公开版本不能覆盖或撤回。公开后有问题时保留原标签和制品，发布新 RC 修复；Central 成功但 GitHub 失败时仅补公开 GitHub Release。Central 状态不明确时先检查归档的 deployment ID 与 Portal 状态，避免重复上传。
 
 本次发布配置为直接替换，无额外数据库迁移。既有历史版本和 GitHub Releases 保留。
+
+## 只声明依赖的 starter
+
+20 个 starter 没有 Java 源码，Maven 不生成它们的源码和 Javadoc jar。发布步骤将实际模块 POM、许可证及由声明依赖生成的说明页打包为这两类制品并签名；检测到 Java 源码或二进制类时拒绝该补全路径，仍要求 Maven 生成完整源码和 Javadoc。
+
+只有发布工具或 workflow 改动时，`reuse_run` 可指定同仓库已完成的 Release run。流程核对源 workflow、成功的构建步骤以及 Git 差异，确认 POM、Java 和运行时资源完全未改动后，复用归档制品，补全并重新校验整个发布包。任何运行时或 Maven 文件改动都必须重建。

@@ -20,6 +20,11 @@ on:
         required: true
         type: string
         default: v2.1.0-RC1
+      reuse_run:
+        description: Reuse signed artifacts from an earlier build with identical Maven and Java sources
+        required: false
+        type: string
+        default: ''
       publish:
         description: Publish to Maven Central and GitHub after signing validation
         required: true
@@ -40,6 +45,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
       CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+      REUSE_RUN: ${{ inputs.reuse_run }}
       MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -93,8 +99,39 @@ jobs:
           server-password: CENTRAL_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Verify reusable build provenance
+        if: ${{ inputs.reuse_run != '' }}
+        shell: bash
+        run: |
+          python3 - <<'PYCODE'
+          import json
+          import os
+          import subprocess
+          run_id = os.environ['REUSE_RUN']
+          assert run_id.isdigit(), 'Invalid source run ID'
+          repo = os.environ['GITHUB_REPOSITORY']
+          run = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/actions/runs/{run_id}']))
+          assert run['status'] == 'completed', 'Source run must be completed'
+          assert run['path'] == '.github/workflows/release.yml', 'Unexpected source workflow'
+          source = run['head_sha']
+          changed = subprocess.check_output(['git', 'diff', '--name-only', source, 'HEAD'], text=True).splitlines()
+          assert all(path.startswith(('.github/workflows/', 'tools/scripts/')) or path == 'RELEASING.md' for path in changed), 'Maven or runtime sources changed; rebuild required'
+          jobs = json.loads(subprocess.check_output(['gh', 'api', f'repos/{repo}/actions/runs/{run_id}/jobs']))
+          assert any(step['name'] == 'Build and sign the release' and step['conclusion'] == 'success' for job in jobs['jobs'] for step in job['steps']), 'Source build did not succeed'
+          print(f'Reusing signed build from {source}; Maven and runtime sources are identical')
+          PYCODE
+      - uses: actions/download-artifact@v4
+        if: ${{ inputs.reuse_run != '' }}
+        with:
+          name: signed-${{ inputs.tag }}
+          run-id: ${{ inputs.reuse_run }}
+          github-token: ${{ github.token }}
+          path: .
       - name: Build and sign the release
+        if: ${{ inputs.reuse_run == '' }}
         run: ./mvnw -B -Prelease -Dmaven.test.skip=true verify
+      - name: Complete and sign dependency-only starter classifiers
+        run: python3 tools/scripts/complete-starter-artifacts.py
       - run: python3 tools/scripts/verify-release-artifacts.py --signed --create-bundle target/central-publishing/central-bundle.zip
       - name: Publish to Maven Central
         if: ${{ inputs.publish }}
