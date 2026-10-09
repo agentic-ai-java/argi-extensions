@@ -64,7 +64,7 @@
     </developers>
 
     <properties>
-        <revision>2.1.0-RC1</revision>
+        <revision>2.1.0-RC2-SNAPSHOT</revision>
         <java.version>17</java.version>
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
