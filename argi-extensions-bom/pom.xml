@@ -17,9 +17,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.agentic-ai</groupId>
+    <groupId>io.github.agentic-ai-java</groupId>
     <artifactId>argi-extensions-bom</artifactId>
-    <version>2.1.0-dev</version>
+    <version>${revision}</version>
 
     <packaging>pom</packaging>
 
@@ -64,6 +64,8 @@
     </developers>
 
     <properties>
+        <revision>2.1.0-RC1</revision>
+        <java.version>17</java.version>
         <!-- Plugin Versions -->
         <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
@@ -87,6 +89,61 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-code-executor-docker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-extensions-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-graph-node-network</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-graph-node-rag</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-graph-persistence-jdbc</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-graph-persistence-mongodb</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-graph-persistence-redis</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-sandbox</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-starter-a2a-nacos</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-starter-agentscope</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-starter-config-nacos</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
 
 
@@ -94,43 +151,43 @@
 
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-arms-observation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-mcp-registry</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-mcp-router</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-nacos-prompt</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-mcp-distributed</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-mcp-gateway</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-rag</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -139,93 +196,93 @@
 
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-arms-observation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-mcp-registry</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-mcp-router</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-nacos-prompt</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-mcp-distributed</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-mcp-gateway</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-rag-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <!-- ARGI Core Components -->
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-mcp-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-mcp-registry</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-mcp-router</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-mcp-distributed</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-mcp-gateway</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-prompt-nacos</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-observation</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <!-- ARGI RAG -->
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-rag</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -277,79 +334,79 @@
 
             <!-- ARGI Vector Stores -->
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-vector-store-analyticdb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-vector-store-oceanbase</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-vector-store-opensearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-vector-store-tablestore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-vector-store-tair</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-vector-store-analyticdb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-vector-store-tablestore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-vector-store-oceanbase</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-vector-store-opensearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-vector-store-tair</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-analyticdb-store</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-tablestore-store</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-oceanbase-store</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-opensearch-store</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-tair-store</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -357,119 +414,119 @@
 
             <!-- ARGI Chat Memory -->
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-mem0</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-repository-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-repository-jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-repository-memcached</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-repository-mongodb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-repository-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-starter-model-chat-memory-repository-tablestore</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-mem0</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-repository-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-repository-jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-repository-memcached</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-repository-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-repository-tablestore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-autoconfigure-model-chat-memory-repository-mongodb</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-jdbc</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-memcached</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-mongodb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-redis</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-tablestore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.agentic-ai</groupId>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-model-chat-memory-repository-mem0</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -836,6 +893,10 @@
                         <executions>
                             <execution>
                                 <id>flatten</id>
+                                <configuration combine.self="override">
+                                    <updatePomFile>true</updatePomFile>
+                                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                                </configuration>
                                 <phase>process-resources</phase>
                                 <goals>
                                     <goal>flatten</goal>

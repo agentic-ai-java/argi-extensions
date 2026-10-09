@@ -13,7 +13,7 @@
   </p>
   <p>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg" alt="License"></a>
-    <a href="https://github.com/agentic-ai-java/argi-extensions"><img src="https://img.shields.io/badge/version-2.1.0--dev-blue" alt="Version"></a>
+    <a href="https://github.com/agentic-ai-java/argi-extensions"><img src="https://img.shields.io/badge/version-2.1.0--RC1-blue" alt="Version"></a>
     <img src="https://img.shields.io/badge/Java-17%2B-f59e0b" alt="Java 17+">
   </p>
 </div>
@@ -45,9 +45,9 @@ mvn -DskipTests install
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.github.agentic-ai</groupId>
+      <groupId>io.github.agentic-ai-java</groupId>
       <artifactId>argi-extensions-bom</artifactId>
-      <version>2.1.0-dev</version>
+      <version>2.1.0-RC1</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -56,7 +56,7 @@ mvn -DskipTests install
 
 <dependencies>
   <dependency>
-    <groupId>io.github.agentic-ai</groupId>
+    <groupId>io.github.agentic-ai-java</groupId>
     <artifactId>argi-starter-mcp-registry</artifactId>
   </dependency>
 </dependencies>

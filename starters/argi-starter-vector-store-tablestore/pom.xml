@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.agentic-ai</groupId>
+        <groupId>io.github.agentic-ai-java</groupId>
         <artifactId>argi-extensions</artifactId>
         <version>${revision}</version>
         <relativePath>../../pom.xml</relativePath>
@@ -41,12 +41,12 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.github.agentic-ai</groupId>
+            <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-autoconfigure-vector-store-tablestore</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.agentic-ai</groupId>
+            <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-tablestore-store</artifactId>
             <version>${revision}</version>
         </dependency>

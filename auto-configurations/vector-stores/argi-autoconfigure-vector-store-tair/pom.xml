@@ -17,7 +17,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.agentic-ai</groupId>
+        <groupId>io.github.agentic-ai-java</groupId>
         <artifactId>argi-extensions</artifactId>
         <version>${revision}</version>
         <relativePath>../../../pom.xml</relativePath>
@@ -45,7 +45,7 @@
     <dependencies>
         <!-- production dependencies -->
         <dependency>
-            <groupId>io.github.agentic-ai</groupId>
+            <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-tair-store</artifactId>
             <version>${revision}</version>
         </dependency>

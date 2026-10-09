@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>io.github.agentic-ai</groupId>
+        <groupId>io.github.agentic-ai-java</groupId>
         <artifactId>argi-extensions</artifactId>
         <version>${revision}</version>
         <relativePath>../../pom.xml</relativePath>
@@ -38,12 +38,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.agentic-ai</groupId>
+            <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-graph-core</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>io.github.agentic-ai</groupId>
+            <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-extensions-model</artifactId>
         </dependency>
 
