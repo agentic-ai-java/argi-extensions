@@ -55,12 +55,17 @@ jobs:
           import subprocess
           import json
           import xml.etree.ElementTree as ET
+          from pathlib import Path
           ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
           tag = os.environ['RELEASE_TAG']
           for path in ('pom.xml', 'argi-extensions-bom/pom.xml'):
               root = ET.parse(path).getroot()
               assert root.findtext('m:groupId', namespaces=ns) == 'io.github.agentic-ai-java', path
               assert 'v' + root.findtext('m:properties/m:revision', namespaces=ns) == tag, path
+          for path in Path('.').rglob('pom.xml'):
+              root = ET.parse(path).getroot()
+              for dependency in root.findall('.//m:dependency', ns):
+                  assert dependency.findtext('m:version', default='', namespaces=ns) != '${revision}', path
           sha = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
           release = json.loads(subprocess.check_output([
               'gh', 'release', 'view', tag, '--repo', os.environ['GITHUB_REPOSITORY'],
