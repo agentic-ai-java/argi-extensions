@@ -22,7 +22,7 @@ import io.github.agentic.ai.graph.checkpoint.Checkpoint;
 import io.github.agentic.ai.graph.serializer.Serializer;
 import io.github.agentic.ai.graph.serializer.StateSerializer;
 import io.github.agentic.ai.graph.serializer.check_point.CheckPointSerializer;
-import io.github.agentic.ai.graph.serializer.plain_text.jackson.SpringAIJacksonStateSerializer;
+import io.github.agentic.ai.graph.serializer.plain_text.jackson.ArgiJacksonStateSerializer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -61,7 +61,7 @@ class RedisPersistenceCompatibilityTests {
 
 	private static final String FIELD_THREAD_ID = "thread_id";
 
-	private static final StateSerializer STATE_SERIALIZER = new SpringAIJacksonStateSerializer(OverAllState::new);
+	private static final StateSerializer STATE_SERIALIZER = new ArgiJacksonStateSerializer(OverAllState::new);
 
 	private static final Serializer<Checkpoint> CHECKPOINT_SERIALIZER = new CheckPointSerializer(STATE_SERIALIZER);
 
