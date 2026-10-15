@@ -1,7 +1,7 @@
 # ARGI Redis Graph Persistence
 
-This module provides the maintained Redis checkpoint saver and the Redis-backed
-long-term Store implementation for ARGI extensions.
+This module provides the maintained Redis checkpoint savers, the Redis-backed
+long-term Store implementation and the Redis `RunStore` for ARGI extensions.
 
 ## RedisSaver
 
@@ -166,13 +166,88 @@ provide message queues, worker recovery, tool receipt tracking, or exactly-once
 side-effect execution. External side effects still need their own idempotency or
 receipt protocol.
 
+## RedisRunStore
+
+`RedisRunStore` is the Redis/Valkey implementation of Core's `RunStore`
+contract: idempotent run submission, one nonterminal run per session
+(reservation), namespace leases with fencing tokens, and fenced, revision-checked
+commits of run state, checkpoint, tasks, journal and outbox. It passes the shared
+Core `RunStoreContractTest`.
+
+```java
+import io.github.agentic.ai.graph.persistence.redis.RedisRunStore;
+
+RedisRunStore store = RedisRunStore.builder()
+    .redisson(redisson)               // required, caller-owned
+    .clock(Clock.systemUTC())         // default; the only time source
+    .keyPrefix("argi:run:v1")         // default
+    .durableDeployment(false)         // default; see below
+    .build();
+```
+
+### Key layout
+
+All keys of one namespace (tenant, application, session) share one cluster hash
+tag `T`, the Base64 URL SHA-256 of the namespace identity:
+
+```text
+<prefix>:{T}:ns                 reservation, fence, lease, submission dedup
+<prefix>:{T}:run:<h>            run record (spec, revision, state, checkpoint)
+<prefix>:{T}:run:<h>:tasks      task records
+<prefix>:{T}:run:<h>:journal    append-only journal
+<prefix>:{T}:run:<h>:outbox     append-only EVENT outbox
+```
+
+`<h>` is the Base64 URL SHA-256 of the run id. The key prefix must not contain
+`{` or `}`. Keys never get a TTL: runs, dedup mappings and fences are kept
+forever, and there is no retention or cleanup yet. This keyspace is separate from
+the checkpoint savers and `RedisStore`.
+
+Every operation is one Lua script routed to the primary, sent without Redisson
+client-side retries. Scripts re-check reservation, owner, fence, lease expiry and
+revision, and validate stored data, before their first write. Corrupt or
+unexpected stored data, including a key of the wrong Redis type, fails with
+`IllegalStateException` and is never repaired. Transport errors and timeouts are
+rethrown unchanged; after a timeout the outcome of the call is unknown and the
+caller should re-read with `find` before re-planning.
+
+Each commit reads the whole run, so commit cost grows with the size of the run's
+journal and outbox.
+
+### Clock
+
+The injected `Clock` is the only time source; Redis server time is never used.
+Lease expiry keeps the clock's nanosecond precision, like `MemoryRunStore`. All
+JVMs that share a namespace need synchronized clocks (NTP), with skew far below
+the shortest lease TTL. Clock instants before 1970 or after 2262 are rejected with
+`IllegalStateException`.
+
+### Deployment requirements
+
+`capabilities().persistent()` is `false` unless `durableDeployment(true)` is set.
+Enable it only when all of the following hold:
+
+- `maxmemory-policy noeviction`, so fences, reservations and dedup mappings are
+  never evicted;
+- AOF enabled with `appendfsync always`; with `everysec` a crash can lose the
+  last fence increment and re-issue a fencing token;
+- no asynchronous failover, backup restore or other rollback of acknowledged
+  writes. Redis replication is asynchronous: a promoted replica can miss the
+  latest fence, reservation, dedup or commit, so two owners can hold the same
+  fencing token and an acknowledged commit can disappear. Use a single primary
+  without automatic failover, or a synchronously replicated service.
+
+Fencing protects writes to this store only. External side effects (tool calls,
+messages) still need their own idempotency or receipt protocol.
+
 ## Boundaries
 
 This module does not change legacy in-memory Redis-like Store classes in Core,
 does not add Redis dependencies elsewhere, and does not provide Worker failover
 or graph checkpoint recovery guarantees. Except for the explicit
-`RedisLeasedCheckpointSaver` opt-in mode described above, it also does not
-provide message-queue delivery, leases, fencing, exactly-once side-effect
-execution, automatic failover, TTL management, or legacy checkpoint migration.
+`RedisLeasedCheckpointSaver` and `RedisRunStore` opt-in modes described above, it
+also does not provide message-queue delivery, leases, fencing, exactly-once
+side-effect execution, automatic failover, TTL management, or legacy checkpoint
+migration.
 Durable scheduling, side-effect coordination, and tombstone reclamation remain
 separate milestones.
