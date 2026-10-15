@@ -34,6 +34,12 @@ public class McpGatewayOAuthProperties {
 	private boolean enabled = false;
 
 	/**
+	 * 是否启用严格模式。开启后，OAuth 已启用但 token 为空或获取失败时请求直接失败，不会以无认证方式发出；
+	 * 关闭后恢复旧版兼容行为，无 token 时继续发送无认证请求
+	 */
+	private boolean strictMode = true;
+
+	/**
 	 * OAuth提供商配置
 	 */
 	private OAuthProvider provider = new OAuthProvider();
@@ -250,6 +256,14 @@ public class McpGatewayOAuthProperties {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public boolean isStrictMode() {
+		return strictMode;
+	}
+
+	public void setStrictMode(boolean strictMode) {
+		this.strictMode = strictMode;
 	}
 
 	public OAuthProvider getProvider() {
