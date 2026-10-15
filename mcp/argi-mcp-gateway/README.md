@@ -116,6 +116,7 @@ argi:
     gateway:
       oauth:
         enabled: true
+        strict-mode: true
         provider:
           client-id: your-client-id
           client-secret: your-client-secret
@@ -136,6 +137,7 @@ argi:
 | 参数 | 说明 |
 |------|------|
 | `enabled` | 是否启用 OAuth 认证 |
+| `strict-mode` | 是否启用严格模式（默认 `true`）。无法获取 token 时直接失败，不发送无认证请求 |
 | `provider.client-id` | OAuth 客户端 ID |
 | `provider.client-secret` | OAuth 客户端密钥 |
 | `provider.token-uri` | 获取访问令牌的端点 URL |
@@ -150,6 +152,22 @@ argi:
 ### 当前支持的授权类型
 
 - `client_credentials`: 客户端凭证模式（推荐用于服务间通信）
+
+### 严格模式与失败关闭
+
+`strict-mode` 控制 OAuth 已启用但拿不到 token 时的行为，默认 `true`：
+
+| 场景 | `strict-mode: true`（默认） | `strict-mode: false`（兼容模式） |
+|------|------|------|
+| token 为空或获取异常 | 请求直接失败，下游调用次数为 0 | 打印 WARN 后以无认证方式发送一次 |
+| 有效 token 下下游调用抛异常 | 异常原样向上传播，不重发 | 同左 |
+| 下游返回 401 | 清理缓存 token，不自动重放 | 同左 |
+| `enabled: false` | 请求原样透传 | 同左 |
+
+无论哪种模式，下游 `exchange` 抛出的异常都不会触发第二次请求，也不会退化为无认证请求。
+
+**迁移说明**：旧版本在 token 缺失时会静默降级为无认证请求。升级后该行为默认关闭。若部署依赖降级行为（例如 MCP 服务对部分工具不校验鉴权），
+需显式设置 `strict-mode: false`。该选项仅用于迁移过渡，不建议长期保留。
 
 ## 核心组件
 
