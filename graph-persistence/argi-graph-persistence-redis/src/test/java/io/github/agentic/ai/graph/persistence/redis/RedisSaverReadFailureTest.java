@@ -18,7 +18,7 @@ package io.github.agentic.ai.graph.persistence.redis;
 import io.github.agentic.ai.graph.OverAllState;
 import io.github.agentic.ai.graph.RunnableConfig;
 import io.github.agentic.ai.graph.serializer.StateSerializer;
-import io.github.agentic.ai.graph.serializer.plain_text.jackson.SpringAIJacksonStateSerializer;
+import io.github.agentic.ai.graph.serializer.plain_text.jackson.ArgiJacksonStateSerializer;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -50,7 +50,7 @@ class RedisSaverReadFailureTest {
 
 	private static final String LOCK_PREFIX = "graph:checkpoint:lock:";
 
-	private static final StateSerializer SERIALIZER = new SpringAIJacksonStateSerializer(OverAllState::new);
+	private static final StateSerializer SERIALIZER = new ArgiJacksonStateSerializer(OverAllState::new);
 
 	@Container
 	private static final GenericContainer<?> REDIS = new GenericContainer<>(DockerImageName.parse("valkey/valkey:8.1.2"))

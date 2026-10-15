@@ -29,7 +29,7 @@ import io.github.agentic.ai.graph.checkpoint.config.SaverConfig;
 import io.github.agentic.ai.graph.serializer.Serializer;
 import io.github.agentic.ai.graph.serializer.StateSerializer;
 import io.github.agentic.ai.graph.serializer.check_point.CheckPointSerializer;
-import io.github.agentic.ai.graph.serializer.plain_text.jackson.SpringAIJacksonStateSerializer;
+import io.github.agentic.ai.graph.serializer.plain_text.jackson.ArgiJacksonStateSerializer;
 import io.github.agentic.ai.graph.store.VersionedStoreItem;
 
 import java.io.ByteArrayInputStream;
@@ -84,7 +84,7 @@ import static org.mockito.Mockito.when;
 @Testcontainers(disabledWithoutDocker = true)
 class RedisVersionedSaverTest {
 
-	private static final StateSerializer STATE_SERIALIZER = new SpringAIJacksonStateSerializer(OverAllState::new);
+	private static final StateSerializer STATE_SERIALIZER = new ArgiJacksonStateSerializer(OverAllState::new);
 
 	private static final Serializer<Checkpoint> CHECKPOINT_SERIALIZER = new CheckPointSerializer(STATE_SERIALIZER);
 
