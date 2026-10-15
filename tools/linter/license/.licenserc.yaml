@@ -48,6 +48,8 @@ header:
     - '.github/ISSUE_TEMPLATE'
     - '.github/PULL_REQUEST_TEMPLATE'
     - '.mvn'
+    - 'mvnw'
+    - 'mvnw.cmd'
     - '.codex/**'
     - '.worktrees/**'
     - 'LICENSE'
