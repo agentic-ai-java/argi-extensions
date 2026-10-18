@@ -66,6 +66,11 @@ public class DashScopeApiSpec {
         public Object getNativeUsage() {
             return null;
         }
+
+        @Override
+        public Integer getTotalTokens() {
+            return totalTokens != null ? totalTokens.intValue() : null;
+        }
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
