@@ -438,7 +438,9 @@ public class DashScopeModel {
 
         WANX_2_1_IMAGEEDIT("wanx2.1-imageedit"),
 
-        WAN_2_5_I_2_I_PREVIEW("wan2.2-t2i-preview");
+        WAN_2_5_I_2_I_PREVIEW("wan2.2-t2i-preview"),
+
+        WAN_2_6_IMAGE("wan2.6-image");
 
         public final String value;
 

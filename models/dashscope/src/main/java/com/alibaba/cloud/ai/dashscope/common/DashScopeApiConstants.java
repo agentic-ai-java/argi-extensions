@@ -58,7 +58,9 @@ public final class DashScopeApiConstants {
 
 	public static final String IMAGE2IMAGE_RESTFUL_URL = "/api/v1/services/aigc/image2image/image-synthesis";
 
-	public static final String VIDEO_GENERATION_RESTFUL_URL = "/api/v1/services/aigc/video-generation/video-synthesis";
+	public static final String IMAGE_GENERATION_RESTFUL_URL = "/api/v1/services/aigc/image-generation/generation";
+
+    public static final String VIDEO_GENERATION_RESTFUL_URL = "/api/v1/services/aigc/video-generation/video-synthesis";
 
 	public static final String IMAGE2VIDEO_RESTFUL_URL = "/api/v1/services/aigc/image2video/video-synthesis";
 

@@ -20,13 +20,18 @@ import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
 import com.alibaba.cloud.ai.dashscope.image.observation.DashScopeImageModelObservationConvention;
 import com.alibaba.cloud.ai.dashscope.image.observation.DashScopeImagePromptContentObservationHandler;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec;
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.DashScopeImageAsyncResponse.DashScopeImageAsyncResponseChoice;
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.DashScopeImageAsyncResponse.DashScopeImageAsyncResponseChoice.DashScopeImageAsyncResponseContent;
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.DashScopeImageAsyncResponse.DashScopeImageAsyncResponseChoice.DashScopeImageAsyncResponseMessage;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 import io.micrometer.observation.ObservationRegistry;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -225,10 +230,23 @@ public class DashScopeImageModel implements ImageModel {
     private ImageResponse toImageResponse(DashScopeApiSpec.DashScopeImageAsyncResponse asyncResp) {
         var output = asyncResp.output();
         var results = output.results();
+        List<DashScopeImageAsyncResponseChoice> choices = output.choices();
+        List<ImageGeneration> gens = new ArrayList<>();
         ImageResponseMetadata md = toMetadata(asyncResp);
-        List<ImageGeneration> gens = results == null ? List.of() : results.stream()
-                .map(r -> new ImageGeneration(new Image(r.url(), null)))
-                .toList();
+        if (results != null) {
+            gens = results.stream().map(r -> new ImageGeneration(new Image(r.url(), null))).collect(Collectors.toList());
+        }
+        if (choices != null) {
+            for (DashScopeImageAsyncResponseChoice choice : choices) {
+                DashScopeImageAsyncResponseMessage message = choice.message();
+                List<DashScopeImageAsyncResponseContent> content = message.content();
+                for (DashScopeImageAsyncResponseContent dashScopeImageAsyncResponseContent : content) {
+                    if(dashScopeImageAsyncResponseContent.image() != null && !dashScopeImageAsyncResponseContent.image().isEmpty()){
+                        gens.add(new ImageGeneration(new Image(dashScopeImageAsyncResponseContent.image(), null)));
+                    }
+                }
+            }
+        }
 
         return new ImageResponse(gens, md);
     }
@@ -236,10 +254,32 @@ public class DashScopeImageModel implements ImageModel {
     private DashScopeApiSpec.DashScopeImageRequest constructImageRequest(
             ImagePrompt imagePrompt,
             DashScopeImageOptions options) {
-
-        return new DashScopeApiSpec.DashScopeImageRequest(options.getModel(), new DashScopeApiSpec.DashScopeImageRequest.DashScopeImageRequestInput(imagePrompt.getInstructions()
-                .get(0)
-                .getText(), options.getNegativePrompt(), options.getRefImg(), options.getFunction(), options.getBaseImageUrl(), options.getMaskImageUrl(), options.getSketchImageUrl()), new DashScopeApiSpec.DashScopeImageRequest.DashScopeImageRequestParameter(options.getStyle(), options.getSize(), options.getN(), options.getSeed(), options.getRefStrength(), options.getRefMode(), options.getPromptExtend(), options.getWatermark(), options.getSketchWeight(), options.getSketchExtraction(), options.getSketchColor(), options.getMaskColor()));
+        return new DashScopeApiSpec.DashScopeImageRequest(
+                options.getModel(),
+                new DashScopeApiSpec.DashScopeImageRequest.DashScopeImageRequestInput(
+                        imagePrompt.getInstructions().get(0).getText(),
+                        options.getNegativePrompt(),
+                        options.getRefImg(),
+                        options.getFunction(),
+                        options.getBaseImageUrl(),
+                        options.getMaskImageUrl(),
+                        options.getSketchImageUrl()),
+                new DashScopeApiSpec.DashScopeImageRequest.DashScopeImageRequestParameter(
+                        options.getStyle(),
+                        options.getSize(),
+                        options.getN(),
+                        options.getSeed(),
+                        options.getRefStrength(),
+                        options.getRefMode(),
+                        options.getPromptExtend(),
+                        options.getWatermark(),
+                        options.getSketchWeight(),
+                        options.getSketchExtraction(),
+                        options.getSketchColor(),
+                        options.getMaskColor(),
+                        options.getNegativePrompt(),
+                        options.getMaxImages(),
+                        options.getEnableInterleave()));
     }
 
     private ImageResponseMetadata toMetadata(DashScopeApiSpec.DashScopeImageAsyncResponse re) {

@@ -130,8 +130,9 @@ class DashScopeImageModelObservationTests {
     var fakeResult = new DashScopeImageAsyncResponseResult("https://example-image.url/image.png");
 
     var output =
-        new DashScopeImageAsyncResponseOutput(
-            "00001", "SUCCEEDED", List.of(fakeResult), null, "code", "msg");
+            new DashScopeImageAsyncResponseOutput(
+            "00001", "SUCCEEDED", null, null, null, List.of(fakeResult), null, null, "code", "msg");
+
 
     var response = new DashScopeImageAsyncResponse("req-test", output, null);
 

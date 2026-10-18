@@ -109,6 +109,12 @@ public class DashScopeImageOptions implements ImageOptions {
   @JsonProperty("mask_color")
   private Integer[][] maskColor;
 
+  @JsonProperty("max_images")
+  private Integer maxImages;
+
+  @JsonProperty("enable_interleave")
+  private Boolean enableInterleave;
+
   public Boolean getPromptExtend() {
     return promptExtend;
   }
@@ -187,6 +193,22 @@ public class DashScopeImageOptions implements ImageOptions {
 
   public void setMaskColor(Integer[][] maskColor) {
     this.maskColor = maskColor;
+    }
+
+  public void setMaxImages(Integer maxImages) {
+    this.maxImages = maxImages;
+  }
+
+  public Integer getMaxImages() {
+      return maxImages;
+  }
+
+  public Boolean getEnableInterleave() {
+    return enableInterleave;
+  }
+
+  public void setEnableInterleave(Boolean enableInterleave) {
+    this.enableInterleave = enableInterleave;
   }
 
   public static Builder builder() {
@@ -308,7 +330,8 @@ public class DashScopeImageOptions implements ImageOptions {
         + ", function='" + this.function + '\'' + ", baseImageUrl='" + this.baseImageUrl + '\'' + ", maskImageUrl='"
         + this.maskImageUrl + '\'' + ", sketchImageUrl='" + this.sketchImageUrl + '\'' + ", sketchWeight="
         + this.sketchWeight + ", sketchExtraction=" + this.sketchExtraction + ", sketchColor="
-        + Arrays.toString(this.sketchColor) + ", maskColor=" + Arrays.toString(this.maskColor) + '}';
+        + Arrays.toString(this.sketchColor) + ", maskColor=" + Arrays.toString(this.maskColor) + ", maxImages="
+        + this.maxImages + ", enableInterleave=" + this.enableInterleave + '}';
   }
 
   public static class Builder {
@@ -534,6 +557,25 @@ public class DashScopeImageOptions implements ImageOptions {
     @Deprecated
     public Builder withResponseFormat(String responseFormat) {
       return responseFormat(responseFormat);
+    }
+
+    public Builder maxImages(Integer maxImages) {
+      this.options.maxImages = maxImages;
+      return this;
+    }
+
+    @Deprecated
+    public Builder withMaxImages(Integer maxImages) {
+        return maxImages(maxImages);
+    }
+
+    public Builder enableInterleave(Boolean enableInterleave) {
+        this.options.enableInterleave = enableInterleave;
+        return this;
+    }
+    @Deprecated
+    public Builder withEnableInterleave(Boolean enableInterleave) {
+        return enableInterleave(enableInterleave);
     }
 
     public DashScopeImageOptions build() {

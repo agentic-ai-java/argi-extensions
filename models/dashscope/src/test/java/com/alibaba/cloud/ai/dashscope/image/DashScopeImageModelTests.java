@@ -147,45 +147,45 @@ class DashScopeImageModelTests {
 
 	private void mockSuccessfulImageGeneration() {
 		// Mock successful task submission
-		DashScopeImageAsyncResponse submitResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
-				new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null),
-				new DashScopeImageAsyncResponseUsage(1));
-		when(dashScopeImageApi.submitImageGenTask(any())).thenReturn(ResponseEntity.ok(submitResponse));
+        DashScopeImageAsyncResponse submitResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
+                new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null),
+                new DashScopeImageAsyncResponseUsage(1));
+        when(dashScopeImageApi.submitImageGenTask(any())).thenReturn(ResponseEntity.ok(submitResponse));
+
 
 		// Mock successful task completion
-		DashScopeImageAsyncResponse completedResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
-				new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "SUCCEEDED",
-						List.of(new DashScopeImageAsyncResponseResult(TEST_IMAGE_URL)), null, null, null),
-				new DashScopeImageAsyncResponseUsage(1));
-		when(dashScopeImageApi.getImageGenTaskResult(TEST_TASK_ID)).thenReturn(ResponseEntity.ok(completedResponse));
-	}
+        DashScopeImageAsyncResponse completedResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
+                new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "SUCCEEDED",
+                        null, null, null, List.of(new DashScopeImageAsyncResponseResult(TEST_IMAGE_URL)), null, null, null, null),
+                new DashScopeImageAsyncResponseUsage(1));
+        when(dashScopeImageApi.getImageGenTaskResult(TEST_TASK_ID)).thenReturn(ResponseEntity.ok(completedResponse));
+    }
 
 	private void mockFailedImageGeneration() {
 		// Mock successful task submission but failed completion
 		DashScopeImageAsyncResponse submitResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
-				new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null),
-				new DashScopeImageAsyncResponseUsage(1));
+                new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null),
+                new DashScopeImageAsyncResponseUsage(1));
 		when(dashScopeImageApi.submitImageGenTask(any())).thenReturn(ResponseEntity.ok(submitResponse));
 
 		// Mock failed task completion
 		DashScopeImageAsyncResponse failedResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
-				new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "FAILED", null, null, "ERROR_CODE",
-						"Error message"),
-				new DashScopeImageAsyncResponseUsage(1));
+                new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "FAILED", null, null, null, null, null, null, "ERROR_CODE", "Error message"),
+                new DashScopeImageAsyncResponseUsage(1));
 		when(dashScopeImageApi.getImageGenTaskResult(TEST_TASK_ID)).thenReturn(ResponseEntity.ok(failedResponse));
 	}
 
 	private void mockTimeoutImageGeneration() {
 		// Mock successful task submission but pending status until timeout
 		DashScopeImageAsyncResponse submitResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
-				new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null),
-				new DashScopeImageAsyncResponseUsage(1));
+                new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null),
+                new DashScopeImageAsyncResponseUsage(1));
 		when(dashScopeImageApi.submitImageGenTask(any())).thenReturn(ResponseEntity.ok(submitResponse));
 
 		// Mock pending status for all status checks
 		DashScopeImageAsyncResponse pendingResponse = new DashScopeImageAsyncResponse(TEST_REQUEST_ID,
-				new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null),
-				new DashScopeImageAsyncResponseUsage(1));
+                new DashScopeImageAsyncResponseOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null),
+                new DashScopeImageAsyncResponseUsage(1));
 		when(dashScopeImageApi.getImageGenTaskResult(TEST_TASK_ID)).thenReturn(ResponseEntity.ok(pendingResponse));
 	}
 
