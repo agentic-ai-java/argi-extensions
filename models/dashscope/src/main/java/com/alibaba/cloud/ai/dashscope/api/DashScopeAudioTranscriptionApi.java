@@ -16,6 +16,12 @@
 
 package com.alibaba.cloud.ai.dashscope.api;
 
+import java.io.InputStream;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.function.Consumer;
+
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeException;
 import com.alibaba.cloud.ai.dashscope.protocol.DashScopeWebSocketClient;
@@ -27,11 +33,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import java.io.InputStream;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.function.Consumer;
 import org.springframework.ai.model.ApiKey;
 import org.springframework.ai.model.NoopApiKey;
 import org.springframework.ai.model.SimpleApiKey;
@@ -165,6 +166,14 @@ public class DashScopeAudioTranscriptionApi {
 			throw new RuntimeException(e);
 		}
 	}
+
+    public void ensureWebSocketConnectionReady(long timeout, java.util.concurrent.TimeUnit unit) {
+        try {
+            this.webSocketClient.ensureConnectionReady(timeout, unit);
+        } catch (Exception e) {
+            throw new DashScopeException("Failed to establish WebSocket connection", e);
+        }
+    }
 
 	public Flux<RealtimeResponse> realtimeStream(Flux<ByteBuffer> audio) {
 		return this.webSocketClient.streamTextOut(audio)

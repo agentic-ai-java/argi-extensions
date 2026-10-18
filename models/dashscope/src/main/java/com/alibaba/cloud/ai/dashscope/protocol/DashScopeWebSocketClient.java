@@ -15,23 +15,34 @@
  */
 package com.alibaba.cloud.ai.dashscope.protocol;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.alibaba.cloud.ai.dashscope.api.ApiUtils;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import okhttp3.ConnectionPool;
+import okhttp3.Dispatcher;
 import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
 import okhttp3.Request.Builder;
 import okhttp3.Response;
 import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
-import okhttp3.Dispatcher;
-import okhttp3.Protocol;
-import okhttp3.ConnectionPool;
 import okhttp3.logging.HttpLoggingInterceptor;
 import okio.ByteString;
 import org.slf4j.Logger;
@@ -39,14 +50,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.util.JacksonUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
-import com.fasterxml.jackson.databind.JsonNode;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author kevinlin09
@@ -68,9 +71,12 @@ public class DashScopeWebSocketClient extends WebSocketListener {
 
 	FluxSink<String> textEmitter;
 
+    private final CompletableFuture<Void> connectionReadyFuture;
+
 	public DashScopeWebSocketClient(DashScopeWebSocketClientOptions options) {
 		this.options = options;
 		this.isOpen = new AtomicBoolean(false);
+        this.connectionReadyFuture = new CompletableFuture<>();
 		this.objectMapper = JsonMapper.builder()
 			// Deserialization configuration
 			.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
@@ -182,6 +188,7 @@ public class DashScopeWebSocketClient extends WebSocketListener {
 	public void onOpen(WebSocket webSocket, Response response) {
 		logger.info("receive ws event onOpen: handle={}, body={}", webSocket, getRequestBody(response));
 		isOpen.set(true);
+        connectionReadyFuture.complete(null);
 	}
 
 	@Override
@@ -204,6 +211,7 @@ public class DashScopeWebSocketClient extends WebSocketListener {
 				getRequestBody(response));
 		logger.error("receive ws event onFailure: handle={}, {}", webSocket, failureMessage);
 		isOpen.set(false);
+        connectionReadyFuture.completeExceptionally(new Exception(failureMessage, t));
 		emittersError("failure", new Exception(failureMessage, t));
 	}
 
@@ -259,6 +267,26 @@ public class DashScopeWebSocketClient extends WebSocketListener {
 			logger.info("done");
 		}
 	}
+
+    /**
+     * Ensure WebSocket connection is established and wait for it to be ready.
+     * This method will trigger connection establishment if not already connected,
+     * and block until the connection is ready or timeout occurs.
+     *
+     * @param timeout the maximum time to wait for connection
+     * @param unit    the time unit of the timeout argument
+     *
+     * @throws java.util.concurrent.TimeoutException   if connection is not ready within timeout
+     * @throws InterruptedException                    if the current thread is interrupted while waiting
+     * @throws java.util.concurrent.ExecutionException if connection fails
+     */
+    public void ensureConnectionReady(long timeout, TimeUnit unit) throws TimeoutException, InterruptedException, ExecutionException {
+        if (!isOpen.get()) {
+            establishWebSocketClient();
+        }
+        connectionReadyFuture.get(timeout, unit);
+        logger.info("WebSocket connection is ready");
+    }
 
 	private void emittersError(String event, Throwable t) {
 		if (this.binaryEmitter != null && !this.binaryEmitter.isCancelled()) {

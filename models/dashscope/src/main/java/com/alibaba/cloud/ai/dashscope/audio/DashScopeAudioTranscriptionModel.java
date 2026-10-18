@@ -15,6 +15,14 @@
  */
 package com.alibaba.cloud.ai.dashscope.audio;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.time.Duration;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.alibaba.cloud.ai.dashscope.api.DashScopeAudioTranscriptionApi;
 import com.alibaba.cloud.ai.dashscope.audio.transcription.AudioTranscriptionModel;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
@@ -39,14 +47,6 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Audio transcription: Input audio, output text.
@@ -134,6 +134,15 @@ public class DashScopeAudioTranscriptionModel implements AudioTranscriptionModel
 		String taskId = UUID.randomUUID().toString();
 		DashScopeAudioTranscriptionApi.RealtimeRequest runTaskRequest = this.createRealtimeRequest(prompt, taskId,
 			DashScopeWebSocketClient.EventType.RUN_TASK);
+
+        // Ensure WebSocket connection is established before sending run-task
+        logger.info("Ensuring WebSocket connection is ready, taskId={}", taskId);
+        try {
+            this.audioTranscriptionApi.ensureWebSocketConnectionReady(10, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (DashScopeException e) {
+            logger.error("Failed to establish WebSocket connection: {}", e.getMessage());
+            return Flux.error(e);
+        }
 
 		logger.info("send run-task, taskId={}", taskId);
 		this.audioTranscriptionApi.realtimeSendTask(runTaskRequest);
@@ -273,6 +282,8 @@ public class DashScopeAudioTranscriptionModel implements AudioTranscriptionModel
 		DashScopeAudioTranscriptionApi.RealtimeResponse.Payload payload = realtimeResponse.payload();
 		DashScopeAudioTranscriptionApi.RealtimeResponse.Payload.Output output = payload.output();
 
+        logger.debug("Processing realtime response: taskId={}, output={}", taskId, output);
+
 		String text = "";
 		Boolean transcriptionSentenceEnd = Optional.of(output)
 			.map(DashScopeAudioTranscriptionApi.RealtimeResponse.Payload.Output::transcription)
@@ -280,6 +291,7 @@ public class DashScopeAudioTranscriptionModel implements AudioTranscriptionModel
 			.orElse(Boolean.FALSE);
 		if (transcriptionSentenceEnd) {
 			text = output.transcription().text();
+            logger.debug("Got transcription text (sentence end): {}", text);
 		} else {
 			Boolean sentenceSentenceEnd = Optional.of(output)
 				.map(DashScopeAudioTranscriptionApi.RealtimeResponse.Payload.Output::sentence)
@@ -287,6 +299,17 @@ public class DashScopeAudioTranscriptionModel implements AudioTranscriptionModel
 				.orElse(Boolean.FALSE);
 			if (sentenceSentenceEnd) {
 				text = output.sentence().text();
+                logger.debug("Got sentence text (sentence end): {}", text);
+            } else {
+                logger.debug("No sentence end detected, checking for partial results");
+                // Try to get partial transcription text
+                if (output.transcription() != null && output.transcription().text() != null) {
+                    text = output.transcription().text();
+                    logger.debug("Got partial transcription text: {}", text);
+                } else if (output.sentence() != null && output.sentence().text() != null) {
+                    text = output.sentence().text();
+                    logger.debug("Got partial sentence text: {}", text);
+                }
 			}
 		}
 
