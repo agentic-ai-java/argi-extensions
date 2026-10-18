@@ -32,26 +32,26 @@
     <url>https://github.com/spring-ai-alibaba/spring-ai-extensions</url>
 
     <licenses>
-      <license>
-        <name>Apache 2.0</name>
-        <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-        <distribution>repo</distribution>
-      </license>
+        <license>
+            <name>Apache 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
     </licenses>
 
     <developers>
-      <developer>
-        <id>chickenlj</id>
-        <name>Jun Liu</name>
-        <email>ken.lj.hz@gmail.com</email>
-        <organization>Alibaba Cloud</organization>
-        <organizationUrl>https://aliyun.com</organizationUrl>
-      </developer>
+        <developer>
+            <id>chickenlj</id>
+            <name>Jun Liu</name>
+            <email>ken.lj.hz@gmail.com</email>
+            <organization>Alibaba Cloud</organization>
+            <organizationUrl>https://aliyun.com</organizationUrl>
+        </developer>
     </developers>
     <scm>
-      <connection>git://github.com/spring-ai-alibaba/spring-ai-extensions</connection>
-      <developerConnection>git@github.com/spring-ai-alibaba/spring-ai-extensions</developerConnection>
-      <url>https://github.com/spring-ai-alibaba/spring-ai-extensions</url>
+        <connection>git://github.com/spring-ai-alibaba/spring-ai-extensions</connection>
+        <developerConnection>git@github.com/spring-ai-alibaba/spring-ai-extensions</developerConnection>
+        <url>https://github.com/spring-ai-alibaba/spring-ai-extensions</url>
     </scm>
 
     <dependencies>
@@ -77,38 +77,48 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
         <!-- Transformers Embedding Model -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-transformers</artifactId>
             <optional>true</optional>
         </dependency>
-
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-observation-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers-oceanbase</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
         </dependency>
     </dependencies>
 

@@ -15,6 +15,7 @@
  */
 package com.alibaba.cloud.ai.vectorstore.tablestore;
 
+
 import com.alicloud.openservices.tablestore.model.search.FieldSchema;
 import com.alicloud.openservices.tablestore.model.search.FieldType;
 import com.aliyun.openservices.tablestore.agent.knowledge.KnowledgeStoreImpl;
@@ -60,7 +61,7 @@ class TablestoreVectorStoreTest extends BaseVectorStoreTests {
 			.enableMultiTenant(true)
 			.build();
 		innerStore.deleteTableAndIndex();
-		store = TablestoreVectorStore.builder(innerStore, new TestEmbedding()).initializeTable(true).build();
+		store = TablestoreVectorStore.builder(innerStore, new TestEmbedding()).initializeSchema(true).build();
 		store.afterPropertiesSet();
 		TablestoreHelper.waitSearchIndexIncPhrase(innerStore.getClient(), innerStore.getTableName(),
 				innerStore.getSearchIndexName());

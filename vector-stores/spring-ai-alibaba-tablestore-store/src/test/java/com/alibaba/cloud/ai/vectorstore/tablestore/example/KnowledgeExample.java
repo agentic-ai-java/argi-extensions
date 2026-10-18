@@ -15,6 +15,7 @@
  */
 package com.alibaba.cloud.ai.vectorstore.tablestore.example;
 
+
 import com.aliyun.openservices.tablestore.agent.knowledge.KnowledgeSearchRequest;
 import com.aliyun.openservices.tablestore.agent.knowledge.KnowledgeStoreImpl;
 import com.aliyun.openservices.tablestore.agent.model.Document;
@@ -26,12 +27,7 @@ import com.aliyun.openservices.tablestore.agent.model.sort.FieldSort;
 import com.aliyun.openservices.tablestore.agent.model.sort.Order;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class KnowledgeExample {
 
