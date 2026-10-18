@@ -15,17 +15,16 @@
  */
 package com.alibaba.cloud.ai.dashscope.api;
 
+import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.DEFAULT_WEBSOCKET_URL;
+
 import com.alibaba.cloud.ai.dashscope.protocol.DashScopeWebSocketClient;
 import com.alibaba.cloud.ai.dashscope.protocol.DashScopeWebSocketClientOptions;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reactor.core.publisher.Flux;
-
 import java.nio.ByteBuffer;
-
-import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.DEFAULT_WEBSOCKET_URL;
+import reactor.core.publisher.Flux;
 
 public class DashScopeAudioSpeechApi {
 
@@ -41,9 +40,9 @@ public class DashScopeAudioSpeechApi {
 
 	public DashScopeAudioSpeechApi(String apiKey, String workSpaceId, String websocketUrl) {
 		this.webSocketClient = new DashScopeWebSocketClient(DashScopeWebSocketClientOptions.builder()
-			.withApiKey(apiKey)
-			.withWorkSpaceId(workSpaceId)
-			.withUrl(websocketUrl)
+			.apiKey(apiKey)
+			.workSpaceId(workSpaceId)
+			.url(websocketUrl)
 			.build());
 	}
 

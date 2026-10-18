@@ -317,7 +317,7 @@ public class DashScopeChatModel implements ChatModel {
 			return new ChatResponse(List.of());
 		}
 
-		// DashScope searchInfos
+		// Dashscope searchInfos
         DashScopeApiSpec.SearchInfo searchInfo = chatCompletion.output().searchInfo();
 
 		ConcurrentHashMap<String, String> finalRoleMap = roleMap == null ? new ConcurrentHashMap<>() : roleMap;
