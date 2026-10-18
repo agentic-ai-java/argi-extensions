@@ -26,6 +26,7 @@ import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionChunk;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionFinishReason;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionMessage;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionMessage.ChatCompletionFunction;
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionMessage.MediaContent;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionMessage.ToolCall;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionOutput;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.ChatCompletionOutput.Choice;
@@ -44,6 +45,7 @@ import org.mockito.Mockito;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -1142,6 +1144,108 @@ class DashScopeChatModelTests {
     }
 
     @Test
+    void testCreateRequestWithCacheControlInAssistantMessage() {
+        Map<String, Object> cacheControl = Map.of("type", "ephemeral");
+        AssistantMessage assistantMessage = AssistantMessage.builder()
+                .content(TEST_RESPONSE)
+                .properties(Map.of("cache_control", cacheControl))
+                .build();
+        Prompt prompt = new Prompt(List.of(new UserMessage(TEST_PROMPT), assistantMessage), defaultOptions);
+
+        ChatCompletionRequest request = chatModel.createRequest(prompt, false);
+
+        var assistantRequestMessage = request.input().messages().get(1);
+        assertThat(assistantRequestMessage.role()).isEqualTo(ChatCompletionMessage.Role.ASSISTANT);
+        assertThat(assistantRequestMessage.rawContent()).isInstanceOf(List.class);
+
+        @SuppressWarnings("unchecked")
+        List<MediaContent> contentList = (List<MediaContent>) assistantRequestMessage.rawContent();
+
+        assertThat(contentList).hasSize(1);
+        assertThat(contentList.get(0).text()).isEqualTo(TEST_RESPONSE);
+        assertThat(contentList.get(0).cacheControl()).containsEntry("type", "ephemeral");
+    }
+
+    @Test
+    void testCreateRequestWithCacheControlInAssistantMessageKeepsPartial() {
+        Map<String, Object> cacheControl = Map.of("type", "ephemeral");
+        AssistantMessage assistantMessage = AssistantMessage.builder()
+                .content("def fibonacci(n):")
+                .properties(Map.of("cache_control", cacheControl, "partial", true))
+                .build();
+        Prompt prompt = new Prompt(List.of(new UserMessage(TEST_PROMPT), assistantMessage), defaultOptions);
+
+        ChatCompletionRequest request = chatModel.createRequest(prompt, false);
+
+        var assistantRequestMessage = request.input().messages().get(1);
+        assertThat(assistantRequestMessage.partial()).isTrue();
+        assertThat(assistantRequestMessage.rawContent()).isInstanceOf(List.class);
+
+        @SuppressWarnings("unchecked")
+        List<MediaContent> contentList = (List<MediaContent>) assistantRequestMessage.rawContent();
+
+        assertThat(contentList.get(0).text()).isEqualTo("def fibonacci(n):");
+        assertThat(contentList.get(0).cacheControl()).containsEntry("type", "ephemeral");
+    }
+
+    @Test
+    void testCreateRequestWithCacheControlInAssistantMessageKeepsToolCalls() {
+        Map<String, Object> cacheControl = Map.of("type", "ephemeral");
+        AssistantMessage assistantMessage = AssistantMessage.builder()
+                .content("Calling weather tool.")
+                .properties(Map.of("cache_control", cacheControl))
+                .toolCalls(List.of(new AssistantMessage.ToolCall("call-1", "function", "get_weather", "{\"city\":\"HZ\"}")))
+                .build();
+        Prompt prompt = new Prompt(List.of(new UserMessage(TEST_PROMPT), assistantMessage), defaultOptions);
+
+        ChatCompletionRequest request = chatModel.createRequest(prompt, false);
+
+        var assistantRequestMessage = request.input().messages().get(1);
+        assertThat(assistantRequestMessage.toolCalls()).hasSize(1);
+        assertThat(assistantRequestMessage.toolCalls().get(0).id()).isEqualTo("call-1");
+        assertThat(assistantRequestMessage.toolCalls().get(0).function().name()).isEqualTo("get_weather");
+        assertThat(assistantRequestMessage.rawContent()).isInstanceOf(List.class);
+
+        @SuppressWarnings("unchecked")
+        List<MediaContent> contentList = (List<MediaContent>) assistantRequestMessage.rawContent();
+
+        assertThat(contentList.get(0).cacheControl()).containsEntry("type", "ephemeral");
+    }
+
+    @Test
+    void testCreateRequestWithCacheControlInToolResponseMessage() {
+        Map<String, Object> cacheControl = Map.of("type", "ephemeral");
+        ToolResponseMessage toolResponseMessage = ToolResponseMessage.builder()
+                .responses(List.of(
+                        new ToolResponseMessage.ToolResponse("call-1", "get_weather", "{\"city\":\"HZ\"}"),
+                        new ToolResponseMessage.ToolResponse("call-2", "get_time", "{\"timezone\":\"Asia/Shanghai\"}")))
+                .metadata(Map.of("cache_control", cacheControl))
+                .build();
+        Prompt prompt = new Prompt(List.of(toolResponseMessage), defaultOptions);
+
+        ChatCompletionRequest request = chatModel.createRequest(prompt, false);
+
+        assertThat(request.input().messages()).hasSize(2);
+        var firstToolMessage = request.input().messages().get(0);
+        assertThat(firstToolMessage.role()).isEqualTo(ChatCompletionMessage.Role.TOOL);
+        assertThat(firstToolMessage.name()).isEqualTo("get_weather");
+        assertThat(firstToolMessage.toolCallId()).isEqualTo("call-1");
+        assertThat(firstToolMessage.rawContent()).isInstanceOf(String.class);
+        assertThat(firstToolMessage.rawContent()).isEqualTo("{\"city\":\"HZ\"}");
+
+        var secondToolMessage = request.input().messages().get(1);
+        assertThat(secondToolMessage.name()).isEqualTo("get_time");
+        assertThat(secondToolMessage.toolCallId()).isEqualTo("call-2");
+        assertThat(secondToolMessage.rawContent()).isInstanceOf(List.class);
+
+        @SuppressWarnings("unchecked")
+        List<MediaContent> secondContentList = (List<MediaContent>) secondToolMessage.rawContent();
+
+        assertThat(secondContentList.get(0).text()).isEqualTo("{\"timezone\":\"Asia/Shanghai\"}");
+        assertThat(secondContentList.get(0).cacheControl()).containsEntry("type", "ephemeral");
+    }
+
+    @Test
     void testCreateRequestWithoutCacheControl() {
         // Test that message without cache_control stays as plain text
         Message message = new UserMessage(TEST_PROMPT);
@@ -1154,6 +1258,26 @@ class DashScopeChatModelTests {
         // Without cache_control, content should remain as plain String
         assertThat(firstMessage.rawContent()).isInstanceOf(String.class);
         assertThat(firstMessage.rawContent()).isEqualTo(TEST_PROMPT);
+    }
+
+    @Test
+    void testCreateRequestWithoutCacheControlInAssistantAndToolMessages() {
+        AssistantMessage assistantMessage = new AssistantMessage(TEST_RESPONSE);
+        ToolResponseMessage toolResponseMessage = ToolResponseMessage.builder()
+                .responses(List.of(new ToolResponseMessage.ToolResponse("call-1", "get_weather", "{\"city\":\"HZ\"}")))
+                .metadata(Map.of())
+                .build();
+        Prompt prompt = new Prompt(List.of(assistantMessage, toolResponseMessage), defaultOptions);
+
+        ChatCompletionRequest request = chatModel.createRequest(prompt, false);
+
+        var assistantRequestMessage = request.input().messages().get(0);
+        assertThat(assistantRequestMessage.rawContent()).isInstanceOf(String.class);
+        assertThat(assistantRequestMessage.rawContent()).isEqualTo(TEST_RESPONSE);
+
+        var toolRequestMessage = request.input().messages().get(1);
+        assertThat(toolRequestMessage.rawContent()).isInstanceOf(String.class);
+        assertThat(toolRequestMessage.rawContent()).isEqualTo("{\"city\":\"HZ\"}");
     }
 
     @Test
