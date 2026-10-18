@@ -49,6 +49,7 @@ public class BaiduSearchAutoConfiguration {
 			headers.add(HttpHeaders.REFERER, "https://www.baidu.com/");
 			headers.add(HttpHeaders.CONNECTION, "keep-alive");
 			headers.add(HttpHeaders.ACCEPT_LANGUAGE, "zh-CN,zh;q=0.9");
+			headers.add(HttpHeaders.ACCEPT, "text/html,application/xhtml+xml,application/xml");
 		};
 		return new BaiduSearchService(jsonParseTool, properties,
 				WebClientTool.builder(jsonParseTool, properties).httpHeadersConsumer(consumer).build());

@@ -222,7 +222,7 @@ public class DashScopeChatOptions implements ToolCallingChatOptions {
     /**
      * Indicates whether the request involves multiple models
      */
-    private @JsonProperty("multi_model") Boolean multiModel = false;
+    private @JsonProperty("multi_model") Boolean multiModel;
 
     /**
      * Whether to enable the vision language model to output image height and width.
