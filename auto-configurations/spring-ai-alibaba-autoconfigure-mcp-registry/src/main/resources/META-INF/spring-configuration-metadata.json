@@ -14,9 +14,15 @@
     },
     {
       "name": "spring.ai.alibaba.mcp.nacos.client.sse",
-      "type": "com.alibaba.cloud.ai.mcp.nacos.sse.NacosMcpSseClientProperties",
-      "sourceType": "com.alibaba.cloud.ai.mcp.nacos.sse.NacosMcpSseClientProperties",
+      "type": "com.alibaba.cloud.ai.mcp.nacos.NacosMcpSseClientProperties",
+      "sourceType": "com.alibaba.cloud.ai.mcp.nacos.NacosMcpSseClientProperties",
       "description": "Configuration properties for Nacos MCP SSE client connections."
+    },
+    {
+      "name": "spring.ai.alibaba.mcp.nacos.client.streamable",
+      "type": "com.alibaba.cloud.ai.mcp.nacos.NacosMcpStreamableClientProperties",
+      "sourceType": "com.alibaba.cloud.ai.mcp.nacos.NacosMcpStreamableClientProperties",
+      "description": "Configuration properties for Nacos MCP Streamable client connections."
     }
   ],
   "properties": [
@@ -127,7 +133,7 @@
       "name": "spring.ai.alibaba.mcp.nacos.client.sse.connections",
       "type": "java.util.Map<java.lang.String,com.alibaba.cloud.ai.mcp.nacos.sse.NacosMcpSseClientProperties$NacosSseParameters>",
       "description": "SSE client connections configuration for Nacos MCP services.",
-      "sourceType": "com.alibaba.cloud.ai.mcp.nacos.sse.NacosMcpSseClientProperties"
+      "sourceType": "com.alibaba.cloud.ai.mcp.nacos.NacosMcpSseClientProperties"
     }
   ],
   "hints": []

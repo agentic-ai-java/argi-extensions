@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.cloud.ai.mcp.nacos.sse;
+package com.alibaba.cloud.ai.mcp.nacos;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -25,10 +25,10 @@ import java.util.Map;
  * @author yingzi
  * @since 2025/4/29:08:24
  */
-@ConfigurationProperties(NacosMcpSseClientProperties.CONFIG_PREFIX)
-public class NacosMcpSseClientProperties {
+@ConfigurationProperties(NacosMcpStreamableClientProperties.CONFIG_PREFIX)
+public class NacosMcpStreamableClientProperties {
 
-	public static final String CONFIG_PREFIX = "spring.ai.alibaba.mcp.nacos.client.sse";
+	public static final String CONFIG_PREFIX = "spring.ai.alibaba.mcp.nacos.client.streamable";
 
 	private final Map<String, NacosSseParameters> connections = new HashMap<>();
 

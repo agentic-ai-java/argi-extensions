@@ -130,13 +130,14 @@ public class SseWebFluxDistributedAsyncMcpClient implements DistributedAsyncMcpC
         this.traceFilter = tempTraceFilter;
     }
 
-    public void init() {
+    public Map<String, McpAsyncClient> init() {
         keyToClientMap = new ConcurrentHashMap<>();
         for (McpEndpointInfo mcpEndpointInfo : serverEndpoint.getMcpEndpointInfoList()) {
             updateByAddEndpoint(mcpEndpointInfo, serverEndpoint.getExportPath());
         }
         logger.info("[Nacos Mcp Async Client] McpAsyncClient init, serverName: {}, version: {}, endpoint: {}", serverName,
                 version, serverEndpoint);
+        return keyToClientMap;
     }
 
     public void subscribe() {

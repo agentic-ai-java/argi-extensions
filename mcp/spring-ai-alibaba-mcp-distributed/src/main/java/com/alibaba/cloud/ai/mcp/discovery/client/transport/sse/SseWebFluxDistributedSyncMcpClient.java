@@ -127,13 +127,14 @@ public class SseWebFluxDistributedSyncMcpClient implements DistributedSyncMcpCli
         this.traceFilter = tempTraceFilter;
     }
 
-    public void init() {
+    public Map<String, McpSyncClient> init() {
         keyToClientMap = new ConcurrentHashMap<>();
         for (McpEndpointInfo mcpEndpointInfo : serverEndpoint.getMcpEndpointInfoList()) {
             updateByAddEndpoint(mcpEndpointInfo, serverEndpoint.getExportPath());
         }
         logger.info("[Nacos Mcp Sync Client] McpSyncClient init, serverName: {}, version: {}, endpoint: {}", serverName,
                 version, serverEndpoint);
+        return keyToClientMap;
     }
 
     public void subscribe() {

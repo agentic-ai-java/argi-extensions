@@ -20,6 +20,8 @@ import io.modelcontextprotocol.client.McpAsyncClient;
 import io.modelcontextprotocol.spec.McpSchema;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 /**
  * @author yingzi
  * @since 2025/10/25
@@ -34,4 +36,8 @@ public interface DistributedAsyncMcpClient {
     Mono<McpSchema.ListToolsResult> listTools();
 
     McpAsyncClient getMcpAsyncClient();
+
+    Map<String, McpAsyncClient> init();
+
+    void subscribe();
 }
