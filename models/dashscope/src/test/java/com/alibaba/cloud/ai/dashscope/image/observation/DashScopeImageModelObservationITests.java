@@ -18,6 +18,7 @@ package com.alibaba.cloud.ai.dashscope.image.observation;
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.DEFAULT_BASE_URL;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeImageApi;
 import com.alibaba.cloud.ai.dashscope.image.DashScopeImageModel;
@@ -131,12 +132,12 @@ class DashScopeImageModelObservationTests {
 
     var output =
             new DashScopeImageAsyncResponseOutput(
-            "00001", "SUCCEEDED", null, null, null, List.of(fakeResult), null, null, "code", "msg");
+            "00001", "SUCCEEDED", null, null, null, List.of(fakeResult), null, null, null, "code", "msg");
 
 
     var response = new DashScopeImageAsyncResponse("req-test", output, null);
 
-    Mockito.when(mockApi.submitImageGenTask(any(DashScopeImageRequest.class)))
+    Mockito.when(mockApi.submitImageGenTask(any(DashScopeImageRequest.class), anyBoolean()))
         .thenReturn(
             ResponseEntity.ok(new DashScopeImageAsyncResponse(output.taskId(), output, null)));
 

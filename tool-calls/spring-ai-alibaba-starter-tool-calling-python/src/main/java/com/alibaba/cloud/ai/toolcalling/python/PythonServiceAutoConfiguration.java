@@ -17,6 +17,7 @@ package com.alibaba.cloud.ai.toolcalling.python;
 
 import org.graalvm.polyglot.Engine;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,8 +47,11 @@ public class PythonServiceAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "pythonToolCallback")
-    public ToolCallback pythonToolCallback() {
-        return PythonService.createPythonToolCallback(PythonConstants.DESCRIPTION);
+    public ToolCallback pythonToolCallback(PythonService pythonService) {
+        return FunctionToolCallback.builder("python", pythonService)
+                .description(PythonConstants.DESCRIPTION)
+                .inputType(PythonService.Request.class)
+                .build();
     }
 
 }

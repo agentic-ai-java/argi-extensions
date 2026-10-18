@@ -17,6 +17,9 @@ package com.alibaba.cloud.ai.toolcalling.python;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Configuration properties for Python Tool powered by GraalVM Polyglot.
  *
@@ -121,6 +124,11 @@ public class PythonProperties {
          */
         private boolean allowHostAccess = true;
 
+        /**
+         * GraalVM Context options (e.g., python.Executable, python.PythonPath).
+         */
+        private Map<String, String> options = new HashMap<>();
+
         public boolean isAllowAllAccess() {
             return allowAllAccess;
         }
@@ -159,6 +167,14 @@ public class PythonProperties {
 
         public void setAllowHostAccess(boolean allowHostAccess) {
             this.allowHostAccess = allowHostAccess;
+        }
+
+        public Map<String, String> getOptions() {
+            return options;
+        }
+
+        public void setOptions(Map<String, String> options) {
+            this.options = options;
         }
 
     }

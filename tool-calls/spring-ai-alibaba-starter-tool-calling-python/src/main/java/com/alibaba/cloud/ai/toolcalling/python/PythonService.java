@@ -52,14 +52,20 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
         this.engine = Engine.newBuilder()
                 .allowExperimentalOptions(properties.getEngine().isWarnInterpreterOnly())
                 .build();
-        this.context = Context.newBuilder("python")
+
+        Context.Builder contextBuilder = Context.newBuilder("python")
                 .engine(engine)
                 .allowAllAccess(properties.getContext().isAllowAllAccess())
                 .allowIO(properties.getContext().isAllowIO())
                 .allowNativeAccess(properties.getContext().isAllowNativeAccess())
                 .allowCreateProcess(properties.getContext().isAllowCreateProcess())
-                .allowHostAccess(properties.getContext().isAllowHostAccess())
-                .build();
+                .allowHostAccess(properties.getContext().isAllowHostAccess());
+
+        if (properties.getContext().getOptions() != null && !properties.getContext().getOptions().isEmpty()) {
+            contextBuilder.options(properties.getContext().getOptions());
+        }
+
+        this.context = contextBuilder.build();
     }
 
     /**
@@ -91,7 +97,7 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
     }
 
     /**
-     * 将 Polyglot Value 转换为字符串
+     * Convert a Polyglot Value to its string representation.
      */
     private String convertResultToString(Value result) {
         if (result.isNull()) {
@@ -112,7 +118,7 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
     }
 
     /**
-     * 将数组/列表转换为字符串表示
+     * Convert an array-like value to its string representation.
      */
     private String convertArrayToString(Value result) {
         StringBuilder sb = new StringBuilder("[");
@@ -156,4 +162,3 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
 
     }
 }
-

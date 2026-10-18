@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.dashscope.image;
 
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.InvokeMode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
@@ -115,6 +117,56 @@ public class DashScopeImageOptions implements ImageOptions {
   @JsonProperty("enable_interleave")
   private Boolean enableInterleave;
 
+  /**
+   * Invocation mode for the API call.
+   * - AUTO: automatically choose based on model defaults (backward compatible)
+   * - SYNC: synchronous call (no async header)
+   * - ASYNC: asynchronous call (with async header, returns task_id for polling)
+   * Note: If model doesn't support sync, will auto-downgrade to async with WARN log.
+   */
+  @JsonIgnore
+  private InvokeMode invokeMode = InvokeMode.AUTO;
+
+  /** Output aspect ratio for out-painting, e.g. "4:3". */
+  @JsonProperty("output_ratio")
+  private String outputRatio;
+
+  /** Horizontal expansion scale for out-painting. */
+  @JsonProperty("x_scale")
+  private Float xScale;
+
+  /** Vertical expansion scale for out-painting. */
+  @JsonProperty("y_scale")
+  private Float yScale;
+
+  /** Rotation angle in degrees for out-painting. */
+  @JsonProperty("angle")
+  private Integer angle;
+
+  /** Left expansion in pixels for out-painting. */
+  @JsonProperty("left_offset")
+  private Integer leftOffset;
+
+  /** Right expansion in pixels for out-painting. */
+  @JsonProperty("right_offset")
+  private Integer rightOffset;
+
+  /** Top expansion in pixels for out-painting. */
+  @JsonProperty("top_offset")
+  private Integer topOffset;
+
+  /** Bottom expansion in pixels for out-painting. */
+  @JsonProperty("bottom_offset")
+  private Integer bottomOffset;
+
+  /** Whether to use best quality mode for out-painting. */
+  @JsonProperty("best_quality")
+  private Boolean bestQuality;
+
+  /** Whether to limit output image size for out-painting. */
+  @JsonProperty("limit_image_size")
+  private Boolean limitImageSize;
+
   public Boolean getPromptExtend() {
     return promptExtend;
   }
@@ -209,6 +261,94 @@ public class DashScopeImageOptions implements ImageOptions {
 
   public void setEnableInterleave(Boolean enableInterleave) {
     this.enableInterleave = enableInterleave;
+  }
+
+  public InvokeMode getInvokeMode() {
+    return invokeMode;
+  }
+
+  public void setInvokeMode(InvokeMode invokeMode) {
+    this.invokeMode = invokeMode;
+  }
+
+  public String getOutputRatio() {
+    return outputRatio;
+  }
+
+  public void setOutputRatio(String outputRatio) {
+    this.outputRatio = outputRatio;
+  }
+
+  public Float getXScale() {
+    return xScale;
+  }
+
+  public void setXScale(Float xScale) {
+    this.xScale = xScale;
+  }
+
+  public Float getYScale() {
+    return yScale;
+  }
+
+  public void setYScale(Float yScale) {
+    this.yScale = yScale;
+  }
+
+  public Integer getAngle() {
+    return angle;
+  }
+
+  public void setAngle(Integer angle) {
+    this.angle = angle;
+  }
+
+  public Integer getLeftOffset() {
+    return leftOffset;
+  }
+
+  public void setLeftOffset(Integer leftOffset) {
+    this.leftOffset = leftOffset;
+  }
+
+  public Integer getRightOffset() {
+    return rightOffset;
+  }
+
+  public void setRightOffset(Integer rightOffset) {
+    this.rightOffset = rightOffset;
+  }
+
+  public Integer getTopOffset() {
+    return topOffset;
+  }
+
+  public void setTopOffset(Integer topOffset) {
+    this.topOffset = topOffset;
+  }
+
+  public Integer getBottomOffset() {
+    return bottomOffset;
+  }
+
+  public void setBottomOffset(Integer bottomOffset) {
+    this.bottomOffset = bottomOffset;
+  }
+
+  public Boolean getBestQuality() {
+    return bestQuality;
+  }
+
+  public void setBestQuality(Boolean bestQuality) {
+    this.bestQuality = bestQuality;
+  }
+
+  public Boolean getLimitImageSize() {
+    return limitImageSize;
+  }
+
+  public void setLimitImageSize(Boolean limitImageSize) {
+    this.limitImageSize = limitImageSize;
   }
 
   public static Builder builder() {
@@ -331,7 +471,11 @@ public class DashScopeImageOptions implements ImageOptions {
         + this.maskImageUrl + '\'' + ", sketchImageUrl='" + this.sketchImageUrl + '\'' + ", sketchWeight="
         + this.sketchWeight + ", sketchExtraction=" + this.sketchExtraction + ", sketchColor="
         + Arrays.toString(this.sketchColor) + ", maskColor=" + Arrays.toString(this.maskColor) + ", maxImages="
-        + this.maxImages + ", enableInterleave=" + this.enableInterleave + '}';
+        + this.maxImages + ", enableInterleave=" + this.enableInterleave + ", invokeMode=" + this.invokeMode
+        + ", outputRatio='" + this.outputRatio + '\''
+        + ", xScale=" + this.xScale + ", yScale=" + this.yScale + ", angle=" + this.angle + ", leftOffset="
+        + this.leftOffset + ", rightOffset=" + this.rightOffset + ", topOffset=" + this.topOffset + ", bottomOffset="
+        + this.bottomOffset + ", bestQuality=" + this.bestQuality + ", limitImageSize=" + this.limitImageSize + '}';
   }
 
   public static class Builder {
@@ -576,6 +720,111 @@ public class DashScopeImageOptions implements ImageOptions {
     @Deprecated
     public Builder withEnableInterleave(Boolean enableInterleave) {
         return enableInterleave(enableInterleave);
+    }
+
+    public Builder invokeMode(InvokeMode invokeMode) {
+        this.options.invokeMode = invokeMode;
+        return this;
+    }
+
+    public Builder outputRatio(String outputRatio) {
+        this.options.outputRatio = outputRatio;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withOutputRatio(String outputRatio) {
+        return outputRatio(outputRatio);
+    }
+
+    public Builder xScale(Float xScale) {
+        this.options.xScale = xScale;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withXScale(Float xScale) {
+        return xScale(xScale);
+    }
+
+    public Builder yScale(Float yScale) {
+        this.options.yScale = yScale;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withYScale(Float yScale) {
+        return yScale(yScale);
+    }
+
+    public Builder angle(Integer angle) {
+        this.options.angle = angle;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withAngle(Integer angle) {
+        return angle(angle);
+    }
+
+    public Builder leftOffset(Integer leftOffset) {
+        this.options.leftOffset = leftOffset;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withLeftOffset(Integer leftOffset) {
+        return leftOffset(leftOffset);
+    }
+
+    public Builder rightOffset(Integer rightOffset) {
+        this.options.rightOffset = rightOffset;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withRightOffset(Integer rightOffset) {
+        return rightOffset(rightOffset);
+    }
+
+    public Builder topOffset(Integer topOffset) {
+        this.options.topOffset = topOffset;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withTopOffset(Integer topOffset) {
+        return topOffset(topOffset);
+    }
+
+    public Builder bottomOffset(Integer bottomOffset) {
+        this.options.bottomOffset = bottomOffset;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withBottomOffset(Integer bottomOffset) {
+        return bottomOffset(bottomOffset);
+    }
+
+    public Builder bestQuality(Boolean bestQuality) {
+        this.options.bestQuality = bestQuality;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withBestQuality(Boolean bestQuality) {
+        return bestQuality(bestQuality);
+    }
+
+    public Builder limitImageSize(Boolean limitImageSize) {
+        this.options.limitImageSize = limitImageSize;
+        return this;
+    }
+
+    @Deprecated
+    public Builder withLimitImageSize(Boolean limitImageSize) {
+        return limitImageSize(limitImageSize);
     }
 
     public DashScopeImageOptions build() {
