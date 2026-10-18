@@ -16,8 +16,8 @@
 
 package com.alibaba.cloud.ai.dashscope.spec;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.model.ChatModelDescription;
-import org.springframework.ai.model.ModelDescription;
 
 /**
  * @author yuluo
@@ -454,57 +454,54 @@ public class DashScopeModel {
 
     }
 
-    /**
-     * <a href="https://help.aliyun.com/zh/model-studio/text-to-video-api-reference">Video Models</a>
-     */
-    public enum VideoModel implements ModelDescription {
+    public enum VideoModel {
 
-        /**
-         * Text to Video, faster generation speed and balanced performance.
-         */
-        WANX2_1_T2V_TURBO("wanx2.1-t2v-turbo"),
+        WANX21_I2V_TURBO("wanx2.1-i2v-turbo"),
+        WANX21_I2V_PLUS("wanx2.1-i2v-plus"),
+        WANX22_I2V_PLUS("wan2.2-i2v-plus"),
+        WAN22_I2V_FLASH("wan2.2-i2v-flash"),
+        WAN25_I2V_PREVIEW("wan2.5-i2v-preview"),
+        WAN26_I2V_FLASH("wan2.6-i2v-flash"),
+        WAN26_I2V("wan2.6-i2v"),
+        WAN26_R2V("wan2.6-r2v"),
+        WANX21_T2V_PLUS("wanx2.1-t2v-plus"),
+        WANX21_T2V_TURBO("wanx2.1-t2v-turbo"),
+        WANX22_T2V_PLUS("wan2.2-t2v-plus"),
+        WANX25_T2V_PREVIEW("wan2.5-t2v-preview"),
+        WANX26_T2V("wan2.6-t2v"),
+        WANX21_VACE_PLUS("wanx2.1-vace-plus"),
+        VIDEO_STYLE_TRANSFORM("video-style-transform"),
 
-        WANX2_5_T2V_PREVIEW("wan2.5-t2v-preview"),
+        WANX21_KF2V_PLUS("wanx2.1-kf2v-plus"),
+        WAN22_KF2V_FLASH("wan2.2-kf2v-flash"),
+        WAN22_ANIMATE_MOVE("wan2.2-animate-move"),
+        WAN22_ANIMATE_MIX("wan2.2-animate-mix"),
+        WAN22_S2V("wan2.2-s2v"),
+        ANIMATE_ANYONE_GEN2("animate-anyone-gen2"),
+        EMO_V1("emo-v1"),
+        LIVEPORTRAIT("liveportrait"),
+        VIDEORETALK("videoretalk"),
+        EMOJI_V1("emoji-v1"),
 
-        /**
-         * Text to Video, The generated details are richer and the picture is more
-         * textured.
-         */
-        WANX2_1_T2V_PLUS("wanx2.1-t2v-plus"),
+        WAN22_S2V_DETECT("wan2.2-s2v-detect"),
+        EMO_DETECT_V1("emo-detect-v1"),
+        LIVEPORTRAIT_DETECT("liveportrait-detect"),
+        EMOJI_DETECT_V1("emoji-detect-v1"),
 
-        /**
-         * Picture-generated video, based on the first frame. The generation speed is
-         * faster, taking only one-third of the plus model, and it has a higher
-         * cost-effectiveness.
-         */
-        WANX2_1_I2V_TURBO("wanx2.1-i2v-turbo"),
+        ANIMATE_ANYONE_DETECT_GEN2("animate-anyone-detect-gen2"),
 
-        /**
-         * Picture-generated video, The generated details are richer and the picture is
-         * more textured.
-         */
-        WANX2_1_I2V_PLUS("wanx2.1-i2v-plus"),
+        ANIMATE_ANYONE_TEMPLATE_GEN2("animate-anyone-template-gen2");
 
-        /**
-         * Generate video based on the beginning and end frames
-         */
-        WANX2_1_KF2V_PLUS("wanx2.1-kf2v-plus");
-
-        public final String value;
+        public String value;
 
         VideoModel(String value) {
             this.value = value;
         }
 
-        public String getValue() {
-            return this.value;
-        }
-
-        @Override
+        @NotNull
         public String getName() {
-            return this.value;
+            return value;
         }
-
     }
 
 }

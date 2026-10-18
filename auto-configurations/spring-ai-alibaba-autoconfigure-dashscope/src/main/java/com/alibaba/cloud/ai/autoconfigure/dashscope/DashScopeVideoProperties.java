@@ -19,8 +19,6 @@ import com.alibaba.cloud.ai.dashscope.video.DashScopeVideoOptions;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
-import static com.alibaba.cloud.ai.dashscope.api.DashScopeVideoApi.DEFAULT_VIDEO_MODEL;
-
 /**
  * DashScope Video Generation Properties.
  *
@@ -35,7 +33,7 @@ public class DashScopeVideoProperties extends DashScopeParentProperties {
 	public static final String CONFIG_PREFIX = "spring.ai.dashscope.video";
 
 	@NestedConfigurationProperty
-	private DashScopeVideoOptions options = DashScopeVideoOptions.builder().model(DEFAULT_VIDEO_MODEL).build();
+    private DashScopeVideoOptions options = DashScopeVideoOptions.builder().build();
 
 	public DashScopeVideoOptions getOptions() {
 		return this.options;

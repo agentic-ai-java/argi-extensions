@@ -230,8 +230,12 @@ public class DashScopeWebSocketClient extends WebSocketListener {
 					emittersComplete("finished");
 					break;
 				case TASK_FAILED:
-					logger.error("task failed: text={}", text);
-					emittersError("task failed", new Exception());
+                    String errorCode = message.header.code != null ? message.header.code : "UNKNOWN";
+                    String errorMessage =
+                            message.header.message != null ? message.header.message : "No error message provided";
+                    String errorDetail = String.format("Task failed with error_code='%s', error_message='%s'", errorCode, errorMessage);
+                    logger.error("task failed: text={}, error_code={}, error_message={}", text, errorCode, errorMessage);
+                    emittersError("task failed", new Exception(errorDetail));
 					break;
 				case RESULT_GENERATED:
 					if (this.textEmitter != null) {
@@ -239,8 +243,10 @@ public class DashScopeWebSocketClient extends WebSocketListener {
 					}
 					break;
 				default:
-					logger.error("task error: text={}", text);
-					emittersError("unsupported event", new Exception());
+                    String eventName = message.header.event != null ? message.header.event.getValue() : "UNKNOWN_EVENT";
+                    String unsupportedError = String.format("Unsupported event type: %s", eventName);
+                    logger.error("task error: text={}, event={}", text, eventName);
+                    emittersError("unsupported event", new Exception(unsupportedError));
 			}
 		}
 		catch (Exception e) {

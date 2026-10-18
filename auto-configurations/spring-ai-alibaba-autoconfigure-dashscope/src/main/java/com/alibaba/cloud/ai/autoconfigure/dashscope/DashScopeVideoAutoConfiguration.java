@@ -58,7 +58,7 @@ public class DashScopeVideoAutoConfiguration {
 			DashScopeVideoProperties videoProperties, ObjectProvider<RestClient.Builder> restClientBuilderProvider,
 			RetryTemplate retryTemplate, ResponseErrorHandler responseErrorHandler) {
 
-		ResolvedConnectionProperties resolved = resolveConnectionProperties(commonProperties, videoProperties, "image");
+        ResolvedConnectionProperties resolved = resolveConnectionProperties(commonProperties, videoProperties, "video");
 
 		var videoApi = DashScopeVideoApi.builder()
 			.apiKey(resolved.apiKey())

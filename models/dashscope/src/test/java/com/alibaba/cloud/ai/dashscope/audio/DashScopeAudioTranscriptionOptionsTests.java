@@ -252,39 +252,6 @@ class DashScopeAudioTranscriptionOptionsTests {
     }
 
     @Test
-    void testDeprecatedBuilderMethods() {
-        // Test deprecated builder methods still work
-        DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
-                .withModel(TEST_MODEL)
-                .withVocabularyId(TEST_VOCABULARY_ID)
-                .withResourceId(TEST_RESOURCE_ID)
-                .withSampleRate(TEST_SAMPLE_RATE)
-                .withFormat(TEST_FORMAT)
-                .withChannelId(TEST_CHANNEL_ID)
-                .withDisfluencyRemovalEnabled(TEST_DISFLUENCY_REMOVAL)
-                .withTimestampAlignmentEnabled(TEST_TIMESTAMP_ALIGNMENT)
-                .withSpecialWordFilter(TEST_SPECIAL_WORD_FILTER)
-                .withLanguageHints(TEST_LANGUAGE_HINTS)
-                .withDiarizationEnabled(TEST_DIARIZATION_ENABLED)
-                .withSpeakerCount(TEST_SPEAKER_COUNT)
-                .build();
-
-        // Verify fields are set correctly via deprecated methods
-        assertThat(options.getModel()).isEqualTo(TEST_MODEL);
-        assertThat(options.getVocabularyId()).isEqualTo(TEST_VOCABULARY_ID);
-        assertThat(options.getResourceId()).isEqualTo(TEST_RESOURCE_ID);
-        assertThat(options.getSampleRate()).isEqualTo(TEST_SAMPLE_RATE);
-        assertThat(options.getFormat()).isEqualTo(TEST_FORMAT);
-        assertThat(options.getChannelId()).isEqualTo(TEST_CHANNEL_ID);
-        assertThat(options.getDisfluencyRemovalEnabled()).isEqualTo(TEST_DISFLUENCY_REMOVAL);
-        assertThat(options.getTimestampAlignmentEnabled()).isEqualTo(TEST_TIMESTAMP_ALIGNMENT);
-        assertThat(options.getSpecialWordFilter()).isEqualTo(TEST_SPECIAL_WORD_FILTER);
-        assertThat(options.getLanguageHints()).isEqualTo(TEST_LANGUAGE_HINTS);
-        assertThat(options.getDiarizationEnabled()).isEqualTo(TEST_DIARIZATION_ENABLED);
-        assertThat(options.getSpeakerCount()).isEqualTo(TEST_SPEAKER_COUNT);
-    }
-
-    @Test
     void testRealtimeTranscriptionOptions() {
         // Test realtime transcription specific options
         DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()

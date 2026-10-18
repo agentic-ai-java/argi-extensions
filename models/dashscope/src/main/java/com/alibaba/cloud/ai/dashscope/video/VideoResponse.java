@@ -16,35 +16,34 @@
 
 package com.alibaba.cloud.ai.dashscope.video;
 
-import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec;
-import org.springframework.ai.model.ModelResponse;
-import org.springframework.ai.model.ResponseMetadata;
-
 import java.util.Collections;
 import java.util.List;
 
+import com.alibaba.cloud.ai.dashscope.video.model.DashScopeVideoResponse;
+import org.springframework.ai.model.ModelResponse;
+import org.springframework.ai.model.ResponseMetadata;
+
 /**
- * @author yuluo
- * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
+ * @author yuluo, yingzi
  */
 
-public class VideoResponse implements ModelResponse<DashScopeApiSpec.VideoGenerationResponse> {
+public class VideoResponse implements ModelResponse<DashScopeVideoResponse> {
 
-	private final DashScopeApiSpec.VideoGenerationResponse result;
+    private final DashScopeVideoResponse result;
 
-	public VideoResponse(DashScopeApiSpec.VideoGenerationResponse result) {
+    public VideoResponse(DashScopeVideoResponse result) {
 
 		this.result = result;
 	}
 
 	@Override
-	public DashScopeApiSpec.VideoGenerationResponse getResult() {
+    public DashScopeVideoResponse getResult() {
 
 		return this.result;
 	}
 
 	@Override
-	public List<DashScopeApiSpec.VideoGenerationResponse> getResults() {
+    public List<DashScopeVideoResponse> getResults() {
 
 		return Collections.singletonList(this.result);
 	}

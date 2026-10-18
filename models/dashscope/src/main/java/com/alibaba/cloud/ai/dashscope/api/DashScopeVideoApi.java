@@ -16,9 +16,12 @@
 
 package com.alibaba.cloud.ai.dashscope.api;
 
+import java.util.function.Consumer;
+
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
-import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec;
-import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel;
+import com.alibaba.cloud.ai.dashscope.common.DashScopeVideoApiConstants;
+import com.alibaba.cloud.ai.dashscope.video.model.DashScopeVideoRequest;
+import com.alibaba.cloud.ai.dashscope.video.model.DashScopeVideoResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.model.ApiKey;
@@ -31,8 +34,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
-
-import java.util.function.Consumer;
 
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.ENABLED;
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.HEADER_ASYNC;
@@ -48,8 +49,6 @@ import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.HEADER
 public class DashScopeVideoApi {
 
 	private static final Logger logger = LoggerFactory.getLogger(DashScopeVideoApi.class);
-
-	public static final String DEFAULT_VIDEO_MODEL = DashScopeModel.VideoModel.WANX2_1_T2V_TURBO.getValue();
 
 	private final String baseUrl;
 
@@ -92,36 +91,27 @@ public class DashScopeVideoApi {
 	/**
 	 * Submit video generation task.
 	 */
-	public ResponseEntity<DashScopeApiSpec.VideoGenerationResponse> submitVideoGenTask(DashScopeApiSpec.VideoGenerationRequest request) {
+    public ResponseEntity<DashScopeVideoResponse> submitVideoGenTask(DashScopeVideoRequest request) {
+        logger.debug("Submitting video generation task with options: {}", request);
+        String uri = DashScopeVideoApiConstants.getPathByModelName(request.getModel());
+        boolean detect = DashScopeVideoApiConstants.isDetect(request.getModel());
 
-		logger.debug("Submitting video generation task with options: {}", request);
+        var requestSpec = this.restClient.post().uri(uri).body(request);
 
-		String uri;
+        if (!detect) {
+            requestSpec.header(HEADER_ASYNC, ENABLED);
+        }
+        return requestSpec.retrieve().toEntity(DashScopeVideoResponse.class);
+    }
 
-		// Use unused uri paths based on the head and tail frames
-		if (request.getInput().getFirstFrameUrl() != null || request.getInput().getLastFrameUrl() != null) {
-			uri = DashScopeApiConstants.IMAGE2VIDEO_RESTFUL_URL;
-		}
-		else {
-			uri = DashScopeApiConstants.VIDEO_GENERATION_RESTFUL_URL;
-		}
-
-		return this.restClient.post()
-			.uri(uri)
-			.body(request)
-			.header(HEADER_ASYNC, ENABLED)
-			.retrieve()
-			.toEntity(DashScopeApiSpec.VideoGenerationResponse.class);
-	}
 
 	/**
 	 * Query video generation task status.
 	 */
-	public ResponseEntity<DashScopeApiSpec.VideoGenerationResponse> queryVideoGenTask(String taskId) {
+    public ResponseEntity<DashScopeVideoResponse> queryVideoGenTask(String taskId) {
 		return this.restClient.get()
 			.uri(DashScopeApiConstants.QUERY_TASK_RESTFUL_URL, taskId)
-			.retrieve()
-			.toEntity(DashScopeApiSpec.VideoGenerationResponse.class);
+			.retrieve().toEntity(DashScopeVideoResponse.class);
 	}
 
 	String getBaseUrl() {

@@ -20,8 +20,7 @@ import org.springframework.ai.model.ModelOptions;
 import org.springframework.lang.Nullable;
 
 /**
- * @author yuluo
- * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
+ * @author yuluo, yingzi
  */
 
 public interface VideoOptions extends ModelOptions {
@@ -29,6 +28,6 @@ public interface VideoOptions extends ModelOptions {
 	@Nullable
 	String getModel();
 
-	// Add others?
+    // Add others?
 
 }
