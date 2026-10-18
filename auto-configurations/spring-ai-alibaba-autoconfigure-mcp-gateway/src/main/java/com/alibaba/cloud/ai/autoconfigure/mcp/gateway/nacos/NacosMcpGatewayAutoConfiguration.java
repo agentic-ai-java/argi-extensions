@@ -32,7 +32,6 @@ import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpSyncServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.mcp.server.common.autoconfigure.properties.McpServerProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -45,7 +44,7 @@ import java.util.Properties;
 /**
  * @author aias00
  */
-@EnableConfigurationProperties({ NacosMcpGatewayProperties.class, NacosMcpProperties.class, McpServerProperties.class })
+@EnableConfigurationProperties({ NacosMcpGatewayProperties.class, NacosMcpProperties.class })
 @AutoConfiguration(after = { McpGatewayServerAutoConfiguration.class, McpGatewayOAuthAutoConfiguration.class })
 @ConditionalOnProperty(prefix = "spring.ai.alibaba.mcp.gateway", name = "registry", havingValue = "nacos",
 		matchIfMissing = true)

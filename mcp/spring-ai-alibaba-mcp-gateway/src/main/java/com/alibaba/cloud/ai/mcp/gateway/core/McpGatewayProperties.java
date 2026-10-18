@@ -17,6 +17,8 @@ package com.alibaba.cloud.ai.mcp.gateway.core;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 /**
  * @author aias00
  */
@@ -41,7 +43,9 @@ public class McpGatewayProperties {
 
 		private String endpoint = "/sse";
 
-		private String protocolVersion = "2025-03-26";
+		private String sseMessageEndpoint = "/mcp/message";
+
+		private Duration keepAliveInterval;
 
 		public Boolean getEnabled() {
 			return enabled;
@@ -59,12 +63,20 @@ public class McpGatewayProperties {
 			this.endpoint = endpoint;
 		}
 
-		public String getProtocolVersion() {
-			return protocolVersion;
+		public String getSseMessageEndpoint() {
+			return sseMessageEndpoint;
 		}
 
-		public void setProtocolVersion(String protocolVersion) {
-			this.protocolVersion = protocolVersion;
+		public void setSseMessageEndpoint(String sseMessageEndpoint) {
+			this.sseMessageEndpoint = sseMessageEndpoint;
+		}
+
+		public Duration getKeepAliveInterval() {
+			return keepAliveInterval;
+		}
+
+		public void setKeepAliveInterval(Duration keepAliveInterval) {
+			this.keepAliveInterval = keepAliveInterval;
 		}
 
 	}
@@ -73,9 +85,11 @@ public class McpGatewayProperties {
 
 		private Boolean enabled = false;
 
-		private String endpoint = "/streamable";
+		private String mcpEndpoint = "/mcp";
 
-		private String protocolVersion = "2025-06-18";
+		private Duration keepAliveInterval;
+
+		private boolean disallowDelete;
 
 		public Boolean getEnabled() {
 			return enabled;
@@ -85,20 +99,28 @@ public class McpGatewayProperties {
 			this.enabled = enabled;
 		}
 
-		public String getEndpoint() {
-			return endpoint;
+		public String getMcpEndpoint() {
+			return mcpEndpoint;
 		}
 
-		public void setEndpoint(String endpoint) {
-			this.endpoint = endpoint;
+		public void setMcpEndpoint(String mcpEndpoint) {
+			this.mcpEndpoint = mcpEndpoint;
 		}
 
-		public String getProtocolVersion() {
-			return protocolVersion;
+		public Duration getKeepAliveInterval() {
+			return keepAliveInterval;
 		}
 
-		public void setProtocolVersion(String protocolVersion) {
-			this.protocolVersion = protocolVersion;
+		public void setKeepAliveInterval(Duration keepAliveInterval) {
+			this.keepAliveInterval = keepAliveInterval;
+		}
+
+		public boolean isDisallowDelete() {
+			return disallowDelete;
+		}
+
+		public void setDisallowDelete(boolean disallowDelete) {
+			this.disallowDelete = disallowDelete;
 		}
 
 	}

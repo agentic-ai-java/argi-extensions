@@ -16,7 +16,6 @@
 
 package com.alibaba.cloud.ai.mcp.gateway.core.security;
 
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -25,6 +24,7 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
+
 
 /**
  * OAuth认证拦截器 自动为MCP Gateway的HTTP请求添加OAuth认证头
@@ -43,7 +43,6 @@ public class McpGatewayOAuthInterceptor implements ExchangeFilterFunction {
 		this.oauthProperties = oauthProperties;
 	}
 
-	@NotNull
 	@Override
 	public Mono<ClientResponse> filter(ClientRequest request, ExchangeFunction next) {
 		if (!oauthProperties.isEnabled()) {
