@@ -1,27 +1,27 @@
 {
   "groups": [
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql",
+      "name": "spring.ai.memory.mysql",
       "type": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.oracle",
+      "name": "spring.ai.memory.oracle",
       "type": "com.alibaba.cloud.ai.autoconfigure.memory.OracleChatMemoryProperties",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.OracleChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.postgres",
-      "type": "com.alibaba.cloud.ai.autoconfigure.memory.PostgresChatMemoryProperties",
-      "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.PostgresChatMemoryProperties"
+      "name": "spring.ai.memory.postgres",
+      "type": "com.alibaba.cloud.ai.autoconfigure.memory.PostgresqlChatMemoryProperties",
+      "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.PostgresqlChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.sqlite",
+      "name": "spring.ai.memory.sqlite",
       "type": "com.alibaba.cloud.ai.autoconfigure.memory.SQLiteChatMemoryProperties",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.SQLiteChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.sqlserver",
+      "name": "spring.ai.memory.sqlserver",
       "type": "com.alibaba.cloud.ai.autoconfigure.memory.SqlServerChatMemoryProperties",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.SqlServerChatMemoryProperties"
     },
@@ -60,67 +60,79 @@
       "name": "spring.ai.memory.mem0",
       "type": "com.alibaba.cloud.ai.autoconfigure.memory.Mem0ChatMemoryProperties",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.Mem0ChatMemoryProperties"
+    },
+    {
+      "name": "spring.ai.alibaba.mem0.client",
+      "type": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Client",
+      "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.Mem0ChatMemoryProperties",
+      "sourceMethod": "getClient()"
+    },
+    {
+      "name": "spring.ai.alibaba.mem0.server",
+      "type": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Server",
+      "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.Mem0ChatMemoryProperties",
+      "sourceMethod": "getServer()"
     }
   ],
   "properties": [
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql.driver-class-name",
+      "name": "spring.ai.memory.mysql.driver-class-name",
       "type": "java.lang.String",
       "description": "Fully qualified name of the JDBC driver class.",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties",
       "defaultValue": "com.mysql.cj.jdbc.Driver"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql.enabled",
+      "name": "spring.ai.memory.mysql.enabled",
       "type": "java.lang.Boolean",
       "description": "Whether to enable custom datasource configuration.",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties",
       "defaultValue": false
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql.initialize-schema",
+      "name": "spring.ai.memory.mysql.initialize-schema",
       "type": "java.lang.Boolean",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties",
       "defaultValue": true
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql.jdbc-url",
+      "name": "spring.ai.memory.mysql.jdbc-url",
       "type": "java.lang.String",
       "description": "JDBC URL of the database.",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql.password",
+      "name": "spring.ai.memory.mysql.password",
       "type": "java.lang.String",
       "description": "Database password.",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.mysql.username",
+      "name": "spring.ai.memory.jdbc.mysql.username",
       "type": "java.lang.String",
       "description": "Database username.",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.MysqlChatMemoryProperties"
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.oracle.initialize-schema",
+      "name": "spring.ai.memory.oracle.initialize-schema",
       "type": "java.lang.Boolean",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.OracleChatMemoryProperties",
       "defaultValue": true
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.postgres.initialize-schema",
+      "name": "spring.ai.memory.postgres.initialize-schema",
       "type": "java.lang.Boolean",
-      "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.PostgresChatMemoryProperties",
+      "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.PostgresqlChatMemoryProperties",
       "defaultValue": true
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.sqlite.initialize-schema",
+      "name": "spring.ai.memory.sqlite.initialize-schema",
       "type": "java.lang.Boolean",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.SQLiteChatMemoryProperties",
       "defaultValue": true
     },
     {
-      "name": "spring.ai.chat.memory.repository.jdbc.sqlserver.initialize-schema",
+      "name": "spring.ai.memory.sqlserver.initialize-schema",
       "type": "java.lang.Boolean",
       "sourceType": "com.alibaba.cloud.ai.autoconfigure.memory.SqlServerChatMemoryProperties",
       "defaultValue": true
@@ -356,37 +368,43 @@
       "name": "spring.ai.alibaba.mem0.client.async.enabled",
       "type": "java.lang.Boolean",
       "description": "Enable asynchronous execution for memory operations (add and update).",
+      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Client",
       "defaultValue": true
     },
     {
       "name": "spring.ai.alibaba.mem0.client.async.core-pool-size",
       "type": "java.lang.Integer",
       "description": "Core pool size for the async thread pool.",
+      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Client",
       "defaultValue": 2
     },
     {
       "name": "spring.ai.alibaba.mem0.client.async.max-pool-size",
       "type": "java.lang.Integer",
       "description": "Maximum pool size for the async thread pool.",
+      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Client",
       "defaultValue": 4
     },
     {
       "name": "spring.ai.alibaba.mem0.client.async.queue-capacity",
       "type": "java.lang.Integer",
       "description": "Queue capacity for the async thread pool.",
+      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Client",
       "defaultValue": 100
     },
     {
       "name": "spring.ai.alibaba.mem0.client.async.thread-name-prefix",
       "type": "java.lang.String",
       "description": "Thread name prefix for async operations.",
+      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Client",
       "defaultValue": "mem0-async-"
     },
     {
       "name": "spring.ai.alibaba.mem0.server.version",
       "type": "java.lang.String",
       "description": "Version of the Mem0 server to connect to.",
-      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Server"},
+      "sourceType": "com.alibaba.cloud.ai.memory.mem0.core.Mem0Server"
+    },
     {
       "name": "spring.ai.alibaba.mem0.server.vector-store.provider",
       "type": "java.lang.String",

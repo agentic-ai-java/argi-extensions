@@ -15,8 +15,11 @@
  */
 package com.alibaba.cloud.ai.autoconfigure.memory.redis;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -28,15 +31,20 @@ import org.springframework.context.annotation.Import;
  * @since 2025/7/30 23:35
  */
 @AutoConfiguration
-@EnableConfigurationProperties(RedisChatMemoryProperties.class)
 @Import({ JedisRedisChatMemoryConnectionAutoConfiguration.class,
 		LettuceRedisChatMemoryConnectionAutoConfiguration.class,
 		RedissonRedisChatMemoryConnectionAutoConfiguration.class })
+@ConditionalOnProperty(prefix = RedisChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = false)
+@EnableConfigurationProperties(RedisChatMemoryProperties.class)
 public class RedisChatMemoryAutoConfiguration {
+
+	private static final Logger logger = LoggerFactory.getLogger(RedisChatMemoryAutoConfiguration.class);
 
 	@Bean
 	@ConditionalOnMissingBean(RedisMemoryConnectionDetails.class)
 	RedisChatMemoryConnectionDetails redisChatMemoryConnectionDetails(RedisChatMemoryProperties properties) {
+		logger.info("Configuring Redis chat memory connection details");
 		return new RedisChatMemoryConnectionDetails(properties);
 	}
 

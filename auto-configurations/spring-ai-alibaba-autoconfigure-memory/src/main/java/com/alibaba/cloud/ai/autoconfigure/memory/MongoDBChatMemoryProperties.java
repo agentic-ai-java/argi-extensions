@@ -21,8 +21,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for mongodb chat memory.
  */
-@ConfigurationProperties(prefix = "spring.ai.memory.mongodb")
+@ConfigurationProperties(prefix = MongoDBChatMemoryProperties.CONFIG_PREFIX)
 public class MongoDBChatMemoryProperties {
+
+	public static final String CONFIG_PREFIX = "spring.ai.memory.mongodb";
 
 	/**
 	 * mongodb host URL

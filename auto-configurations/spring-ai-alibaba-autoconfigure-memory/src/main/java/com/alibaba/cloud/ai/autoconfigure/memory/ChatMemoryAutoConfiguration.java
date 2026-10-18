@@ -16,32 +16,43 @@
 
 package com.alibaba.cloud.ai.autoconfigure.memory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 
 @AutoConfiguration
 @ConditionalOnClass({ ChatMemory.class, ChatMemoryRepository.class })
+@ConditionalOnProperty(prefix = ChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = false)
+@EnableConfigurationProperties(ChatMemoryProperties.class)
 public class ChatMemoryAutoConfiguration {
 
-	@Bean("inMemoryChatMemoryRepository")
-	@Primary
-	@ConditionalOnMissingBean(name = "inMemoryChatMemoryRepository")
+	private static final Logger logger = LoggerFactory.getLogger(ChatMemoryAutoConfiguration.class);
+
+	public static final String IN_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "inChatMemoryRepository";
+
+	@Bean(value = IN_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean(name = IN_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	ChatMemoryRepository chatMemoryRepository() {
+		logger.info("Using InMemoryChatMemoryRepository");
 		return new InMemoryChatMemoryRepository();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	ChatMemory chatMemory(@Qualifier("inMemoryChatMemoryRepository") ChatMemoryRepository chatMemoryRepository) {
-		return MessageWindowChatMemory.builder().chatMemoryRepository(chatMemoryRepository).build();
+	ChatMemory chatMemory(ChatMemoryRepository chatMemoryRepository, ChatMemoryProperties properties) {
+		return MessageWindowChatMemory.builder().chatMemoryRepository(chatMemoryRepository)
+				.maxMessages(properties.getMaxMessages())
+				.build();
 	}
 
 }

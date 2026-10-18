@@ -19,7 +19,6 @@ package com.alibaba.cloud.ai.autoconfigure.memory;
 import com.alibaba.cloud.ai.memory.jdbc.MysqlChatMemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,16 +35,17 @@ import javax.sql.DataSource;
  */
 @AutoConfiguration(after = JdbcTemplateAutoConfiguration.class)
 @ConditionalOnClass({ MysqlChatMemoryRepository.class, DataSource.class, JdbcTemplate.class })
-@ConditionalOnProperty(prefix = "spring.ai.memory.mysql", name = "enabled", havingValue = "true",
+@ConditionalOnProperty(prefix = MysqlChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
 		matchIfMissing = false)
 @EnableConfigurationProperties(MysqlChatMemoryProperties.class)
 public class MysqlChatMemoryAutoConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(MysqlChatMemoryAutoConfiguration.class);
 
-	@Bean
-	@Qualifier("mysqlChatMemoryRepository")
-	@ConditionalOnMissingBean(name = "mysqlChatMemoryRepository")
+	public static final String MYSQL_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "mysqlChatMemoryRepository";
+
+	@Bean(value = MYSQL_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean(name = MYSQL_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	MysqlChatMemoryRepository mysqlChatMemoryRepository(JdbcTemplate jdbcTemplate) {
 		logger.info("Configuring MySQL chat memory repository");
 		return MysqlChatMemoryRepository.mysqlBuilder().jdbcTemplate(jdbcTemplate).build();

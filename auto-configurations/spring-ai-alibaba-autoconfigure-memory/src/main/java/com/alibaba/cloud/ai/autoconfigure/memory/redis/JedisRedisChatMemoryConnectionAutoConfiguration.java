@@ -17,6 +17,8 @@
 package com.alibaba.cloud.ai.autoconfigure.memory.redis;
 
 import com.alibaba.cloud.ai.autoconfigure.memory.ChatMemoryAutoConfiguration;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryCluster;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryStandalone;
 import com.alibaba.cloud.ai.memory.redis.JedisRedisChatMemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ import redis.clients.jedis.Jedis;
 @AutoConfiguration(before = ChatMemoryAutoConfiguration.class)
 @ConditionalOnClass({ JedisRedisChatMemoryRepository.class, Jedis.class })
 @EnableConfigurationProperties(RedisChatMemoryProperties.class)
-@ConditionalOnProperty(name = "spring.ai.memory.redis.client-type", havingValue = "jedis")
+@ConditionalOnProperty(name = RedisChatMemoryProperties.CONFIG_PREFIX + ".client-type", havingValue = "jedis")
 public class JedisRedisChatMemoryConnectionAutoConfiguration
 		extends RedisChatMemoryConnectionAutoConfiguration<JedisRedisChatMemoryRepository> {
 
@@ -59,7 +61,7 @@ public class JedisRedisChatMemoryConnectionAutoConfiguration
 
 	@Override
 	protected JedisRedisChatMemoryRepository createStandaloneChatMemoryRepository(
-			RedisChatMemoryStandaloneConfiguration standaloneConfiguration) {
+			RedisChatMemoryStandalone standaloneConfiguration) {
 		logger.info("Configuring Redis Standalone chat memory repository using Jedis");
 		return JedisRedisChatMemoryRepository.builder()
 			.host(standaloneConfiguration.hostName())
@@ -75,7 +77,7 @@ public class JedisRedisChatMemoryConnectionAutoConfiguration
 
 	@Override
 	protected JedisRedisChatMemoryRepository createClusterChatMemoryRepository(
-			RedisChatMemoryClusterConfiguration clusterConfiguration) {
+			RedisChatMemoryCluster clusterConfiguration) {
 		logger.info("Configuring Redis Cluster chat memory repository using Jedis");
 		return JedisRedisChatMemoryRepository.builder()
 			.nodes(clusterConfiguration.nodeAddresses())

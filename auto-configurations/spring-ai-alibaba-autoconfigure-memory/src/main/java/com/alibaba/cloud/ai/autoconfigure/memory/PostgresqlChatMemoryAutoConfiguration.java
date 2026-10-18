@@ -19,7 +19,6 @@ package com.alibaba.cloud.ai.autoconfigure.memory;
 import com.alibaba.cloud.ai.memory.jdbc.PostgresChatMemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,16 +35,18 @@ import javax.sql.DataSource;
  */
 @AutoConfiguration(after = JdbcTemplateAutoConfiguration.class)
 @ConditionalOnClass({ PostgresChatMemoryRepository.class, DataSource.class, JdbcTemplate.class })
-@ConditionalOnProperty(prefix = "spring.ai.memory.postgres", name = "enabled", havingValue = "true",
+@ConditionalOnProperty(prefix = PostgresqlChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
 		matchIfMissing = false)
-@EnableConfigurationProperties(PostgresChatMemoryProperties.class)
-public class PostgresChatMemoryAutoConfiguration {
+@EnableConfigurationProperties(PostgresqlChatMemoryProperties.class)
+public class PostgresqlChatMemoryAutoConfiguration {
 
-	private static final Logger logger = LoggerFactory.getLogger(PostgresChatMemoryAutoConfiguration.class);
+	private static final Logger logger = LoggerFactory.getLogger(PostgresqlChatMemoryAutoConfiguration.class);
 
-	@Bean
-	@Qualifier("postgresChatMemoryRepository")
-	@ConditionalOnMissingBean(name = "postgresChatMemoryRepository")
+	public static final String POSTGRESQL_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "PostgresqlChatMemoryRepository";
+
+
+	@Bean(value = POSTGRESQL_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean(name = POSTGRESQL_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	PostgresChatMemoryRepository postgresChatMemoryRepository(JdbcTemplate jdbcTemplate) {
 		logger.info("Configuring PostgreSQL chat memory repository");
 		return PostgresChatMemoryRepository.postgresBuilder().jdbcTemplate(jdbcTemplate).build();

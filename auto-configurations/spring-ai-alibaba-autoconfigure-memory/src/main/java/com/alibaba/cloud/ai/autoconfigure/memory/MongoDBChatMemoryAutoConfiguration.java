@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -31,13 +32,17 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration(before = ChatMemoryAutoConfiguration.class)
 @ConditionalOnClass({ MongoDBChatMemoryRepository.class, MongoClient.class })
+@ConditionalOnProperty(prefix = MongoDBChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true", matchIfMissing = false)
 @EnableConfigurationProperties(MongoDBChatMemoryProperties.class)
 public class MongoDBChatMemoryAutoConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(MongoDBChatMemoryAutoConfiguration.class);
 
-	@Bean
-	@ConditionalOnMissingBean
+	public static final String MONGODB_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "mongoDBChatMemoryRepository";
+
+
+	@Bean(value = MONGODB_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean (name = MONGODB_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	MongoDBChatMemoryRepository mongoChatMemoryRepository(MongoDBChatMemoryProperties properties) {
 		logger.info("Configuring MongoDB chat memory repository");
 		return MongoDBChatMemoryRepository.builder()

@@ -19,21 +19,22 @@ package com.alibaba.cloud.ai.autoconfigure.memory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Configuration properties for PostgreSQL chat memory repository.
+ * @author yingzi
+ * @since 2025/11/30
  */
-@ConfigurationProperties(PostgresChatMemoryProperties.CONFIG_PREFIX)
-public class PostgresChatMemoryProperties {
+@ConfigurationProperties(prefix = ChatMemoryProperties.CONFIG_PREFIX)
+public class ChatMemoryProperties {
 
-	public static final String CONFIG_PREFIX = "spring.ai.memory.postgres";
+    public static final String CONFIG_PREFIX = "spring.ai.memory";
 
-	private boolean initializeSchema = true;
+    private int maxMessages = 20;
 
-	public boolean isInitializeSchema() {
-		return this.initializeSchema;
-	}
+    public int getMaxMessages() {
+        return maxMessages;
+    }
 
-	public void setInitializeSchema(boolean initializeSchema) {
-		this.initializeSchema = initializeSchema;
-	}
+    public void setMaxMessages(int maxMessages) {
+        this.maxMessages = maxMessages;
+    }
 
 }

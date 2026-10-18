@@ -26,8 +26,10 @@ import java.util.List;
  * @author Jast
  * @author benym
  */
-@ConfigurationProperties(prefix = "spring.ai.memory.redis")
+@ConfigurationProperties(prefix = RedisChatMemoryProperties.CONFIG_PREFIX)
 public class RedisChatMemoryProperties {
+
+	public static final String CONFIG_PREFIX = "spring.ai.memory.redis";
 
 	/**
 	 * Redis server host.

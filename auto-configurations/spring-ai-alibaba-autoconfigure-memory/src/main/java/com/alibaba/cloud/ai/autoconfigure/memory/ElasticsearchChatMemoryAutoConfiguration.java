@@ -31,7 +31,6 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -46,16 +45,17 @@ import javax.net.ssl.SSLContext;
  * Auto-configuration for ElasticSearch chat memory repository.
  */
 @ConditionalOnClass({ ElasticsearchChatMemoryRepository.class, ElasticsearchClient.class })
-@ConditionalOnProperty(prefix = "spring.ai.memory.elasticsearch", name = "enabled", havingValue = "true",
+@ConditionalOnProperty(prefix = ElasticsearchChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
 		matchIfMissing = false)
 @EnableConfigurationProperties(ElasticsearchChatMemoryProperties.class)
 public class ElasticsearchChatMemoryAutoConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(ElasticsearchChatMemoryAutoConfiguration.class);
 
-	@Bean
-	@Qualifier("elasticsearchChatMemoryRepository")
-	@ConditionalOnMissingBean(name = "elasticsearchChatMemoryRepository")
+	public static final String ES_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "elasticsearchChatMemoryRepository";
+
+	@Bean(value = ES_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean(name = ES_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	ElasticsearchChatMemoryRepository elasticsearchChatMemoryRepository(ElasticsearchChatMemoryProperties properties)
 			throws Exception {
 		logger.info("Configuring elasticsearch chat memory repository");

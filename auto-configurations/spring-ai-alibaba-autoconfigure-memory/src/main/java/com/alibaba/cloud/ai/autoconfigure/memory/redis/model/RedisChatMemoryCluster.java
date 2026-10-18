@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.cloud.ai.autoconfigure.memory.redis;
+package com.alibaba.cloud.ai.autoconfigure.memory.redis.model;
 
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.RedisChatMemoryProperties;
 import org.springframework.boot.ssl.SslBundles;
 
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
  * @author benym
  * @since 2025/7/30 21:33
  */
-public record RedisChatMemoryClusterConfiguration(List<String> nodeAddresses, String username, String password,
-		int timeout, RedisChatMemoryProperties.Ssl ssl, SslBundles sslBundles) {
+public record RedisChatMemoryCluster(List<String> nodeAddresses, String username, String password,
+									 int timeout, RedisChatMemoryProperties.Ssl ssl, SslBundles sslBundles) {
 
 }

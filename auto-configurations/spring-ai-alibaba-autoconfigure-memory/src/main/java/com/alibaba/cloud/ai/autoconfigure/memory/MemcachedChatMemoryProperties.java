@@ -20,8 +20,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * auth: dahua
  */
-@ConfigurationProperties(prefix = "spring.ai.memory.memcached")
+@ConfigurationProperties(prefix = MemcachedChatMemoryProperties.CONFIG_PREFIX)
 public class MemcachedChatMemoryProperties {
+
+	public static final String CONFIG_PREFIX = "spring.ai.memory.memcached";
 
 	private String host = "127.0.0.1";
 

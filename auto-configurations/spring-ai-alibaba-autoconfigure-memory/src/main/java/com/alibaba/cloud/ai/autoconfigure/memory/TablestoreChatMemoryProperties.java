@@ -21,8 +21,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for Tablestore chat memory.
  */
-@ConfigurationProperties(prefix = "spring.ai.memory.tablestore")
+@ConfigurationProperties(prefix = TablestoreChatMemoryProperties.CONFIG_PREFIX)
 public class TablestoreChatMemoryProperties {
+
+	public static final String CONFIG_PREFIX = "spring.ai.memory.tablestore";
 
 	private String endpoint;
 

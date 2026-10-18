@@ -19,7 +19,6 @@ package com.alibaba.cloud.ai.autoconfigure.memory;
 import com.alibaba.cloud.ai.memory.jdbc.SqlServerChatMemoryRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -36,16 +35,17 @@ import javax.sql.DataSource;
  */
 @AutoConfiguration(after = JdbcTemplateAutoConfiguration.class)
 @ConditionalOnClass({ SqlServerChatMemoryRepository.class, DataSource.class, JdbcTemplate.class })
-@ConditionalOnProperty(prefix = "spring.ai.memory.sqlserver", name = "enabled", havingValue = "true",
+@ConditionalOnProperty(prefix = SqlServerChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
 		matchIfMissing = false)
 @EnableConfigurationProperties(SqlServerChatMemoryProperties.class)
 public class SqlServerChatMemoryAutoConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(SqlServerChatMemoryAutoConfiguration.class);
 
-	@Bean
-	@Qualifier("sqlServerChatMemoryRepository")
-	@ConditionalOnMissingBean(name = "sqlServerChatMemoryRepository")
+	public static final String SQL_SERVER_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "sqlServerChatMemoryRepository";
+
+	@Bean(value = SQL_SERVER_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean(name = SQL_SERVER_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	SqlServerChatMemoryRepository sqlServerChatMemoryRepository(JdbcTemplate jdbcTemplate) {
 		logger.info("Configuring SQL Server chat memory repository");
 		return SqlServerChatMemoryRepository.sqlServerBuilder().jdbcTemplate(jdbcTemplate).build();

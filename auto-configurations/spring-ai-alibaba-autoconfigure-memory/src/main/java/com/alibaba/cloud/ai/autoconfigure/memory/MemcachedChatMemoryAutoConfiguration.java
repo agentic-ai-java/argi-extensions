@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -34,13 +35,17 @@ import java.net.InetSocketAddress;
  */
 @AutoConfiguration(before = ChatMemoryAutoConfiguration.class)
 @ConditionalOnClass({ MemcachedChatMemoryRepository.class, MemcachedClient.class })
+@ConditionalOnProperty(prefix = MemcachedChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+		matchIfMissing = false)
 @EnableConfigurationProperties(MemcachedChatMemoryProperties.class)
 public class MemcachedChatMemoryAutoConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(MemcachedChatMemoryAutoConfiguration.class);
 
-	@Bean
-	@ConditionalOnMissingBean
+	public static final String MEMCACHED_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "memcachedChatMemoryRepository";
+
+	@Bean(value = MEMCACHED_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean(name = MEMCACHED_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	MemcachedChatMemoryRepository memcachedChatMemoryRepository(MemcachedChatMemoryProperties properties)
 			throws IOException {
 		MemcachedClient memcachedClient = new MemcachedClient(

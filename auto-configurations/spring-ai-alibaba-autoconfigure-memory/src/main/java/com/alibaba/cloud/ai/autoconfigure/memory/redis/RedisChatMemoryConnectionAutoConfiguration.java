@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.autoconfigure.memory.redis;
 
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryCluster;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryStandalone;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.ssl.SslBundles;
@@ -53,7 +55,7 @@ public abstract class RedisChatMemoryConnectionAutoConfiguration<T extends ChatM
 	 * implementation
 	 */
 	protected abstract T createStandaloneChatMemoryRepository(
-			RedisChatMemoryStandaloneConfiguration standaloneConfiguration);
+			RedisChatMemoryStandalone standaloneConfiguration);
 
 	/**
 	 * Creates a cluster chat memory repository instance using Redis This abstract method
@@ -63,7 +65,7 @@ public abstract class RedisChatMemoryConnectionAutoConfiguration<T extends ChatM
 	 * @return An initialized cluster instance of the redis chat memory repository
 	 * implementation
 	 */
-	protected abstract T createClusterChatMemoryRepository(RedisChatMemoryClusterConfiguration clusterConfiguration);
+	protected abstract T createClusterChatMemoryRepository(RedisChatMemoryCluster clusterConfiguration);
 
 	/**
 	 * Builds and returns a Redis-based chat memory repository instance based on the
@@ -73,11 +75,11 @@ public abstract class RedisChatMemoryConnectionAutoConfiguration<T extends ChatM
 	protected T buildRedisChatMemoryRepository() {
 		RedisChatMemoryProperties.Mode redisChatMemoryMode = getRedisChatMemoryMode();
 		if (redisChatMemoryMode == RedisChatMemoryProperties.Mode.STANDALONE) {
-			RedisChatMemoryStandaloneConfiguration standaloneConfiguration = getStandaloneConfiguration();
+			RedisChatMemoryStandalone standaloneConfiguration = getStandaloneConfiguration();
 			return createStandaloneChatMemoryRepository(standaloneConfiguration);
 		}
 		else if (redisChatMemoryMode == RedisChatMemoryProperties.Mode.CLUSTER) {
-			RedisChatMemoryClusterConfiguration clusterConfiguration = getClusterConfiguration();
+			RedisChatMemoryCluster clusterConfiguration = getClusterConfiguration();
 			return createClusterChatMemoryRepository(clusterConfiguration);
 		}
 		else {
@@ -104,9 +106,9 @@ public abstract class RedisChatMemoryConnectionAutoConfiguration<T extends ChatM
 	 * Constructs and returns the standalone Redis configuration for chat memory
 	 * @return Fully configured standalone Redis chat memory configuration
 	 */
-	protected final RedisChatMemoryStandaloneConfiguration getStandaloneConfiguration() {
+	protected final RedisChatMemoryStandalone getStandaloneConfiguration() {
 		RedisMemoryConnectionDetails.Standalone standalone = connectionDetails.getStandalone();
-		return new RedisChatMemoryStandaloneConfiguration(standalone.getHost(), standalone.getPort(),
+		return new RedisChatMemoryStandalone(standalone.getHost(), standalone.getPort(),
 				connectionDetails.getUsername(), connectionDetails.getPassword(), properties.getTimeout(),
 				properties.getSsl(), sslBundles);
 	}
@@ -115,12 +117,12 @@ public abstract class RedisChatMemoryConnectionAutoConfiguration<T extends ChatM
 	 * Constructs and returns the cluster Redis configuration for chat memory
 	 * @return Fully configured cluster Redis chat memory configuration
 	 */
-	protected final RedisChatMemoryClusterConfiguration getClusterConfiguration() {
+	protected final RedisChatMemoryCluster getClusterConfiguration() {
 		if (properties.getCluster() == null || CollectionUtils.isEmpty(properties.getCluster().getNodes())) {
 			throw new IllegalStateException("Cluster nodes configuration is required for CLUSTER mode");
 		}
 		List<String> nodes = getNodes(connectionDetails.getCluster());
-		return new RedisChatMemoryClusterConfiguration(nodes, connectionDetails.getUsername(),
+		return new RedisChatMemoryCluster(nodes, connectionDetails.getUsername(),
 				connectionDetails.getPassword(), properties.getTimeout(), properties.getSsl(), sslBundles);
 	}
 

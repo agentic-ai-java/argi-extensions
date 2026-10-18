@@ -24,9 +24,10 @@ import java.util.List;
 /**
  * Configuration properties for ElasticSearch chat memory.
  */
-@ConfigurationProperties(prefix = "spring.ai.memory.elasticsearch")
+@ConfigurationProperties(prefix = ElasticsearchChatMemoryProperties.CONFIG_PREFIX)
 public class ElasticsearchChatMemoryProperties {
 
+	public static final String CONFIG_PREFIX = "spring.ai.memory.elasticsearch";
 	/**
 	 * Elasticsearch host URL
 	 */

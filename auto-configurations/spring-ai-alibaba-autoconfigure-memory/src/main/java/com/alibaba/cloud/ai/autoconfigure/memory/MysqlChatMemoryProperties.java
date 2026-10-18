@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Configuration properties for MySQL chat memory repository.
  */
-@ConfigurationProperties(MysqlChatMemoryProperties.CONFIG_PREFIX)
+@ConfigurationProperties(prefix = MysqlChatMemoryProperties.CONFIG_PREFIX)
 public class MysqlChatMemoryProperties {
 
 	public static final String CONFIG_PREFIX = "spring.ai.memory.mysql";

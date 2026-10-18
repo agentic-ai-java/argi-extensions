@@ -33,11 +33,14 @@ import java.util.Collections;
  */
 @ConditionalOnClass({ TablestoreChatMemoryRepository.class, SyncClient.class })
 @EnableConfigurationProperties(TablestoreChatMemoryProperties.class)
-@ConditionalOnProperty(prefix = "spring.ai.memory.tablestore", name = "enabled", havingValue = "true",
+@ConditionalOnProperty(prefix = TablestoreChatMemoryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
 		matchIfMissing = false)
 public class TablestoreChatMemoryAutoConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(TablestoreChatMemoryAutoConfiguration.class);
+
+	public static final String TABLESTORE_CHAT_MEMORY_REPOSITORY_BEAN_NAME = "tablestoreChatMemoryRepository";
+
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -46,8 +49,8 @@ public class TablestoreChatMemoryAutoConfiguration {
 				properties.getInstanceName());
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
+	@Bean(value = TABLESTORE_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
+	@ConditionalOnMissingBean (name = TABLESTORE_CHAT_MEMORY_REPOSITORY_BEAN_NAME)
 	TablestoreChatMemoryRepository tablestoreChatMemoryRepository(SyncClient syncClient,
 			TablestoreChatMemoryProperties properties) {
 		logger.info("Configuring Tablestore chat memory repository");

@@ -16,6 +16,8 @@
 package com.alibaba.cloud.ai.autoconfigure.memory.redis;
 
 import com.alibaba.cloud.ai.autoconfigure.memory.ChatMemoryAutoConfiguration;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryCluster;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryStandalone;
 import com.alibaba.cloud.ai.memory.redis.RedissonRedisChatMemoryRepository;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
@@ -38,7 +40,7 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration(before = ChatMemoryAutoConfiguration.class)
 @ConditionalOnClass({ RedissonRedisChatMemoryRepository.class, RedissonClient.class })
 @EnableConfigurationProperties(RedisChatMemoryProperties.class)
-@ConditionalOnProperty(name = "spring.ai.memory.redis.client-type", havingValue = "redisson")
+@ConditionalOnProperty(name = RedisChatMemoryProperties.CONFIG_PREFIX + ".client-type", havingValue = "redisson")
 public class RedissonRedisChatMemoryConnectionAutoConfiguration
 		extends RedisChatMemoryConnectionAutoConfiguration<RedissonRedisChatMemoryRepository> {
 
@@ -59,7 +61,7 @@ public class RedissonRedisChatMemoryConnectionAutoConfiguration
 
 	@Override
 	protected RedissonRedisChatMemoryRepository createStandaloneChatMemoryRepository(
-			RedisChatMemoryStandaloneConfiguration standaloneConfiguration) {
+			RedisChatMemoryStandalone standaloneConfiguration) {
 		logger.info("Configuring Redis Standalone chat memory repository using Redisson");
 		return RedissonRedisChatMemoryRepository.builder()
 			.host(standaloneConfiguration.hostName())
@@ -75,7 +77,7 @@ public class RedissonRedisChatMemoryConnectionAutoConfiguration
 
 	@Override
 	protected RedissonRedisChatMemoryRepository createClusterChatMemoryRepository(
-			RedisChatMemoryClusterConfiguration clusterConfiguration) {
+			RedisChatMemoryCluster clusterConfiguration) {
 		logger.info("Configuring Redis Cluster chat memory repository using Redisson");
 		return RedissonRedisChatMemoryRepository.builder()
 			.nodes(clusterConfiguration.nodeAddresses())

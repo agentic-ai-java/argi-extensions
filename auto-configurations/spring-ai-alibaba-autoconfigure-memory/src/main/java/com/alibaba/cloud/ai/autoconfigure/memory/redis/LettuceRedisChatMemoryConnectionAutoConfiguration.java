@@ -16,6 +16,8 @@
 package com.alibaba.cloud.ai.autoconfigure.memory.redis;
 
 import com.alibaba.cloud.ai.autoconfigure.memory.ChatMemoryAutoConfiguration;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryCluster;
+import com.alibaba.cloud.ai.autoconfigure.memory.redis.model.RedisChatMemoryStandalone;
 import com.alibaba.cloud.ai.memory.redis.LettuceRedisChatMemoryRepository;
 import io.lettuce.core.RedisClient;
 import org.slf4j.Logger;
@@ -38,7 +40,7 @@ import org.springframework.context.annotation.Bean;
 @AutoConfiguration(before = ChatMemoryAutoConfiguration.class)
 @ConditionalOnClass({ LettuceRedisChatMemoryRepository.class, RedisClient.class })
 @EnableConfigurationProperties(RedisChatMemoryProperties.class)
-@ConditionalOnProperty(name = "spring.ai.memory.redis.client-type", havingValue = "lettuce")
+@ConditionalOnProperty(name = RedisChatMemoryProperties.CONFIG_PREFIX + ".client-type", havingValue = "lettuce")
 public class LettuceRedisChatMemoryConnectionAutoConfiguration
 		extends RedisChatMemoryConnectionAutoConfiguration<LettuceRedisChatMemoryRepository> {
 
@@ -59,7 +61,7 @@ public class LettuceRedisChatMemoryConnectionAutoConfiguration
 
 	@Override
 	protected LettuceRedisChatMemoryRepository createStandaloneChatMemoryRepository(
-			RedisChatMemoryStandaloneConfiguration standaloneConfiguration) {
+			RedisChatMemoryStandalone standaloneConfiguration) {
 		logger.info("Configuring Redis Standalone chat memory repository using Lettuce");
 		return LettuceRedisChatMemoryRepository.builder()
 			.host(standaloneConfiguration.hostName())
@@ -75,7 +77,7 @@ public class LettuceRedisChatMemoryConnectionAutoConfiguration
 
 	@Override
 	protected LettuceRedisChatMemoryRepository createClusterChatMemoryRepository(
-			RedisChatMemoryClusterConfiguration clusterConfiguration) {
+			RedisChatMemoryCluster clusterConfiguration) {
 		logger.info("Configuring Redis Cluster chat memory repository using Lettuce");
 		return LettuceRedisChatMemoryRepository.builder()
 			.nodes(clusterConfiguration.nodeAddresses())
