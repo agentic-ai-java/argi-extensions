@@ -350,6 +350,11 @@ public class DashScopeApiSpec {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
+    public record AddPipelineDocumentsRequest(@JsonProperty("configured_transformations") List transformations,
+                                              @JsonProperty("data_sources") List<DataSourcesConfig> dataSources) {
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public record DataSinksConfig(@JsonProperty("sink_type") String sinkType,
                                   @JsonProperty("component") DataSinksComponent component) {
 
@@ -436,7 +441,7 @@ public class DashScopeApiSpec {
             @JsonProperty("data_sources") List<DelePipelineDocumentDataSource> dataSources) {
         @JsonInclude(JsonInclude.Include.NON_NULL)
         public record DelePipelineDocumentDataSource(@JsonProperty("source_type") String sourceType,
-                                                     @JsonProperty("component") List<DelePipelineDocumentDataSourceComponent> component) {
+                                                     @JsonProperty("component") DelePipelineDocumentDataSourceComponent component) {
         }
 
         @JsonInclude(JsonInclude.Include.NON_NULL)

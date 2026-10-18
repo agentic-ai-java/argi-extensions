@@ -15,6 +15,7 @@
  */
 package com.alibaba.cloud.ai.dashscope.api;
 
+import com.alibaba.cloud.ai.dashscope.rag.DashScopeStoreOptions;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.ChatModel;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.EmbeddingModel;
 import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.EmbeddingRequest;
@@ -24,13 +25,24 @@ import com.alibaba.cloud.ai.dashscope.spec.DashScopeModel.EmbeddingTextType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.ai.document.Document;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 import java.util.List;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.client.ExpectedCount.once;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * Tests for DashScopeApi class functionality
@@ -65,6 +77,101 @@ class DashScopeApiTests {
 		assertEquals("qwen-plus", ChatModel.QWEN_PLUS.getValue(), "ChatModel.QWEN_PLUS should have value 'qwen-plus'");
 		assertEquals("qwen-turbo", ChatModel.QWEN_TURBO.getValue(),
 				"ChatModel.QWEN_TURBO should have value 'qwen-turbo'");
+	}
+
+	@Test
+	void upsertPipelineShouldAddDocumentsWithoutCreatingPipelineWhenPipelineAlreadyExists() {
+		RestClient.Builder restClientBuilder = RestClient.builder();
+		MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
+		DashScopeApi api = DashScopeApi.builder()
+			.apiKey("test-api-key")
+			.restClientBuilder(restClientBuilder)
+			.build();
+		DashScopeStoreOptions options = new DashScopeStoreOptions("existing-index");
+
+		server.expect(once(),
+				requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline_simple?pipeline_name=existing-index"))
+			.andExpect(method(HttpMethod.GET))
+			.andRespond(withSuccess("""
+					{"id":"pipeline-1","status":"SUCCESS"}
+					""", MediaType.APPLICATION_JSON));
+		server.expect(once(), requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline/pipeline-1/documents"))
+			.andExpect(method(HttpMethod.PUT))
+			.andRespond(withSuccess("""
+					{"ingestionId":"ingestion-1","code":"SUCCESS"}
+					""", MediaType.APPLICATION_JSON));
+
+		assertThatCode(() -> api.upsertPipeline(List.of(new Document("file-1", "content", Map.of())), options))
+			.doesNotThrowAnyException();
+
+		server.verify();
+	}
+
+	@Test
+	void upsertPipelineShouldFallbackToExistingPipelineWhenCreateFails() {
+		RestClient.Builder restClientBuilder = RestClient.builder();
+		MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
+		DashScopeApi api = DashScopeApi.builder()
+			.apiKey("test-api-key")
+			.restClientBuilder(restClientBuilder)
+			.build();
+		DashScopeStoreOptions options = new DashScopeStoreOptions("race-index");
+
+		server.expect(once(),
+				requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline_simple?pipeline_name=race-index"))
+			.andExpect(method(HttpMethod.GET))
+			.andRespond(withSuccess("""
+					{"status":"SUCCESS"}
+					""", MediaType.APPLICATION_JSON));
+		server.expect(once(), requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline"))
+			.andExpect(method(HttpMethod.PUT))
+			.andRespond(withSuccess("""
+					{"status":"FAILED","message":"duplicate pipeline"}
+					""", MediaType.APPLICATION_JSON));
+		server.expect(once(),
+				requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline_simple?pipeline_name=race-index"))
+			.andExpect(method(HttpMethod.GET))
+			.andRespond(withSuccess("""
+					{"id":"pipeline-1","status":"SUCCESS"}
+					""", MediaType.APPLICATION_JSON));
+		server.expect(once(), requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline/pipeline-1/documents"))
+			.andExpect(method(HttpMethod.PUT))
+			.andRespond(withSuccess("""
+					{"ingestionId":"ingestion-2","code":"SUCCESS"}
+					""", MediaType.APPLICATION_JSON));
+
+		assertThatCode(() -> api.upsertPipeline(List.of(new Document("file-1", "content", Map.of())), options))
+			.doesNotThrowAnyException();
+
+		server.verify();
+	}
+
+	// The DATA_CENTER_FILE data source expects `component` to be a single object (as the
+	// add/upsert path already sends). Wrapping it in an array made the delete request body
+	// malformed and DashScope answered 500 SystemError (gh#288). Assert `component` is an
+	// object whose `doc_ids` are directly addressable; the old array shape fails this.
+	@Test
+	void deletePipelineDocumentShouldSendComponentAsObjectNotArray() {
+		RestClient.Builder restClientBuilder = RestClient.builder();
+		MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
+		DashScopeApi api = DashScopeApi.builder()
+			.apiKey("test-api-key")
+			.restClientBuilder(restClientBuilder)
+			.build();
+
+		server.expect(once(), requestTo("https://dashscope.aliyuncs.com/api/v1/indices/pipeline/pipeline-1/delete"))
+			.andExpect(method(HttpMethod.POST))
+			.andExpect(jsonPath("$.data_sources[0].source_type").value("DATA_CENTER_FILE"))
+			.andExpect(jsonPath("$.data_sources[0].component.doc_ids[0]").value("doc-1"))
+			.andExpect(jsonPath("$.data_sources[0].component.doc_ids[1]").value("doc-2"))
+			.andRespond(withSuccess("""
+					{"status":"200","code":"SUCCESS"}
+					""", MediaType.APPLICATION_JSON));
+
+		boolean deleted = api.deletePipelineDocument("pipeline-1", List.of("doc-1", "doc-2"));
+
+		assertEquals(true, deleted);
+		server.verify();
 	}
 
 	@Test
