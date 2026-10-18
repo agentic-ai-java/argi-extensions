@@ -709,13 +709,13 @@ public class DashScopeApi {
 		}
 
 		public Builder completionsPath(String completionsPath) {
-			Assert.notNull(completionsPath, "Completions path cannot be null");
-			this.completionsPath = completionsPath;
+            Assert.notNull(completionsPath, "completionsPath cannot be null");
+            this.completionsPath = completionsPath;
 			return this;
 		}
 
 		public Builder embeddingsPath(String embeddingsPath) {
-			Assert.notNull(embeddingsPath, "Embeddings path cannot be null");
+            Assert.notNull(embeddingsPath, "embeddingsPath cannot be null");
 			this.embeddingsPath = embeddingsPath;
 			return this;
 		}

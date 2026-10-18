@@ -32,6 +32,8 @@ import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.FunctionTool;
 import com.alibaba.cloud.ai.dashscope.chat.observation.DashScopeChatModelObservationConvention;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
 import com.alibaba.cloud.ai.tool.observation.inner.ToolCallReactiveContextHolder;
+import com.alibaba.cloud.ai.tool.validator.DefaultToolCallValidator;
+import com.alibaba.cloud.ai.tool.validator.ToolCallValidator;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.observation.contextpropagation.ObservationThreadLocalAccessor;
@@ -124,11 +126,18 @@ public class DashScopeChatModel implements ChatModel {
 
 	private final ToolCallingManager toolCallingManager;
 
+    /**
+     * The tool call validator used to filter out invalid tool calls.
+     */
+    private final ToolCallValidator toolCallingValidator;
+
 	/**
 	 * The tool execution eligibility predicate used to determine if a tool can be
 	 * executed.
 	 */
 	private final ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate;
+
+
 
 	/**
 	 * Conventions to use for generating observations.
@@ -140,12 +149,20 @@ public class DashScopeChatModel implements ChatModel {
 			ObservationRegistry observationRegistry) {
 
 		this(dashscopeApi, defaultOptions, toolCallingManager, retryTemplate, observationRegistry,
-				new DefaultToolExecutionEligibilityPredicate());
+				new DefaultToolExecutionEligibilityPredicate(), new DefaultToolCallValidator());
 	}
 
 	public DashScopeChatModel(DashScopeApi dashscopeApi, DashScopeChatOptions defaultOptions,
 			ToolCallingManager toolCallingManager, RetryTemplate retryTemplate, ObservationRegistry observationRegistry,
 			ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate) {
+
+		this(dashscopeApi, defaultOptions, toolCallingManager, retryTemplate, observationRegistry,
+				toolExecutionEligibilityPredicate, new DefaultToolCallValidator());
+	}
+
+	public DashScopeChatModel(DashScopeApi dashscopeApi, DashScopeChatOptions defaultOptions,
+			ToolCallingManager toolCallingManager, RetryTemplate retryTemplate, ObservationRegistry observationRegistry,
+			ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate, ToolCallValidator toolCallingValidator) {
 
 		Assert.notNull(dashscopeApi, "dashscopeApi cannot be null");
 		Assert.notNull(defaultOptions, "defaultOptions cannot be null");
@@ -153,6 +170,7 @@ public class DashScopeChatModel implements ChatModel {
 		Assert.notNull(retryTemplate, "retryTemplate cannot be null");
 		Assert.notNull(observationRegistry, "observationRegistry cannot be null");
 		Assert.notNull(toolExecutionEligibilityPredicate, "toolExecutionEligibilityPredicate cannot be null");
+		Assert.notNull(toolCallingValidator, "toolCallingValidator cannot be null");
 
 		this.dashscopeApi = dashscopeApi;
 		this.defaultOptions = defaultOptions;
@@ -160,6 +178,7 @@ public class DashScopeChatModel implements ChatModel {
 		this.retryTemplate = retryTemplate;
 		this.observationRegistry = observationRegistry;
 		this.toolExecutionEligibilityPredicate = toolExecutionEligibilityPredicate;
+		this.toolCallingValidator = toolCallingValidator;
 	}
 
 	@Override
@@ -353,23 +372,16 @@ public class DashScopeChatModel implements ChatModel {
 		this.defaultOptions = options;
 	}
 
-	private static Generation buildGeneration(Choice choice, Map<String, Object> metadata,
+	private Generation buildGeneration(Choice choice, Map<String, Object> metadata,
 			ChatCompletionRequest request) {
-		List<AssistantMessage.ToolCall> toolCalls = choice.message().toolCalls() == null ? List.of()
-				: choice.message().toolCalls().stream().filter(toolCall -> {
-					if (toolCall.function() == null) {
-						logger.warn("Filtering out toolCall with null function: {}", toolCall);
-						return false;
-					}
-					if (toolCall.function().name() == null) {
-						logger.warn("Filtering out toolCall with null function name: {}", toolCall);
-						return false;
-					}
-					return true;
-				})
-					.map(toolCall -> new AssistantMessage.ToolCall(toolCall.id(), "function",
-							toolCall.function().name(), toolCall.function().arguments()))
-					.toList();
+		// Use the validator to filter and validate tool calls
+		List<DashScopeApiSpec.ChatCompletionMessage.ToolCall> validatedToolCalls =
+				toolCallingValidator.validate(choice.message().toolCalls(), choice.finishReason());
+
+		List<AssistantMessage.ToolCall> toolCalls = validatedToolCalls.stream()
+				.map(toolCall -> new AssistantMessage.ToolCall(toolCall.id(), "function",
+						toolCall.function().name(), toolCall.function().arguments()))
+				.toList();
 
 		String finishReason = finishReasonToMetadataValue(choice.finishReason());
 		var generationMetadataBuilder = ChatGenerationMetadata.builder().finishReason(finishReason);
@@ -379,6 +391,7 @@ public class DashScopeChatModel implements ChatModel {
 			.properties(metadata)
 			.toolCalls(toolCalls)
 			.build();
+
 		return new Generation(assistantMessage, generationMetadataBuilder.build());
 	}
 
@@ -740,6 +753,7 @@ public class DashScopeChatModel implements ChatModel {
 			this.retryTemplate = dashScopeChatModel.retryTemplate;
 			this.observationRegistry = dashScopeChatModel.observationRegistry;
 			this.toolExecutionEligibilityPredicate = dashScopeChatModel.toolExecutionEligibilityPredicate;
+			this.toolCallValidator = dashScopeChatModel.toolCallingValidator;
 		}
 
 		private DashScopeApi dashScopeApi;
@@ -753,6 +767,8 @@ public class DashScopeChatModel implements ChatModel {
 		private ToolCallingManager toolCallingManager;
 
 		private ToolExecutionEligibilityPredicate toolExecutionEligibilityPredicate = new DefaultToolExecutionEligibilityPredicate();
+
+		private ToolCallValidator toolCallValidator = new DefaultToolCallValidator();
 
 		private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
@@ -787,15 +803,22 @@ public class DashScopeChatModel implements ChatModel {
 			return this;
 		}
 
+		public Builder toolCallValidator(ToolCallValidator toolCallValidator) {
+			this.toolCallValidator = toolCallValidator;
+			return this;
+		}
+
 		public DashScopeChatModel build() {
 
 			if (this.toolCallingManager != null) {
 				return new DashScopeChatModel(this.dashScopeApi, this.defaultOptions, this.toolCallingManager,
-						this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate);
+						this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate,
+						this.toolCallValidator);
 			}
 
 			return new DashScopeChatModel(this.dashScopeApi, this.defaultOptions, DEFAULT_TOOL_CALLING_MANAGER,
-					this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate);
+					this.retryTemplate, this.observationRegistry, this.toolExecutionEligibilityPredicate,
+					this.toolCallValidator);
 		}
 
 	}

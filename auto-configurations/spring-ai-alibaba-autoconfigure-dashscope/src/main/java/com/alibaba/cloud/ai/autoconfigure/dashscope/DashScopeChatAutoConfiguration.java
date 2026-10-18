@@ -73,7 +73,6 @@ import static com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeConnectionUt
 })
 public class DashScopeChatAutoConfiguration {
 
-
 		@Bean
 		@ConditionalOnMissingBean
 		public DashScopeChatModel dashScopeChatModel(
@@ -130,10 +129,11 @@ public class DashScopeChatAutoConfiguration {
 
 			return DashScopeApi.builder()
 					.apiKey(resolved.apiKey())
+                    .workSpaceId(resolved.workspaceId())
 					.headers(resolved.headers())
 					.baseUrl(resolved.baseUrl())
+					.completionsPath(chatProperties.getCompletionsPath())
 					.webClientBuilder(webClientBuilder)
-					.workSpaceId(resolved.workspaceId())
 					.restClientBuilder(restClientBuilder)
 					.responseErrorHandler(responseErrorHandler)
 					.build();

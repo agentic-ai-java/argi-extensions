@@ -87,10 +87,11 @@ public class DashScopeEmbeddingAutoConfiguration {
 
 		return DashScopeApi.builder()
 			.apiKey(resolved.apiKey())
+            .workSpaceId(resolved.workspaceId())
 			.headers(resolved.headers())
 			.baseUrl(resolved.baseUrl())
+			.embeddingsPath(embeddingProperties.getEmbeddingsPath())
 			.webClientBuilder(webClientBuilder)
-			.workSpaceId(resolved.workspaceId())
 			.restClientBuilder(restClientBuilder)
 			.responseErrorHandler(responseErrorHandler)
 			.build();
