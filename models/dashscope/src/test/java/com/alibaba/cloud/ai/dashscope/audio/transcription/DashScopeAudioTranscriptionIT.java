@@ -15,14 +15,10 @@
  */
 package com.alibaba.cloud.ai.dashscope.audio.transcription;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.alibaba.cloud.ai.dashscope.api.DashScopeAudioTranscriptionApi;
@@ -40,9 +36,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.model.SimpleApiKey;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBuffer;
-import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -103,6 +96,186 @@ class DashScopeAudioTranscriptionIT {
 				.audioTranscriptionApi(transcriptionApi)
 				.defaultOptions(defaultOptions)
 				.build();
+	}
+
+	/**
+	 * Load audio resource and emit as Flux of ByteBuffer chunks (simulates streaming input).
+	 */
+	private static Flux<ByteBuffer> loadAudioAsStream(org.springframework.core.io.Resource resource, int chunkSize)
+			throws IOException {
+		byte[] bytes = resource.getInputStream().readAllBytes();
+		List<ByteBuffer> chunks = new ArrayList<>();
+		for (int i = 0; i < bytes.length; i += chunkSize) {
+			int end = Math.min(i + chunkSize, bytes.length);
+			chunks.add(ByteBuffer.wrap(Arrays.copyOfRange(bytes, i, end)));
+		}
+		return Flux.fromIterable(chunks);
+	}
+
+	private static final String AUDIO_RESOURCE_PATH = "audio/qwen-tts/stream-url-test.wav";
+
+	/**
+	 * 双向流：streamRecognition - Paraformer 实时识别
+	 *
+	 * 测试 paraformer-realtime-v2 模型的 streamRecognition 双向流功能
+	 */
+	@org.junit.jupiter.api.Test
+	void testStreamRecognition_Paraformer_RealApi() throws IOException {
+		DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
+				.model(AudioModel.PARAFORMER_REALTIME_V2.getValue())
+				.sampleRate(16000)
+				.format("pcm")
+				.disfluencyRemovalEnabled(false)
+				.languageHints(List.of("zh"))
+				.build();
+
+		org.springframework.core.io.Resource audioResource =
+				new org.springframework.core.io.ClassPathResource(AUDIO_RESOURCE_PATH);
+		Flux<ByteBuffer> audioStream = loadAudioAsStream(audioResource, 3200);
+
+		Flux<RecognitionResult> result = transcriptionModel.streamRecognition(audioStream, options);
+
+		List<RecognitionResult> responses = new ArrayList<>();
+		StepVerifier.create(result)
+				.thenConsumeWhile(response -> {
+					assertThat(response).isNotNull();
+					responses.add(response);
+					if (response.sentence() != null) {
+						String text = response.getText();
+						if (text != null && !text.isEmpty()) {
+							logger.info("  - Recognition: {}", text);
+						}
+						if (response.sentence().stash() != null) {
+							logger.info("  - Stash (partial): {}", response.sentence().stash().text());
+						}
+					}
+					return true;
+				})
+				.verifyComplete();
+
+		assertThat(responses).isNotEmpty();
+		logger.info("streamRecognition (Paraformer) test passed, total responses: {}", responses.size());
+	}
+
+	/**
+	 * 双向流：streamRecognition - Fun-ASR 实时识别
+	 *
+	 * 测试 fun-asr-realtime 模型的 streamRecognition 双向流功能
+	 */
+	@org.junit.jupiter.api.Test
+	void testStreamRecognition_FunAsr_RealApi() throws IOException {
+		DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
+				.model(AudioModel.FUN_ASR_REALTIME.getValue())
+				.sampleRate(16000)
+				.format("pcm")
+				.build();
+
+		org.springframework.core.io.Resource audioResource =
+				new org.springframework.core.io.ClassPathResource(AUDIO_RESOURCE_PATH);
+		Flux<ByteBuffer> audioStream = loadAudioAsStream(audioResource, 3200);
+
+		Flux<RecognitionResult> result = transcriptionModel.streamRecognition(audioStream, options);
+
+		List<RecognitionResult> responses = new ArrayList<>();
+		StepVerifier.create(result)
+				.thenConsumeWhile(response -> {
+					assertThat(response).isNotNull();
+					responses.add(response);
+					if (response.sentence() != null && response.getText() != null) {
+						logger.info("  - Recognition: {}", response.getText());
+					}
+					return true;
+				})
+				.verifyComplete();
+
+		assertThat(responses).isNotEmpty();
+		logger.info("streamRecognition (Fun-ASR) test passed, total responses: {}", responses.size());
+	}
+
+	/**
+	 * 双向流：streamTranslation - Gummy 长语音翻译
+	 *
+	 * 测试 gummy-realtime-v1 模型的 streamTranslation 双向流功能
+	 */
+	@org.junit.jupiter.api.Test
+	void testStreamTranslation_GummyRealtime_RealApi() throws IOException {
+		DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
+				.model(AudioModel.GUMMY_REALTIME_V1.getValue())
+				.sampleRate(16000)
+				.format("wav")
+				.transcriptionEnabled(true)
+				.translationEnabled(true)
+				.translationTargetLanguages(List.of("en"))
+				.build();
+
+		org.springframework.core.io.Resource audioResource =
+				new org.springframework.core.io.ClassPathResource(AUDIO_RESOURCE_PATH);
+		Flux<ByteBuffer> audioStream = loadAudioAsStream(audioResource, 3200);
+
+		Flux<TranslationRecognitionResult> result = transcriptionModel.streamTranslation(audioStream, options);
+
+		List<TranslationRecognitionResult> responses = new ArrayList<>();
+		StepVerifier.create(result)
+				.thenConsumeWhile(response -> {
+					assertThat(response).isNotNull();
+					responses.add(response);
+					if (response.getTranscriptionText() != null) {
+						logger.info("  - Transcription: {}", response.getTranscriptionText());
+					}
+					if (response.getTranslationText("en") != null) {
+						logger.info("  - Translation (en): {}", response.getTranslationText("en"));
+					}
+					return true;
+				})
+				.verifyComplete();
+
+		assertThat(responses).isNotEmpty();
+		logger.info("streamTranslation (Gummy realtime) test passed, total responses: {}", responses.size());
+	}
+
+	/**
+	 * 双向流：streamTranslationChat - Gummy 短语音翻译（单句模式）
+	 *
+	 * 测试 gummy-chat-v1 模型的 streamTranslationChat 双向流功能
+	 * 流在 sentenceEnd 后自动完成
+	 */
+	@org.junit.jupiter.api.Test
+	void testStreamTranslationChat_GummyChat_RealApi() throws IOException {
+		DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
+				.model(AudioModel.GUMMY_CHAT_V1.getValue())
+				.sampleRate(16000)
+				.format("wav")
+				.transcriptionEnabled(true)
+				.translationEnabled(true)
+				.translationTargetLanguages(List.of("en"))
+				.build();
+
+		org.springframework.core.io.Resource audioResource =
+				new org.springframework.core.io.ClassPathResource(AUDIO_RESOURCE_PATH);
+		Flux<ByteBuffer> audioStream = loadAudioAsStream(audioResource, 3200);
+
+		Flux<TranslationRecognitionResult> result = transcriptionModel.streamTranslationChat(audioStream, options);
+
+		List<TranslationRecognitionResult> responses = new ArrayList<>();
+		StepVerifier.create(result)
+				.thenConsumeWhile(response -> {
+					assertThat(response).isNotNull();
+					responses.add(response);
+					if (response.getTranscriptionText() != null) {
+						logger.info("  - Transcription: {}", response.getTranscriptionText());
+					}
+					if (response.getTranslationText("en") != null) {
+						logger.info("  - Translation (en): {}", response.getTranslationText("en"));
+					}
+					if (response.isSentenceEnd()) {
+						logger.info("  - Sentence end reached");
+					}
+					return true;
+				})
+				.verifyComplete();
+
+		assertThat(responses).isNotEmpty();
+		logger.info("streamTranslationChat (Gummy chat) test passed, total responses: {}", responses.size());
 	}
 
 	/**
@@ -575,7 +748,8 @@ class DashScopeAudioTranscriptionIT {
 
 			if (result.transcripts() != null) {
 				for (DashScopeAudioTranscription transcript : result.transcripts()) {
-					logger.info("  - Channel: {}, Text: {}", transcript.getMetadata().channelId(), transcript.getText());
+					Integer channelId = transcript.getMetadata() != null ? transcript.getMetadata().channelId() : null;
+					logger.info("  - Channel: {}, Text: {}", channelId, transcript.getText());
 					assertThat(transcript.getText()).isNotEmpty();
 				}
 			}
@@ -649,7 +823,8 @@ class DashScopeAudioTranscriptionIT {
 
 			if (result.transcripts() != null) {
 				for (DashScopeAudioTranscription transcript : result.transcripts()) {
-					logger.info("  - Channel: {}, Text: {}", transcript.getMetadata().channelId(), transcript.getText());
+					Integer channelId = transcript.getMetadata() != null ? transcript.getMetadata().channelId() : null;
+					logger.info("  - Channel: {}, Text: {}", channelId, transcript.getText());
 					assertThat(transcript.getText()).isNotEmpty();
 				}
 			}
@@ -856,136 +1031,6 @@ class DashScopeAudioTranscriptionIT {
 		// 验证至少收到了一些响应
 		assertThat(responses).isNotEmpty();
 		logger.info("Qwen-ASR stream test passed, total chunks: {}", responses.size());
-	}
-
-	/**
-	 * Streaming audio transcription test using Flux<DataBuffer>.
-	 * Tests real-time transcription by splitting an audio file into chunks.
-	 *
-	 * <p>This test downloads a test audio file, splits it into chunks,
-	 * and streams it through the new stream(Flux<DataBuffer>, options) method.</p>
-	 */
-	@org.junit.jupiter.api.Test
-	void testStreamingAudioTranscription_RealApi() throws IOException, InterruptedException {
-		// Arrange - Download test audio file
-		byte[] audioData = downloadTestAudio(PARAFORMER_TEST_AUDIO_URL_1);
-		logger.info("Downloaded test audio: {} bytes", audioData.length);
-
-		// Split audio into chunks (simulating real-time streaming)
-		int chunkSize = 3200; // ~100ms at 16kHz PCM
-		List<byte[]> chunks = splitAudioIntoChunks(audioData, chunkSize);
-		logger.info("Split audio into {} chunks", chunks.size());
-
-		// Create Flux of DataBuffers
-		DefaultDataBufferFactory bufferFactory = new DefaultDataBufferFactory();
-		Flux<DataBuffer> audioStream = Flux.fromIterable(chunks)
-				.map(chunk -> {
-					DefaultDataBuffer buffer = bufferFactory.wrap(chunk);
-					return buffer;
-				});
-
-		// Arrange - Configure transcription options
-        DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
-                .model(AudioModel.PARAFORMER_REALTIME_V2.getValue())
-                .sampleRate(16000)
-                .format("pcm")
-                .disfluencyRemovalEnabled(false)
-                .languageHints(List.of("zh")) // 可以改为en
-                .vocabularyId(null) // 待传入
-                .resources(null) // 待传入
-                .build();
-
-		// Act - Stream transcription
-		Flux<AudioTranscriptionResponse> responses = transcriptionModel.stream(audioStream, options);
-
-	// Assert - Collect and verify responses
-		List<DashScopeTranscriptionResponse> responseList = new ArrayList<>();
-		StepVerifier.create(responses)
-				.thenConsumeWhile(response -> {
-					assertThat(response).isNotNull();
-					assertThat(response).isInstanceOf(DashScopeTranscriptionResponse.class);
-
-					DashScopeTranscriptionResponse r = (DashScopeTranscriptionResponse) response;
-					responseList.add(r);
-
-					Sentence sentence = r.getMetadata().getSentence();
-					logger.info("WebSocket response received: {}", sentence.text());
-
-					return true;
-				})
-				.verifyComplete();
-
-		assertThat(responseList).isNotEmpty();
-		logger.info("Streaming audio transcription test passed, total responses: {}", responseList.size());
-	}
-
-	/**
-	 * Unit test for backpressure handling.
-	 * Verifies that slow WebSocket processing applies backpressure to upstream audio source.
-	 */
-	@org.junit.jupiter.api.Test
-	void testStreamingAudioBackpressure() {
-		// This test verifies backpressure without making actual API calls
-		// In a real scenario, if the WebSocket can't keep up with the audio source,
-		// the Flux should naturally apply backpressure
-
-		DefaultDataBufferFactory bufferFactory = new DefaultDataBufferFactory();
-		List<DataBuffer> chunks = new ArrayList<>();
-		for (int i = 0; i < 10; i++) {
-			byte[] chunk = new byte[3200]; // Dummy audio data
-			chunks.add(bufferFactory.wrap(chunk));
-		}
-
-		Flux<DataBuffer> audioStream = Flux.fromIterable(chunks);
-
-		DashScopeAudioTranscriptionOptions options = DashScopeAudioTranscriptionOptions.builder()
-				.model(AudioModel.PARAFORMER_V2.getValue())
-				.format("wav")
-				.sampleRate(16000)
-				.build();
-
-		// Note: This will fail without proper API key, but demonstrates the API structure
-		Flux<AudioTranscriptionResponse> responses = transcriptionModel.stream(audioStream, options);
-
-		// Verify the Flux is properly constructed (actual API call requires valid key)
-		assertThat(responses).isNotNull();
-		logger.info("Backpressure test API structure verified");
-	}
-
-	/**
-	 * Helper method to download test audio file.
-	 */
-	private byte[] downloadTestAudio(String urlString) throws IOException, InterruptedException {
-		HttpClient client = HttpClient.newHttpClient();
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(urlString))
-				.GET()
-				.build();
-
-		HttpResponse<InputStream> response = client.send(request,
-				HttpResponse.BodyHandlers.ofInputStream());
-
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		int nRead;
-		byte[] data = new byte[16384];
-		while ((nRead = response.body().read(data, 0, data.length)) != -1) {
-			buffer.write(data, 0, nRead);
-		}
-		return buffer.toByteArray();
-	}
-
-	/**
-	 * Helper method to split audio data into chunks.
-	 */
-	private List<byte[]> splitAudioIntoChunks(byte[] audioData, int chunkSize) {
-		List<byte[]> chunks = new ArrayList<>();
-		for (int i = 0; i < audioData.length; i += chunkSize) {
-			int remainingLength = Math.min(chunkSize, audioData.length - i);
-			byte[] chunk = new byte[remainingLength];
-			System.arraycopy(audioData, i, chunk, 0, remainingLength);
-			chunks.add(chunk);
-		}
-		return chunks;
 	}
 
 }
