@@ -41,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
@@ -54,6 +55,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.MimeTypeUtils;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import tools.jackson.databind.json.JsonMapper;
 
 import static com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants.MESSAGE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,6 +137,23 @@ public class DashScopeMultiModalChatTests {
 
         // Create the chat model with mocked API
         chatModel = DashScopeChatModel.builder().dashScopeApi(dashScopeApi).defaultOptions(defaultOptions).build();
+    }
+
+    @Test
+    void createRequestKeepsSystemContentAsTextForMultimodalPrompt() throws Exception {
+        UserMessage userMessage = multimodalMessage(TEST_PROMPT, MessageFormat.IMAGE, List.of(new Media(MimeTypeUtils.IMAGE_PNG, new URI("https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"))));
+        Prompt prompt = new Prompt(List.of(new SystemMessage("You are a helpful assistant."), userMessage), DashScopeChatOptions.builder()
+                .model(TEST_MODEL)
+                .multiModel(true)
+                .build());
+
+        ChatCompletionRequest request = chatModel.createRequest(prompt);
+
+        assertThat(request.input().messages()).hasSize(2);
+        assertThat(request.input().messages().get(0).role()).isEqualTo(Role.SYSTEM);
+        assertThat(request.input().messages().get(0).rawContent()).isEqualTo("You are a helpful assistant.");
+        assertThat(request.input().messages().get(1).role()).isEqualTo(Role.USER);
+        assertMediaContentList(request.input().messages().get(1).rawContent());
     }
 
     /**
@@ -361,6 +380,12 @@ public class DashScopeMultiModalChatTests {
         assertThat(imageContent.image()).isEqualTo(MULTIMODAL_IMAGE_URL);
         assertThat(textContent.type()).isEqualTo("text");
         assertThat(textContent.text()).isEqualTo(MULTIMODAL_IMAGE_PROMPT);
+
+        String jsonRequest = JsonMapper.builder().build().writeValueAsString(request);
+        assertThat(jsonRequest).contains("\"image\":\"" + MULTIMODAL_IMAGE_URL + "\"");
+        assertThat(jsonRequest).contains("\"text\":\"" + MULTIMODAL_IMAGE_PROMPT + "\"");
+        assertThat(jsonRequest).doesNotContain("\"type\"");
+        assertThat(jsonRequest).doesNotContain("\"multi_model\"");
     }
 
     @Test
@@ -379,7 +404,6 @@ public class DashScopeMultiModalChatTests {
         DashScopeChatOptions options = DashScopeChatOptions.builder()
                 .model(MULTIMODAL_VIDEO_MODEL)
                 .multiModel(true)
-                .incrementalOutput(false)
                 .build();
         Prompt prompt = new Prompt(message, options);
 
@@ -403,6 +427,14 @@ public class DashScopeMultiModalChatTests {
         assertThat(videoContent.video()).containsExactlyElementsOf(MULTIMODAL_VIDEO_FRAME_URLS);
         assertThat(textContent.type()).isEqualTo("text");
         assertThat(textContent.text()).isEqualTo(MULTIMODAL_VIDEO_PROMPT);
+
+        String jsonRequest = JsonMapper.builder().build().writeValueAsString(request);
+        assertThat(jsonRequest).contains("\"video\":[");
+        assertThat(jsonRequest).contains("\"text\":\"" + MULTIMODAL_VIDEO_PROMPT + "\"");
+        assertThat(jsonRequest).doesNotContain("\"type\"");
+        assertThat(jsonRequest).doesNotContain("\"multi_model\"");
+        assertThat(jsonRequest).doesNotContain("\"incremental_output\"");
+        assertThat(jsonRequest).doesNotContain("\"result_format\"");
     }
 
     // =============== Integration Test Cases ===============
@@ -447,7 +479,6 @@ public class DashScopeMultiModalChatTests {
         DashScopeChatOptions options = DashScopeChatOptions.builder()
                 .model(MULTIMODAL_VIDEO_MODEL)
                 .multiModel(true)
-                .incrementalOutput(false)
                 .build();
         Prompt prompt = new Prompt(message, options);
 
