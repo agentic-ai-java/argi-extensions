@@ -21,6 +21,7 @@ import com.alibaba.cloud.ai.dashscope.metadata.audio.DashScopeAudioTranscription
 import com.alibaba.cloud.ai.dashscope.metadata.audio.DashScopeAudioTranscriptionResponseMetadata.Translation;
 import com.alibaba.cloud.ai.dashscope.metadata.audio.DashScopeAudioTranscriptionResponseMetadata.Usage;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.jspecify.annotations.NonNull;
 import org.springframework.ai.audio.transcription.AudioTranscription;
@@ -53,7 +54,6 @@ public class DashScopeTranscriptionResponse extends AudioTranscriptionResponse {
 
     @NonNull
     public DashScopeAudioTranscription getResult() {
-        assert this.transcription != null;
         return this.transcription;
     }
 
@@ -66,10 +66,17 @@ public class DashScopeTranscriptionResponse extends AudioTranscriptionResponse {
         @JsonProperty("text")
         private String text;
 
+        @JsonUnwrapped
         private DashScopeAudioTranscriptionMetadata metadata;
+
+        // Default constructor for Jackson deserialization
+        public DashScopeAudioTranscription() {
+            super("");
+        }
 
         public DashScopeAudioTranscription(String text) {
             super(text);
+            this.text = text;
         }
 
         public DashScopeAudioTranscriptionMetadata withTranscriptionMetadata(DashScopeAudioTranscriptionMetadata metadata) {

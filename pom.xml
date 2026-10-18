@@ -60,6 +60,7 @@
         <module>document-readers/spring-ai-alibaba-starter-document-reader-archive</module>
         <module>document-readers/spring-ai-alibaba-starter-document-reader-arxiv</module>
         <module>document-readers/spring-ai-alibaba-starter-document-reader-bilibili</module>
+        <module>document-readers/spring-ai-alibaba-starter-document-reader-csdn</module>
         <module>document-readers/spring-ai-alibaba-starter-document-reader-chatgpt-data</module>
         <module>document-readers/spring-ai-alibaba-starter-document-reader-elasticsearch</module>
         <module>document-readers/spring-ai-alibaba-starter-document-reader-email</module>
