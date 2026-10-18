@@ -78,12 +78,25 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 
 		private JedisPoolConfig poolConfig;
 
+        protected Integer maxRedirects;
+
 		@Override
 		protected RedisBuilder self() {
 			return this;
 		}
 
+        public RedisBuilder poolConfig(JedisPoolConfig poolConfig) {
+            this.poolConfig = poolConfig;
+            return this;
+        }
+
+        public RedisBuilder maxRedirects(Integer maxRedirects) {
+            this.maxRedirects = maxRedirects;
+            return this;
+        }
+
 		public JedisRedisChatMemoryRepository build() {
+            CUSTOM_KEY_PREFIX = this.keyPrefix;
 			JedisConnectionFactory jedisConnectionFactory;
 			if (useCluster) {
 				RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration(Set.copyOf(nodes));
@@ -93,10 +106,14 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 				if (StringUtils.hasText(password)) {
 					clusterConfig.setPassword(password);
 				}
+                if (maxRedirects != null) {
+                    clusterConfig.setMaxRedirects(maxRedirects);
+                }
 				jedisConnectionFactory = new JedisConnectionFactory(clusterConfig, applyConfiguration());
 			}
 			else {
 				RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration(host, port);
+                standaloneConfig.setDatabase(database);
 				if (StringUtils.hasText(username)) {
 					standaloneConfig.setUsername(username);
 				}
@@ -142,14 +159,14 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 
 	@Override
 	public List<String> findConversationIds() {
-		Set<String> keys = redisTemplate.keys(DEFAULT_KEY_PREFIX + "*");
-		return keys.stream().map(key -> key.substring(DEFAULT_KEY_PREFIX.length())).collect(Collectors.toList());
+		Set<String> keys = redisTemplate.keys(getKeyPrefix() + "*");
+		return keys.stream().map(key -> key.substring(getKeyPrefix().length())).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Message> findByConversationId(String conversationId) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
-		String key = DEFAULT_KEY_PREFIX + conversationId;
+		String key = getKeyPrefix() + conversationId;
 		List<String> messageStrings = redisTemplate.opsForList().range(key, 0, -1);
 		if (CollectionUtils.isEmpty(messageStrings)) {
 			return Collections.emptyList();
@@ -162,7 +179,7 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		Assert.notNull(messages, "messages cannot be null");
 		Assert.noNullElements(messages, "messages cannot contain null elements");
-		String key = DEFAULT_KEY_PREFIX + conversationId;
+		String key = getKeyPrefix() + conversationId;
 		List<String> messageJsons = messages.stream().map(this::serializeMessage).toList();
 		try (RedisConnection connection = redisTemplate.getConnectionFactory().getConnection()) {
 			connection.keyCommands().del(key.getBytes());
@@ -179,7 +196,7 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 	@Override
 	public void deleteByConversationId(String conversationId) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
-		redisTemplate.delete(DEFAULT_KEY_PREFIX + conversationId);
+		redisTemplate.delete(getKeyPrefix() + conversationId);
 	}
 
 	/**
@@ -190,7 +207,7 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 	 */
 	public void clearOverLimit(String conversationId, int maxLimit, int deleteSize) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
-		String key = DEFAULT_KEY_PREFIX + conversationId;
+		String key = getKeyPrefix() + conversationId;
 		Long size = redisTemplate.opsForList().size(key);
 		if (size < maxLimit) {
 			return;
