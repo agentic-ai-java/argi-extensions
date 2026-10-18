@@ -45,7 +45,8 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 public class OceanBaseVectorStoreAutoConfiguration {
 
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingBean(DataSource.class)
+	@ConditionalOnClass(DriverManagerDataSource.class)
 	public DataSource oceanbaseDataSource(OceanBaseVectorStoreProperties properties) {
 		DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setUrl(properties.getUrl());
@@ -71,6 +72,7 @@ public class OceanBaseVectorStoreAutoConfiguration {
 			.batchingStrategy(batchingStrategy)
 			.observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
 			.customObservationConvention(customObservationConvention.getIfAvailable(() -> null));
+
 		if (properties.getDefaultTopK() >= 0) {
 			builder.defaultTopK(properties.getDefaultTopK());
 		}
@@ -78,6 +80,15 @@ public class OceanBaseVectorStoreAutoConfiguration {
 		if (properties.getDefaultSimilarityThreshold() >= 0.0) {
 			builder.defaultSimilarityThreshold(properties.getDefaultSimilarityThreshold());
 		}
+
+		if (properties.getDimension() != null) {
+			builder.dimension(properties.getDimension());
+		}
+
+		if (properties.getHybridSearchType() != null) {
+			builder.hybridSearchType(properties.getHybridSearchType());
+		}
+
 		return builder.build();
 	}
 

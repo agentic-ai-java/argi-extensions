@@ -16,12 +16,9 @@
 package com.alibaba.cloud.ai.vectorstore.oceanbase;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 /**
- * Configuration properties for OceanBase Vector Store. Natural language related
- * properties for configuring OceanBaseVecotrStore to ensure proper initialization and
- * operation.
+ * Configuration properties for OceanBase Vector Store.
  *
  * @author xxsc0529
  */
@@ -30,50 +27,83 @@ public class OceanBaseVectorStoreProperties {
 
 	public static final String CONFIG_PREFIX = "spring.ai.vectorstore.oceanbase";
 
-	private final String url;
+	private String url;
 
-	private final String username;
+	private String username;
 
-	private final String password;
+	private String password;
 
-	private final String tableName; // Table name
+	private String tableName;
 
 	private Integer defaultTopK = -1;
 
 	private Double defaultSimilarityThreshold = -1.0;
 
-	@ConstructorBinding
-	public OceanBaseVectorStoreProperties(String url, String username, String password, String tableName,
-			Integer vectordimnum, boolean enabled) {
-		this.url = url;
-		this.username = username;
-		this.password = password;
-		this.tableName = tableName;
-	}
+	private Integer dimension;
 
-	// Getters
+	private String hybridSearchType;
 	public String getUrl() {
 		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public String getUsername() {
 		return username;
 	}
 
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
 	public String getPassword() {
 		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getTableName() {
 		return tableName;
 	}
 
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
+
 	public Integer getDefaultTopK() {
 		return defaultTopK;
 	}
 
+	public void setDefaultTopK(Integer defaultTopK) {
+		this.defaultTopK = defaultTopK;
+	}
+
 	public Double getDefaultSimilarityThreshold() {
 		return defaultSimilarityThreshold;
+	}
+
+	public void setDefaultSimilarityThreshold(Double defaultSimilarityThreshold) {
+		this.defaultSimilarityThreshold = defaultSimilarityThreshold;
+	}
+
+	public Integer getDimension() {
+		return dimension;
+	}
+
+	public void setDimension(Integer dimension) {
+		this.dimension = dimension;
+	}
+
+	public String getHybridSearchType() {
+		return hybridSearchType;
+	}
+
+	public void setHybridSearchType(String hybridSearchType) {
+		this.hybridSearchType = hybridSearchType;
 	}
 
 }

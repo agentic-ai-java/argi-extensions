@@ -22,11 +22,19 @@ import org.springframework.ai.vectorstore.filter.Filter.Key;
 import org.springframework.ai.vectorstore.filter.converter.AbstractFilterExpressionConverter;
 
 import java.util.List;
+import java.util.Set;
 
 /**
+ * OceanBase filter expression converter.
+ * Converts filter expressions to SQL WHERE clauses, handling metadata fields via JSON_EXTRACT.
+ *
  * @author xxsc0529
  */
 public class OceanBaseVectorFilterExpressionConverter extends AbstractFilterExpressionConverter {
+
+	private static final Set<String> TABLE_COLUMNS = Set.of(
+		"id", "embedding", "document", "metadata", "timestamp"
+	);
 
 	@Override
 	protected void doExpression(Expression expression, StringBuilder context) {
@@ -49,13 +57,14 @@ public class OceanBaseVectorFilterExpressionConverter extends AbstractFilterExpr
 		context.append(")");
 	}
 
+	@SuppressWarnings("unchecked")
 	private void convertToConditions(Expression expression, StringBuilder context) {
 		Filter.Value right = (Filter.Value) expression.right();
 		Object value = right.value();
 		if (!(value instanceof List)) {
 			throw new IllegalArgumentException("Expected a List, but got: " + value.getClass().getSimpleName());
 		}
-		List<Object> values = (List) value;
+		List<Object> values = (List<Object>) value;
 		for (int i = 0; i < values.size(); i++) {
 			this.convertOperand(expression.left(), context);
 			context.append(" = ");
@@ -97,7 +106,31 @@ public class OceanBaseVectorFilterExpressionConverter extends AbstractFilterExpr
 
 	@Override
 	protected void doKey(Key key, StringBuilder context) {
-		context.append(key.key());
+		String keyName = key.key();
+		if (TABLE_COLUMNS.contains(keyName.toLowerCase())) {
+			context.append(keyName);
+		}
+		else {
+			context.append("JSON_UNQUOTE(JSON_EXTRACT(").append("metadata").append(", '$.").append(keyName).append("'))");
+		}
+	}
+
+	@Override
+	protected void doSingleValue(Object value, StringBuilder context) {
+		if (value == null) {
+			context.append("NULL");
+		}
+		else if (value instanceof String) {
+			String escaped = ((String) value).replace("'", "''");
+			context.append("'").append(escaped).append("'");
+		}
+		else if (value instanceof Number || value instanceof Boolean) {
+			context.append(value);
+		}
+		else {
+			String escaped = value.toString().replace("'", "''");
+			context.append("'").append(escaped).append("'");
+		}
 	}
 
 	@Override
