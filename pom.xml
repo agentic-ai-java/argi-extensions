@@ -98,6 +98,7 @@
         <module>auto-configurations/spring-ai-alibaba-autoconfigure-arms-observation</module>
         <module>auto-configurations/spring-ai-alibaba-autoconfigure-mcp-registry</module>
         <module>auto-configurations/spring-ai-alibaba-autoconfigure-mcp-router</module>
+        <module>auto-configurations/spring-ai-alibaba-autoconfigure-rag-elasticsearch</module>
 
         <!-- spring-boot-starters modules -->
         <module>spring-boot-starters/spring-ai-alibaba-starter-dashscope</module>
@@ -107,6 +108,7 @@
         <module>spring-boot-starters/spring-ai-alibaba-starter-arms-observation</module>
         <module>spring-boot-starters/spring-ai-alibaba-starter-mcp-registry</module>
         <module>spring-boot-starters/spring-ai-alibaba-starter-mcp-router</module>
+        <module>spring-boot-starters/spring-ai-alibaba-starter-rag</module>
 
         <!-- tool-calls modules -->
         <module>tool-calls/spring-ai-alibaba-starter-tool-calling-alitranslate</module>
@@ -167,6 +169,8 @@
         <module>prompt/spring-ai-alibaba-prompt-nacos</module>
 
         <module>models/dashscope</module>
+
+        <module>rag/spring-ai-alibaba-rag</module>
 
         <module>observation</module>
         <module>mcp/spring-ai-alibaba-mcp-distributed</module>
