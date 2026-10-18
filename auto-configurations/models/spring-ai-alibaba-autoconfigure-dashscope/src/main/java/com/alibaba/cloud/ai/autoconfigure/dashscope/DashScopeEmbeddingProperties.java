@@ -18,9 +18,10 @@ package com.alibaba.cloud.ai.autoconfigure.dashscope;
 
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
 import com.alibaba.cloud.ai.dashscope.embedding.text.DashScopeEmbeddingOptions;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 @ConfigurationProperties(DashScopeEmbeddingProperties.CONFIG_PREFIX)
 public class DashScopeEmbeddingProperties extends DashScopeParentProperties {
@@ -38,17 +39,63 @@ public class DashScopeEmbeddingProperties extends DashScopeParentProperties {
   private String embeddingsPath = DashScopeApiConstants.TEXT_EMBEDDING_RESTFUL_URL;
 
   private MetadataMode metadataMode = MetadataMode.EMBED;
-
-  @NestedConfigurationProperty
   private DashScopeEmbeddingOptions options =
       DashScopeEmbeddingOptions.builder().model(DEFAULT_EMBEDDING_MODEL).build();
+	private final Options legacyOptions = new Options();
 
-  public DashScopeEmbeddingOptions getOptions() {
-    return this.options;
+  public DashScopeEmbeddingOptions toOptions() {
+		if (this.options == null) {
+			this.options = DashScopeEmbeddingOptions.builder().model(DEFAULT_EMBEDDING_MODEL).build();
+		}
+		return this.options;
+	}
+
+  @DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+  @Deprecated(since = "2.0.0", forRemoval = true)
+  public Options getOptions() {
+		return this.legacyOptions;
+	}
+
+	public void setOptions(Options options) {
+		// Deprecated options are applied by the nested Options setters.
+	}
+
+	private void updateOptions(java.util.function.Consumer<DashScopeEmbeddingOptions.Builder> customizer) {
+		DashScopeEmbeddingOptions.Builder builder = DashScopeEmbeddingOptions.builder().from(toOptions());
+		customizer.accept(builder);
+		this.options = builder.build();
+	}
+
+  public @Nullable String getModel() {
+    return toOptions().getModel();
   }
 
-  public void setOptions(DashScopeEmbeddingOptions options) {
-    this.options = options;
+  public void setModel(String model) {
+    updateOptions(builder -> builder.model(model));
+  }
+
+  public @Nullable Integer getDimensions() {
+    return toOptions().getDimensions();
+  }
+
+  public void setDimensions(Integer dimensions) {
+    updateOptions(builder -> builder.dimensions(dimensions));
+  }
+
+  public @Nullable String getTextType() {
+    return toOptions().getTextType();
+  }
+
+  public void setTextType(String textType) {
+    updateOptions(builder -> builder.textType(textType));
+  }
+
+  public @Nullable String getOutputType() {
+    return toOptions().getOutputType();
+  }
+
+  public void setOutputType(String outputType) {
+    updateOptions(builder -> builder.outputType(outputType));
   }
 
   public MetadataMode getMetadataMode() {
@@ -73,5 +120,51 @@ public class DashScopeEmbeddingProperties extends DashScopeParentProperties {
 
   public void setEmbeddingsPath(String embeddingsPath) {
     this.embeddingsPath = embeddingsPath;
+    updateOptions(builder -> builder.embeddingsPath(embeddingsPath));
   }
+	public class Options {
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable String getModel() {
+			return DashScopeEmbeddingProperties.this.getModel();
+		}
+
+		public void setModel(String model) {
+			DashScopeEmbeddingProperties.this.setModel(model);
+		}
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".dimensions")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable Integer getDimensions() {
+			return DashScopeEmbeddingProperties.this.getDimensions();
+		}
+
+		public void setDimensions(Integer dimensions) {
+			DashScopeEmbeddingProperties.this.setDimensions(dimensions);
+		}
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".text-type")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable String getTextType() {
+			return DashScopeEmbeddingProperties.this.getTextType();
+		}
+
+		public void setTextType(String textType) {
+			DashScopeEmbeddingProperties.this.setTextType(textType);
+		}
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".output-type")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable String getOutputType() {
+			return DashScopeEmbeddingProperties.this.getOutputType();
+		}
+
+		public void setOutputType(String outputType) {
+			DashScopeEmbeddingProperties.this.setOutputType(outputType);
+		}
+
+	}
+
+
 }

@@ -16,10 +16,13 @@
 
 package com.alibaba.cloud.ai.autoconfigure.dashscope.sdk;
 
+import java.util.Map;
+
 import com.alibaba.cloud.ai.dashscope.sdk.embedding.DashScopeSdkEmbeddingOptions;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 
 /**
  * DashScope SDK embedding model properties.
@@ -32,11 +35,17 @@ public class DashScopeSdkEmbeddingProperties extends DashScopeSdkParentPropertie
 	private boolean enabled = true;
 
 	private MetadataMode metadataMode = MetadataMode.EMBED;
-
-	@NestedConfigurationProperty
 	private DashScopeSdkEmbeddingOptions options = DashScopeSdkEmbeddingOptions.builder()
 		.model("text-embedding-v2")
 		.build();
+	private final Options legacyOptions = new Options();
+
+	public DashScopeSdkEmbeddingOptions toOptions() {
+		if (this.options == null) {
+			this.options = DashScopeSdkEmbeddingOptions.builder().model("text-embedding-v2").build();
+		}
+		return this.options;
+	}
 
 	public boolean isEnabled() {
 		return this.enabled;
@@ -54,12 +63,96 @@ public class DashScopeSdkEmbeddingProperties extends DashScopeSdkParentPropertie
 		this.metadataMode = metadataMode;
 	}
 
-	public DashScopeSdkEmbeddingOptions getOptions() {
-		return this.options;
+	@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX)
+	@Deprecated(since = "2.0.0", forRemoval = true)
+	public Options getOptions() {
+		return this.legacyOptions;
 	}
 
-	public void setOptions(DashScopeSdkEmbeddingOptions options) {
-		this.options = options;
+	public void setOptions(Options options) {
+		// Deprecated options are applied by the nested Options setters.
 	}
+
+	private void updateOptions(java.util.function.Consumer<DashScopeSdkEmbeddingOptions.Builder> customizer) {
+		DashScopeSdkEmbeddingOptions.Builder builder = DashScopeSdkEmbeddingOptions.builder().from(toOptions());
+		customizer.accept(builder);
+		this.options = builder.build();
+	}
+
+	public @Nullable String getModel() {
+		return toOptions().getModel();
+	}
+
+	public void setModel(String model) {
+		updateOptions(builder -> builder.model(model));
+	}
+
+	public @Nullable String getTextType() {
+		return toOptions().getTextType();
+	}
+
+	public void setTextType(String textType) {
+		updateOptions(builder -> builder.textType(textType));
+	}
+
+	public @Nullable Integer getDimensions() {
+		return toOptions().getDimensions();
+	}
+
+	public void setDimensions(Integer dimensions) {
+		updateOptions(builder -> builder.dimensions(dimensions));
+	}
+
+	public @Nullable Map<String, String> getHttpHeaders() {
+		return toOptions().getHttpHeaders();
+	}
+
+	public void setHttpHeaders(Map<String, String> httpHeaders) {
+		updateOptions(builder -> builder.httpHeaders(httpHeaders));
+	}
+	public class Options {
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".model")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable String getModel() {
+			return DashScopeSdkEmbeddingProperties.this.getModel();
+		}
+
+		public void setModel(String model) {
+			DashScopeSdkEmbeddingProperties.this.setModel(model);
+		}
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".text-type")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable String getTextType() {
+			return DashScopeSdkEmbeddingProperties.this.getTextType();
+		}
+
+		public void setTextType(String textType) {
+			DashScopeSdkEmbeddingProperties.this.setTextType(textType);
+		}
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".dimensions")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable Integer getDimensions() {
+			return DashScopeSdkEmbeddingProperties.this.getDimensions();
+		}
+
+		public void setDimensions(Integer dimensions) {
+			DashScopeSdkEmbeddingProperties.this.setDimensions(dimensions);
+		}
+
+		@DeprecatedConfigurationProperty(replacement = CONFIG_PREFIX + ".http-headers")
+		@Deprecated(since = "2.0.0", forRemoval = true)
+		public @Nullable Map<String, String> getHttpHeaders() {
+			return DashScopeSdkEmbeddingProperties.this.getHttpHeaders();
+		}
+
+		public void setHttpHeaders(Map<String, String> httpHeaders) {
+			DashScopeSdkEmbeddingProperties.this.setHttpHeaders(httpHeaders);
+		}
+
+	}
+
 
 }
