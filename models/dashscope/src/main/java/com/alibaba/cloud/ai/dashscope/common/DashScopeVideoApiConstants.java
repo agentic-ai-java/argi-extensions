@@ -39,7 +39,7 @@ public class DashScopeVideoApiConstants {
             // 通义万相-参考生视频
             DashScopeModel.VideoModel.WAN26_R2V.getName(),
             // 通义万相-文生视频
-            DashScopeModel.VideoModel.WANX21_T2V_PLUS.getName(), DashScopeModel.VideoModel.WANX21_T2V_TURBO.getName(), DashScopeModel.VideoModel.WANX22_T2V_PLUS.getName(), DashScopeModel.VideoModel.WANX25_T2V_PREVIEW.getName(), DashScopeModel.VideoModel.WANX26_T2V.getName(),
+            DashScopeModel.VideoModel.WANX21_T2V_PLUS.getName(), DashScopeModel.VideoModel.WANX21_T2V_TURBO.getName(), DashScopeModel.VideoModel.WAN22_T2V_PLUS.getName(), DashScopeModel.VideoModel.WAN25_T2V_PREVIEW.getName(), DashScopeModel.VideoModel.WAN26_T2V.getName(),
             // 通义万相-通用视频编辑
             DashScopeModel.VideoModel.WANX21_VACE_PLUS.getName(),
             // 视频风格重绘
@@ -53,6 +53,7 @@ public class DashScopeVideoApiConstants {
             DashScopeModel.VideoModel.WANX21_KF2V_PLUS.getName(),
             // 通义万相-图生动作
             DashScopeModel.VideoModel.WAN22_KF2V_FLASH.getName(),
+            DashScopeModel.VideoModel.WAN22_ANIMATE_MOVE.getName(),
             // 通义万相-视频换人
             DashScopeModel.VideoModel.WAN22_ANIMATE_MIX.getName(),
             // 通义万相数字人-图像检测-视频生成

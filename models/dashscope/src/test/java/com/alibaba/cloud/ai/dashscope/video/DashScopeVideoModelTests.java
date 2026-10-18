@@ -136,7 +136,7 @@ class DashScopeVideoModelTests {
     @Test
     void testNullTaskIdResponseThrowsException() {
         // Test handling of null task ID in submit response - should throw exception
-        VideoOutput submitOutput = new VideoOutput(null, "PENDING", null, null, null, null, null, null, null, null, null, false, false, false, null, null);
+        VideoOutput submitOutput = new VideoOutput(null, "PENDING", null, null, null, null, null, null, null, null, null, null, false, false, false, null, null);
         DashScopeVideoResponse submitResponse = new DashScopeVideoResponse(TEST_REQUEST_ID, submitOutput, null);
         when(dashScopeVideoApi.submitVideoGenTask(any(DashScopeVideoRequest.class))).thenReturn(ResponseEntity.ok(submitResponse));
 
@@ -256,7 +256,7 @@ class DashScopeVideoModelTests {
                 .build();
 
         // Mock detection response - no task polling needed
-        VideoOutput detectionOutput = new VideoOutput(null, null, null, null, null, null, null, null, null, null, null, false, false, false, List.of(212, 194, 460, 441), List.of(63, 30, 609, 575));
+        VideoOutput detectionOutput = new VideoOutput(null, null, null, null, null, null, null, null, null, null, null, null, false, false, false, List.of(212, 194, 460, 441), List.of(63, 30, 609, 575));
         VideoUsage detectionUsage = new VideoUsage(0, 0, 0, 0, 0, null, null, null, 1);
         DashScopeVideoResponse detectionResponse = new DashScopeVideoResponse(TEST_REQUEST_ID, detectionOutput, detectionUsage);
 
@@ -275,12 +275,12 @@ class DashScopeVideoModelTests {
 
     private void mockSuccessfulVideoGeneration() {
         // Mock successful task submission
-        VideoOutput submitOutput = new VideoOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null, null, false, false, false, null, null);
+        VideoOutput submitOutput = new VideoOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null, null, null, false, false, false, null, null);
         DashScopeVideoResponse submitResponse = new DashScopeVideoResponse(TEST_REQUEST_ID, submitOutput, null);
         when(dashScopeVideoApi.submitVideoGenTask(any(DashScopeVideoRequest.class))).thenReturn(ResponseEntity.ok(submitResponse));
 
         // Mock successful task completion
-        VideoOutput completedOutput = new VideoOutput(TEST_TASK_ID, "SUCCEEDED", null, null, null, null, null, TEST_VIDEO_URL, null, null, null, true, false, true, null, null);
+        VideoOutput completedOutput = new VideoOutput(TEST_TASK_ID, "SUCCEEDED", null, null, null, null, null, TEST_VIDEO_URL, null, null, null, null, false, false, false, null, null);
         VideoUsage usage = new VideoUsage(5, 0, 5, 1, 0, "832*480", "16:9", "5s", 0);
         DashScopeVideoResponse completedResponse = new DashScopeVideoResponse(TEST_REQUEST_ID, completedOutput, usage);
         when(dashScopeVideoApi.queryVideoGenTask(TEST_TASK_ID)).thenReturn(ResponseEntity.ok(completedResponse));
@@ -288,12 +288,12 @@ class DashScopeVideoModelTests {
 
     private void mockFailedVideoGeneration() {
         // Mock successful task submission but failed completion
-        VideoOutput submitOutput = new VideoOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null, null, false, false, false, null, null);
+        VideoOutput submitOutput = new VideoOutput(TEST_TASK_ID, "PENDING", null, null, null, null, null, null, null, null, null, null, false, false, false, null, null);
         DashScopeVideoResponse submitResponse = new DashScopeVideoResponse(TEST_REQUEST_ID, submitOutput, null);
         when(dashScopeVideoApi.submitVideoGenTask(any(DashScopeVideoRequest.class))).thenReturn(ResponseEntity.ok(submitResponse));
 
         // Mock failed task completion
-        VideoOutput failedOutput = new VideoOutput(TEST_TASK_ID, "FAILED", null, null, null, null, null, null, "VIDEO_GEN_ERROR", "Video generation failed due to internal error", null, false, false, false, null, null);
+        VideoOutput failedOutput = new VideoOutput(TEST_TASK_ID, "FAILED", null, null, null, null, null, null, null, "VIDEO_GEN_ERROR", "Video generation failed due to internal error", null, false, false, false, null, null);
         DashScopeVideoResponse failedResponse = new DashScopeVideoResponse(TEST_REQUEST_ID, failedOutput, null);
         when(dashScopeVideoApi.queryVideoGenTask(anyString())).thenReturn(ResponseEntity.ok(failedResponse));
     }

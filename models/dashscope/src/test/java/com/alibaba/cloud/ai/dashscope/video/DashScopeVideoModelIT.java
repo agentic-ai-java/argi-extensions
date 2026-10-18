@@ -99,7 +99,7 @@ class DashScopeVideoModelIT {
 
         // Build options matching curl command
         DashScopeVideoOptions options = DashScopeVideoOptions.builder()
-                .model(DashScopeModel.VideoModel.WANX22_T2V_PLUS.getName())
+                .model(DashScopeModel.VideoModel.WAN22_T2V_PLUS.getName())
                 .input(InputOptions.builder().prompt(prompt).build())
                 .parameters(ParametersOptions.builder().size("832*480").promptExtend(true).build())
                 .build();
@@ -114,7 +114,7 @@ class DashScopeVideoModelIT {
         // Create prompt using builder pattern
         VideoPrompt videoPrompt = VideoPrompt.builder().options(options).build();
 
-        System.out.println("Model: " + DashScopeModel.VideoModel.WANX22_T2V_PLUS.getName());
+        System.out.println("Model: " + DashScopeModel.VideoModel.WAN22_T2V_PLUS.getName());
         System.out.println("Video Size: 832*480");
         System.out.println("Prompt Extend: true");
         System.out.println("\nSubmitting video generation task...");

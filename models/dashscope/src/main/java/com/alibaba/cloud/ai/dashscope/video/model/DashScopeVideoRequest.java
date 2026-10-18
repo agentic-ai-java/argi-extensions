@@ -144,7 +144,7 @@ public class DashScopeVideoRequest {
         private String refImageUrl;
 
         @JsonProperty("ref_images_url")
-        private String refImagesUrl;
+        private List<String> refImagesUrl;
 
         @JsonProperty("mask_frame_id")
         private Integer maskFrameId;
@@ -261,7 +261,7 @@ public class DashScopeVideoRequest {
                 return this;
             }
 
-            public Builder refImagesUrl(String refImagesUrl) {
+            public Builder refImagesUrl(List<String> refImagesUrl) {
                 this.videoInput.refImagesUrl = refImagesUrl;
                 return this;
             }
@@ -323,6 +323,9 @@ public class DashScopeVideoRequest {
 
         @JsonProperty("prompt_extend")
         private Boolean promptExtend;
+
+        @JsonProperty("video_extension")
+        private Boolean videoExtension;
 
         @JsonProperty("duration")
         private Integer duration;
@@ -394,6 +397,9 @@ public class DashScopeVideoRequest {
         }
 
         public static VideoParameters optionsConvertReq(ParametersOptions parameters) {
+            if (parameters == null)
+                return VideoParameters.builder().build();
+
             return VideoParameters.builder()
                     .resolution(parameters.getResolution())
                     .size(parameters.getSize())
@@ -447,6 +453,11 @@ public class DashScopeVideoRequest {
 
             public Builder promptExtend(Boolean promptExtend) {
                 this.videoParameters.promptExtend = promptExtend;
+                return this;
+            }
+
+            public Builder videoExtension(Boolean videoExtension) {
+                this.videoParameters.videoExtension = videoExtension;
                 return this;
             }
 

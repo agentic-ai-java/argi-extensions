@@ -466,9 +466,9 @@ public class DashScopeModel {
         WAN26_R2V("wan2.6-r2v"),
         WANX21_T2V_PLUS("wanx2.1-t2v-plus"),
         WANX21_T2V_TURBO("wanx2.1-t2v-turbo"),
-        WANX22_T2V_PLUS("wan2.2-t2v-plus"),
-        WANX25_T2V_PREVIEW("wan2.5-t2v-preview"),
-        WANX26_T2V("wan2.6-t2v"),
+        WAN22_T2V_PLUS("wan2.2-t2v-plus"),
+        WAN25_T2V_PREVIEW("wan2.5-t2v-preview"),
+        WAN26_T2V("wan2.6-t2v"),
         WANX21_VACE_PLUS("wanx2.1-vace-plus"),
         VIDEO_STYLE_TRANSFORM("video-style-transform"),
 

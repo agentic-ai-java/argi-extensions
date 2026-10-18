@@ -146,7 +146,7 @@ public class DashScopeVideoOptions implements VideoOptions {
         private String refImageUrl;
 
         @JsonProperty("ref_images_url")
-        private String refImagesUrl;
+        private List<String> refImagesUrl;
 
         @JsonProperty("mask_frame_id")
         private Integer maskFrameId;
@@ -260,11 +260,11 @@ public class DashScopeVideoOptions implements VideoOptions {
             this.refImageUrl = refImageUrl;
         }
 
-        public String getRefImagesUrl() {
+        public List<String> getRefImagesUrl() {
             return refImagesUrl;
         }
 
-        public void setRefImagesUrl(String refImagesUrl) {
+        public void setRefImagesUrl(List<String> refImagesUrl) {
             this.refImagesUrl = refImagesUrl;
         }
 
@@ -391,7 +391,7 @@ public class DashScopeVideoOptions implements VideoOptions {
                 return this;
             }
 
-            public Builder refImagesUrl(String refImagesUrl) {
+            public Builder refImagesUrl(List<String> refImagesUrl) {
                 this.options.setRefImagesUrl(refImagesUrl);
                 return this;
             }
@@ -447,6 +447,9 @@ public class DashScopeVideoOptions implements VideoOptions {
 
         @JsonProperty("prompt_extend")
         private Boolean promptExtend;
+
+        @JsonProperty("video_extension")
+        private Boolean videoExtension;
 
         @JsonProperty("duration")
         private Integer duration;
@@ -539,6 +542,14 @@ public class DashScopeVideoOptions implements VideoOptions {
 
         public void setPromptExtend(Boolean promptExtend) {
             this.promptExtend = promptExtend;
+        }
+
+        public Boolean getVideoExtension() {
+            return videoExtension;
+        }
+
+        public void setVideoExtension(Boolean videoExtension) {
+            this.videoExtension = videoExtension;
         }
 
         public Integer getDuration() {
@@ -741,6 +752,11 @@ public class DashScopeVideoOptions implements VideoOptions {
 
             public Builder promptExtend(Boolean promptExtend) {
                 this.options.setPromptExtend(promptExtend);
+                return this;
+            }
+
+            public Builder videoExtension(Boolean videoExtension) {
+                this.options.setVideoExtension(videoExtension);
                 return this;
             }
 
