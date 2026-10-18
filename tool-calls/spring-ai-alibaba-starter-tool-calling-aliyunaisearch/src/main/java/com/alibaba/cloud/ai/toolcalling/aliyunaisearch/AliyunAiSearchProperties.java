@@ -35,6 +35,9 @@ public class AliyunAiSearchProperties extends CommonToolCallProperties {
 		if (!StringUtils.hasText(this.getBaseUrl())) {
 			this.setBaseUrl(System.getenv(AliyunAiSearchConstants.BASE_URL_ENV));
 		}
+        if (!StringUtils.hasText(this.getPath())) {
+            this.setPath(AliyunAiSearchConstants.PATH);
+        }
 	}
 
 }

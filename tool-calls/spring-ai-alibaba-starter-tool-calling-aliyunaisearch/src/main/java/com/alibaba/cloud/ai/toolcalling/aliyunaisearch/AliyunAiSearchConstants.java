@@ -23,6 +23,8 @@ public class AliyunAiSearchConstants {
 
 	public static final String BASE_URL_ENV = "ALIYUN_AI_SEARCH_BASE_URL";
 
+    public static final String PATH = "/v3/openapi/workspaces/default/web-search/ops-web-search-001";
+
 	public static final String API_KEY_ENV = "ALIYUN_AI_SEARCH_API_KEY";
 
 	public static final String TOOL_NAME = "aliyunAiSearch";

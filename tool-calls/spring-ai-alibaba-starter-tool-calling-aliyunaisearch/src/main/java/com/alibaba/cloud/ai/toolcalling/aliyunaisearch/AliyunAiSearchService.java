@@ -70,7 +70,7 @@ public class AliyunAiSearchService
 			throw new RuntimeException("Service Api Key is Invalid.");
 		}
 		try {
-			String responseStr = webClientTool.post("/", request).block();
+			String responseStr = webClientTool.post(properties.getPath(), request).block();
 			log.debug("Response: {}", responseStr);
 			return jsonParseTool.getFieldValue(responseStr, new TypeReference<Response>() {
 			}, "result");

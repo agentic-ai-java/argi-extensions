@@ -30,6 +30,8 @@ public class CommonToolCallProperties {
 
 	private String baseUrl;
 
+    private String path;
+
 	private Integer networkTimeout;
 
 	private String appId;
@@ -85,6 +87,14 @@ public class CommonToolCallProperties {
 
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
+	}
+
+    public String getPath() {
+		return path;
+	}
+
+    public void setPath(String path) {
+		this.path = path;
 	}
 
 	public Integer getNetworkTimeout() {
