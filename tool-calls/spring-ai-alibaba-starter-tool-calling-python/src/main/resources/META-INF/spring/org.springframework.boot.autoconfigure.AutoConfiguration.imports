@@ -13,5 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-com.alibaba.cloud.ai.agent.python.autoconfigure.PythonToolAutoConfiguration
+com.alibaba.cloud.ai.toolcalling.python.PythonServiceAutoConfiguration
 

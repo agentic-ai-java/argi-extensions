@@ -41,9 +41,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
+import io.modelcontextprotocol.client.transport.WebClientStreamableHttpTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.InitializeResult;
+import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema.TextContent;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -760,13 +762,21 @@ public class NacosMcpGatewayToolCallback implements ToolCallback {
                 sseEndpoint = exportPath;
             }
             
-            HttpClientSseClientTransport.Builder transportBuilder = HttpClientSseClientTransport.builder(baseUrl)
-                    .sseEndpoint(sseEndpoint);
-            
-            // Add custom request headers (if needed)
-            // Authentication headers can be added here as needed
-            
-            HttpClientSseClientTransport transport = transportBuilder.build();
+            McpClientTransport transport;
+            if ("mcp-streamable".equalsIgnoreCase(protocol)) {
+                // Use WebClientStreamableHttpTransport for streamable protocol
+                WebClient.Builder webClientBuilder = this.webClientBuilder.clone().baseUrl(baseUrl);
+                transport = WebClientStreamableHttpTransport.builder(webClientBuilder)
+                        .endpoint(sseEndpoint)
+                        .build();
+                logger.info("[handleMcpStreamProtocol] Using WebClientStreamableHttpTransport for mcp-streamable");
+            } else {
+                // Use HttpClientSseClientTransport for SSE protocol
+                transport = HttpClientSseClientTransport.builder(baseUrl)
+                        .sseEndpoint(sseEndpoint)
+                        .build();
+                logger.info("[handleMcpStreamProtocol] Using HttpClientSseClientTransport for mcp-sse");
+            }
             
             // Create MCP sync client
             McpSyncClient client = McpClient.sync(transport).build();

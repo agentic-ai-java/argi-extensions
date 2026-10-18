@@ -33,12 +33,20 @@ Add the starter to your `pom.xml`:
 The Python Tool is enabled by default. To disable it, add the following configuration:
 
 ```yaml
-spring:
-  ai:
-    alibaba:
-      python:
-        tool:
-          enabled: false
+  spring:
+      ai:
+          alibaba:
+              tool-calling:
+                  python:
+                      enabled: true
+                      engine:
+                          warn-interpreter-only: false
+                      context:
+                          allow-all-access: false
+                          allow-io: false
+                          allow-native-access: false
+                          allow-create-process: false
+                          allow-host-access: true
 ```
 
 ### 3. Use in Agent
@@ -60,12 +68,14 @@ The Python Tool runs in a sandboxed environment with the following restrictions:
 
 ## Customization
 
-You can provide your own `PythonTool` bean to customize the behavior:
+You can provide your own `PythonService` bean to customize the behavior:
 
 ```java
-@Bean
-public PythonTool pythonTool() {
-    return new PythonTool();
+
+@Bean(name = PythonConstants.TOOL_NAME)
+@ConditionalOnMissingBean
+public PythonService pythonService(PythonProperties properties) {
+    return new PythonService(properties);
 }
 ```
 
@@ -73,8 +83,9 @@ Or provide a custom `ToolCallback`:
 
 ```java
 @Bean
-public ToolCallback pythonToolCallback(PythonTool pythonTool) {
-    return PythonTool.createPythonToolCallback("Custom description");
+@ConditionalOnMissingBean(name = "pythonToolCallback")
+public ToolCallback pythonToolCallback() {
+    return PythonService.createPythonToolCallback(PythonConstants.DESCRIPTION);
 }
 ```
 

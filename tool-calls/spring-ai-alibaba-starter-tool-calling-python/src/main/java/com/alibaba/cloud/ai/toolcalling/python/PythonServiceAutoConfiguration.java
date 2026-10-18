@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.cloud.ai.agent.python.autoconfigure;
+package com.alibaba.cloud.ai.toolcalling.python;
 
-import com.alibaba.cloud.ai.agent.python.tool.PythonTool;
 import org.graalvm.polyglot.Engine;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -34,20 +34,21 @@ import org.springframework.context.annotation.Bean;
  */
 @AutoConfiguration
 @ConditionalOnClass({ Engine.class })
-@ConditionalOnProperty(prefix = "spring.ai.alibaba.python.tool", name = "enabled", havingValue = "true", matchIfMissing = true)
-public class PythonToolAutoConfiguration {
+@ConditionalOnProperty(prefix = PythonConstants.CONFIG_PREFIX, name = "enabled", havingValue = "true", matchIfMissing = true)
+@EnableConfigurationProperties(PythonProperties.class)
+public class PythonServiceAutoConfiguration {
 
-	@Bean
+    @Bean(name = PythonConstants.TOOL_NAME)
 	@ConditionalOnMissingBean
-	public PythonTool pythonTool() {
-		return new PythonTool();
+    public PythonService pythonService(PythonProperties properties) {
+        return new PythonService(properties);
 	}
 
-	@Bean
-	@ConditionalOnMissingBean(name = "pythonToolCallback")
-	public ToolCallback pythonToolCallback(PythonTool pythonTool) {
-		return PythonTool.createPythonToolCallback(PythonTool.DESCRIPTION);
-	}
+    @Bean
+    @ConditionalOnMissingBean(name = "pythonToolCallback")
+    public ToolCallback pythonToolCallback() {
+        return PythonService.createPythonToolCallback(PythonConstants.DESCRIPTION);
+    }
 
 }
 

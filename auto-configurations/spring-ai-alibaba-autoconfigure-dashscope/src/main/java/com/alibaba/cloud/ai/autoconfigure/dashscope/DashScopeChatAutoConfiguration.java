@@ -19,7 +19,6 @@ import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import com.alibaba.cloud.ai.model.SpringAIAlibabaModels;
 import io.micrometer.observation.ObservationRegistry;
-
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.model.tool.DefaultToolExecutionEligibilityPredicate;
@@ -59,6 +58,7 @@ import static com.alibaba.cloud.ai.autoconfigure.dashscope.DashScopeConnectionUt
 		matchIfMissing = true)
 @AutoConfiguration(after = {
 		RestClientAutoConfiguration.class,
+        WebClientAutoConfiguration.class,
 		SpringAiRetryAutoConfiguration.class,
         ToolCallingAutoConfiguration.class})
 @ImportAutoConfiguration(classes = {
