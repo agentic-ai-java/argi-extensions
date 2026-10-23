@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 @NullMarked
-package io.github.agentic.ai.chat.memory.repository.elasticsearch;
+package io.github.agentic.ai.memory.elasticsearch;
 
 import org.jspecify.annotations.NullMarked;

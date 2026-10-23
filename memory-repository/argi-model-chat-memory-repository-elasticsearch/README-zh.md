@@ -48,7 +48,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import io.github.agentic.ai.chat.memory.repository.elasticsearch.ElasticsearchChatMemoryRepository;
+import io.github.agentic.ai.memory.elasticsearch.ElasticsearchChatMemoryRepository;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
