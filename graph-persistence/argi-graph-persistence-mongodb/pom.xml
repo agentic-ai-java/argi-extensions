@@ -39,8 +39,15 @@
     <dependencies>
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
+            <artifactId>argi-loop-core</artifactId>
+            <version>${argi.loop.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.agentic-ai-java</groupId>
             <artifactId>argi-graph-core</artifactId>
             <version>${argi.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
