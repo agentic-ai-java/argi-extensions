@@ -157,6 +157,7 @@
         <!-- ARGI Version -->
         <revision>2.1.0-RC2-SNAPSHOT</revision>
         <argi.version>2.1.0-RC1</argi.version>
+        <argi.loop.version>2.1.0-RC2-SNAPSHOT</argi.loop.version>
 
         <!-- Maven project basic config -->
         <java.version>17</java.version>
