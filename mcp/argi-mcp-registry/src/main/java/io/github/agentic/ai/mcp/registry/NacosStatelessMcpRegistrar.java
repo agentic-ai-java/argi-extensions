@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.agentic.ai.mcp.register;
+package io.github.agentic.ai.mcp.registry;
 
 import io.github.agentic.ai.mcp.nacos.NacosMcpProperties;
 import io.github.agentic.ai.mcp.nacos.service.NacosMcpOperationService;
-import io.github.agentic.ai.mcp.register.utils.CheckCompatibleResult;
-import io.github.agentic.ai.mcp.register.utils.JsonSchemaUtil;
+import io.github.agentic.ai.mcp.registry.utils.CheckCompatibleResult;
+import io.github.agentic.ai.mcp.registry.utils.JsonSchemaUtil;
 import com.alibaba.nacos.api.ai.constant.AiConstants;
 import com.alibaba.nacos.api.ai.model.mcp.McpEndpointSpec;
 import com.alibaba.nacos.api.ai.model.mcp.McpServerBasicInfo;
@@ -59,13 +59,13 @@ import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class NacosStatelessMcpRegister implements ApplicationListener<WebServerInitializedEvent> {
+public class NacosStatelessMcpRegistrar implements ApplicationListener<WebServerInitializedEvent> {
 
-    private static final Logger log = LoggerFactory.getLogger(NacosMcpRegister.class);
+    private static final Logger log = LoggerFactory.getLogger(NacosStatelessMcpRegistrar.class);
 
     private String type;
 
-    private NacosMcpRegisterProperties nacosMcpRegistryProperties;
+    private NacosMcpRegistryProperties nacosMcpRegistryProperties;
 
     private NacosMcpProperties nacosMcpProperties;
 
@@ -94,9 +94,9 @@ public class NacosStatelessMcpRegister implements ApplicationListener<WebServerI
     private boolean success = false;
 
     @SuppressWarnings("NullAway.Init")
-    public NacosStatelessMcpRegister(NacosMcpOperationService nacosMcpOperationService,
+    public NacosStatelessMcpRegistrar(NacosMcpOperationService nacosMcpOperationService,
             McpStatelessAsyncServer mcpStatelessAsyncServer, NacosMcpProperties nacosMcpProperties,
-            NacosMcpRegisterProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties,
+            NacosMcpRegistryProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties,
             McpServerSseProperties mcpServerSseProperties, ApplicationContext applicationContext, String type) {
         this.mcpStatelessAsyncServer = mcpStatelessAsyncServer;
         log.info("Mcp server type: {}", type);

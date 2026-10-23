@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.agentic.ai.mcp.register;
+package io.github.agentic.ai.mcp.registry;
 
 import io.github.agentic.ai.mcp.nacos.NacosMcpProperties;
 import io.github.agentic.ai.mcp.nacos.service.NacosMcpOperationService;
-import io.github.agentic.ai.mcp.register.utils.CheckCompatibleResult;
-import io.github.agentic.ai.mcp.register.utils.JsonSchemaUtil;
+import io.github.agentic.ai.mcp.registry.utils.CheckCompatibleResult;
+import io.github.agentic.ai.mcp.registry.utils.JsonSchemaUtil;
 import com.alibaba.nacos.api.ai.constant.AiConstants;
 import com.alibaba.nacos.api.ai.model.mcp.McpEndpointSpec;
 import com.alibaba.nacos.api.ai.model.mcp.McpServerBasicInfo;
@@ -63,13 +63,13 @@ import java.util.stream.Collectors;
 /**
  * @author Sunrisea
  */
-public class NacosMcpRegister implements ApplicationListener<WebServerInitializedEvent> {
+public class NacosMcpRegistrar implements ApplicationListener<WebServerInitializedEvent> {
 
-	private static final Logger log = LoggerFactory.getLogger(NacosMcpRegister.class);
+	private static final Logger log = LoggerFactory.getLogger(NacosMcpRegistrar.class);
 
 	private String type;
 
-	private NacosMcpRegisterProperties nacosMcpRegistryProperties;
+	private NacosMcpRegistryProperties nacosMcpRegistryProperties;
 
 	private NacosMcpProperties nacosMcpProperties;
 
@@ -100,8 +100,8 @@ public class NacosMcpRegister implements ApplicationListener<WebServerInitialize
     private JsonHelper jsonHelper;
 
 	@SuppressWarnings("NullAway.Init")
-	public NacosMcpRegister(NacosMcpOperationService nacosMcpOperationService, McpAsyncServer mcpAsyncServer,
-							NacosMcpProperties nacosMcpProperties, NacosMcpRegisterProperties nacosMcpRegistryProperties,
+	public NacosMcpRegistrar(NacosMcpOperationService nacosMcpOperationService, McpAsyncServer mcpAsyncServer,
+							NacosMcpProperties nacosMcpProperties, NacosMcpRegistryProperties nacosMcpRegistryProperties,
 							McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
 							ApplicationContext applicationContext,
 							String type) {

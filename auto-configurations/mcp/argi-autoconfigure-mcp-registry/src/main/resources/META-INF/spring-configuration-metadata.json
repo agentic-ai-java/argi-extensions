@@ -8,8 +8,8 @@
     },
     {
       "name": "argi.mcp.nacos.register",
-      "type": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "type": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "description": "Configuration properties for Nacos MCP server registration."
     },
     {
@@ -85,42 +85,42 @@
       "name": "argi.mcp.nacos.register.enabled",
       "type": "java.lang.Boolean",
       "description": "Whether to register MCP server service to Nacos.",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "defaultValue": false
     },
     {
       "name": "argi.mcp.nacos.register.service-name",
       "type": "java.lang.String",
       "description": "Service name for MCP server service.",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "defaultValue": "mcp-server"
     },
     {
       "name": "argi.mcp.nacos.register.service-group",
       "type": "java.lang.String",
       "description": "Group for MCP server service.",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "defaultValue": "DEFAULT_GROUP"
     },
     {
       "name": "argi.mcp.nacos.register.sse-export-context-path",
       "type": "java.lang.String",
       "description": "Base context path for SSE MCP server.",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "defaultValue": "/mcp"
     },
     {
       "name": "argi.mcp.nacos.register.service-register",
       "type": "java.lang.Boolean",
       "description": "Whether to register MCP server service to Nacos.",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "defaultValue": true
     },
     {
       "name": "argi.mcp.nacos.register.service-ephemeral",
       "type": "java.lang.Boolean",
       "description": "Whether the MCP server service should be ephemeral.",
-      "sourceType": "io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties",
+      "sourceType": "io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties",
       "defaultValue": true
     },
     {

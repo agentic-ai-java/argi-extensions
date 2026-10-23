@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.agentic.ai.mcp.register;
+package io.github.agentic.ai.mcp.registry;
 
 import com.alibaba.nacos.api.utils.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,14 +26,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 
 /**
+ * Nacos settings used by the MCP service registrar.
+ *
  * @author Sunrisea
  */
-@ConfigurationProperties(prefix = NacosMcpRegisterProperties.CONFIG_PREFIX)
-public class NacosMcpRegisterProperties {
+@ConfigurationProperties(prefix = NacosMcpRegistryProperties.CONFIG_PREFIX)
+public class NacosMcpRegistryProperties {
 
-	private static final Logger log = LoggerFactory.getLogger(NacosMcpRegisterProperties.class);
+	private static final Logger log = LoggerFactory.getLogger(NacosMcpRegistryProperties.class);
 
 	public static final String CONFIG_PREFIX = "argi.mcp.nacos.register";
+
+	private boolean enabled;
 
 	@Nullable
 	String host;
@@ -59,6 +63,14 @@ public class NacosMcpRegisterProperties {
 
 	public boolean isServiceRegister() {
 		return serviceRegister;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public void setServiceRegister(boolean serviceRegister) {
