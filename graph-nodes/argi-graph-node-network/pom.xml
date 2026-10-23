@@ -44,7 +44,7 @@
 
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
-            <artifactId>argi-extensions-model</artifactId>
+            <artifactId>argi-document-model</artifactId>
         </dependency>
 
         <dependency>

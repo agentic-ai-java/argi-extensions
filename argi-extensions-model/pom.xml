@@ -28,35 +28,18 @@
     <packaging>jar</packaging>
 
     <name>ARGI Extensions Model</name>
-    <description>Provider-neutral model and document contracts for ARGI Extensions</description>
+    <description>Compatibility aggregator for ARGI document and rerank model contracts</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-commons</artifactId>
+            <groupId>io.github.agentic-ai-java</groupId>
+            <artifactId>argi-document-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-model</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jspecify</groupId>
-            <artifactId>jspecify</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <scope>test</scope>
+            <groupId>io.github.agentic-ai-java</groupId>
+            <artifactId>argi-rerank-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
