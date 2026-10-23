@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 @NullMarked
-package io.github.agentic.ai.mcp.register.utils;
+package io.github.agentic.ai.autoconfigure.mcp.registry;
 
 import org.jspecify.annotations.NullMarked;

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package io.github.agentic.ai.autoconfigure.mcp.register;
+package io.github.agentic.ai.autoconfigure.mcp.registry;
 
 import io.github.agentic.ai.mcp.nacos.NacosMcpProperties;
 import io.github.agentic.ai.mcp.nacos.service.NacosMcpOperationService;
-import io.github.agentic.ai.mcp.register.NacosMcpRegisterProperties;
-import io.github.agentic.ai.mcp.register.NacosStatelessMcpRegister;
+import io.github.agentic.ai.mcp.registry.NacosMcpRegistryProperties;
+import io.github.agentic.ai.mcp.registry.NacosStatelessMcpRegistrar;
 import com.alibaba.nacos.api.ai.constant.AiConstants;
 import com.alibaba.nacos.api.exception.NacosException;
 import io.modelcontextprotocol.server.McpStatelessAsyncServer;
@@ -42,14 +42,14 @@ import java.lang.reflect.Field;
 import java.util.Properties;
 
 
-@EnableConfigurationProperties({ NacosMcpRegisterProperties.class, NacosMcpProperties.class,
+@EnableConfigurationProperties({ NacosMcpRegistryProperties.class, NacosMcpProperties.class,
         McpServerProperties.class, McpServerSseProperties.class, McpServerStreamableHttpProperties.class})
 @AutoConfiguration(after = McpServerAutoConfiguration.class)
-@ConditionalOnProperty(prefix = NacosMcpRegisterProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
+@ConditionalOnProperty(prefix = NacosMcpRegistryProperties.CONFIG_PREFIX, name = "enabled", havingValue = "true",
         matchIfMissing = false)
 @Conditional({ McpServerStdioDisabledCondition.class,
         McpServerStatelessAutoConfiguration.EnabledStatelessServerCondition.class })
-public class NacosStatelessMcpRegisterAutoConfiguration {
+public class NacosStatelessMcpRegistrarAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(NacosMcpOperationService.class)
@@ -66,35 +66,35 @@ public class NacosStatelessMcpRegisterAutoConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = McpServerProperties.CONFIG_PREFIX, name = "type", havingValue = "SYNC",
             matchIfMissing = true)
-    public NacosStatelessMcpRegister nacosStatelessMcpRegisterSync(NacosMcpOperationService nacosMcpOperationService,
+    public NacosStatelessMcpRegistrar nacosStatelessMcpRegistrarSync(NacosMcpOperationService nacosMcpOperationService,
             McpStatelessSyncServer mcpStatelessSyncServer, NacosMcpProperties nacosMcpProperties,
-            NacosMcpRegisterProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
+            NacosMcpRegistryProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
             ApplicationContext applicationContext)
             throws NoSuchFieldException, IllegalAccessException {
         Field asyncServerField = McpStatelessSyncServer.class.getDeclaredField("asyncServer");
         asyncServerField.setAccessible(true);
         McpStatelessAsyncServer mcpStatelessAsyncServer = (McpStatelessAsyncServer) asyncServerField.get(mcpStatelessSyncServer);
-        return getNacosMcpRegister(nacosMcpOperationService, mcpStatelessAsyncServer, nacosMcpProperties,
+        return getNacosMcpRegistrar(nacosMcpOperationService, mcpStatelessAsyncServer, nacosMcpProperties,
                 nacosMcpRegistryProperties, mcpServerProperties, mcpServerSseProperties, applicationContext);
     }
 
     @Bean
     //	@ConditionalOnBean(McpAsyncServer.class)
     @ConditionalOnProperty(prefix = McpServerProperties.CONFIG_PREFIX, name = "type", havingValue = "ASYNC")
-    public NacosStatelessMcpRegister nacosStatelessMcpRegisterAsync(NacosMcpOperationService nacosMcpOperationService,
+    public NacosStatelessMcpRegistrar nacosStatelessMcpRegistrarAsync(NacosMcpOperationService nacosMcpOperationService,
             McpStatelessAsyncServer mcpStatelessAsyncServer, NacosMcpProperties nacosMcpProperties,
-            NacosMcpRegisterProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
+            NacosMcpRegistryProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
             ApplicationContext applicationContext) {
-        return getNacosMcpRegister(nacosMcpOperationService, mcpStatelessAsyncServer, nacosMcpProperties,
+        return getNacosMcpRegistrar(nacosMcpOperationService, mcpStatelessAsyncServer, nacosMcpProperties,
                 nacosMcpRegistryProperties, mcpServerProperties, mcpServerSseProperties, applicationContext);
     }
 
 
-    private NacosStatelessMcpRegister getNacosMcpRegister(NacosMcpOperationService nacosMcpOperationService,
+    private NacosStatelessMcpRegistrar getNacosMcpRegistrar(NacosMcpOperationService nacosMcpOperationService,
             McpStatelessAsyncServer mcpStatelessAsyncServer, NacosMcpProperties nacosMcpProperties,
-            NacosMcpRegisterProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
+            NacosMcpRegistryProperties nacosMcpRegistryProperties, McpServerProperties mcpServerProperties, McpServerSseProperties mcpServerSseProperties,
             ApplicationContext applicationContext) {
-        return new NacosStatelessMcpRegister(nacosMcpOperationService, mcpStatelessAsyncServer, nacosMcpProperties, nacosMcpRegistryProperties,
+        return new NacosStatelessMcpRegistrar(nacosMcpOperationService, mcpStatelessAsyncServer, nacosMcpProperties, nacosMcpRegistryProperties,
                 mcpServerProperties, mcpServerSseProperties, applicationContext ,AiConstants.Mcp.MCP_PROTOCOL_STREAMABLE);
     }
 

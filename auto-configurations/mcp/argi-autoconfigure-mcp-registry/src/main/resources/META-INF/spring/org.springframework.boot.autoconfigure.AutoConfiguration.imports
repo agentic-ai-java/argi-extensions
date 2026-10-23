@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-io.github.agentic.ai.autoconfigure.mcp.register.NacosMcpRegisterAutoConfiguration
-io.github.agentic.ai.autoconfigure.mcp.register.NacosStatelessMcpRegisterAutoConfiguration
+io.github.agentic.ai.autoconfigure.mcp.registry.NacosMcpRegistrarAutoConfiguration
+io.github.agentic.ai.autoconfigure.mcp.registry.NacosStatelessMcpRegistrarAutoConfiguration
 io.github.agentic.ai.autoconfigure.mcp.tracing.McpTracingAutoConfiguration
 
 
