@@ -18,12 +18,14 @@ package io.github.agentic.ai.autoconfigure.prompt;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Configuration properties for the Nacos-backed prompt template integration.
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
-@ConfigurationProperties(NacosPromptTmplProperties.TEMPLATE_PREFIX)
-public class NacosPromptTmplProperties {
+@ConfigurationProperties(NacosPromptTemplateProperties.TEMPLATE_PREFIX)
+public class NacosPromptTemplateProperties {
 
 	public final static String TEMPLATE_PREFIX = "argi.nacos.prompt.template";
 
