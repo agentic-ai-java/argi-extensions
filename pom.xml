@@ -48,7 +48,9 @@
     </developers>
 
     <modules>
+        <module>argi-document-model</module>
         <module>argi-extensions-model</module>
+        <module>argi-rerank-model</module>
 
         <!-- graph-persistence modules -->
         <module>graph-persistence/argi-graph-persistence-jdbc</module>
@@ -261,7 +263,18 @@
         <dependencies>
             <dependency>
                 <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-document-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
                 <artifactId>argi-extensions-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.agentic-ai-java</groupId>
+                <artifactId>argi-rerank-model</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
