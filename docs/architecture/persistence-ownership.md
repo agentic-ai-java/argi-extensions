@@ -29,6 +29,8 @@ versions, leases, retention and recovery tests stay here.
 - The old Core backend classes are removed rather than kept as a second
   implementation. Consumers migrate to the Extensions artifacts listed in the
   module table.
+- Cross-version compatibility tests may use the last published graph artifact
+  as a test-only historical writer; it is never a production dependency.
 - The Extensions BOM must publish the persistence modules with the matching
   Core version.
 

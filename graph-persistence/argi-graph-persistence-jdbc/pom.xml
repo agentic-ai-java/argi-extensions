@@ -48,6 +48,13 @@
         </dependency>
 
         <dependency>
+            <groupId>io.github.agentic-ai-java</groupId>
+            <artifactId>argi-graph-core</artifactId>
+            <version>${argi.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <optional>true</optional>
