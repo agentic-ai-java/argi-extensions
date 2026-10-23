@@ -3,7 +3,7 @@
     {
       "name": "argi.arms.enabled",
       "type": "java.lang.Boolean",
-      "description": "Enable Arms instrumentations and conventions.",
+      "description": "Enable ARGI observation instrumentation exposed through the ARMS adapter.",
       "sourceType": "io.github.agentic.ai.autoconfigure.arms.ArmsCommonProperties",
       "defaultValue": false
     }

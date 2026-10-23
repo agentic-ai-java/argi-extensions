@@ -25,12 +25,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ArmsCommonProperties {
 
 	/**
-	 * ARGI ARMS extension configuration prefix.
+	 * ARGI observation configuration exposed by the ARMS adapter.
 	 */
 	public static final String CONFIG_PREFIX = "argi.arms";
 
 	/**
-	 * Enable Arms instrumentations and conventions.
+	 * Enable ARGI observation instrumentation and conventions.
 	 */
 	private boolean enabled = false;
 
@@ -65,17 +65,17 @@ public class ArmsCommonProperties {
 	public static class ModelProperties {
 
 		/**
-		 * Enable Arms instrumentations and conventions.
+		 * Enable model input capture.
 		 */
 		private boolean captureInput = false;
 
 		/**
-		 * Enable Arms instrumentations and conventions.
+		 * Enable model output capture.
 		 */
 		private boolean captureOutput = false;
 
 		/**
-		 * Arms export type enumeration.
+		 * Message capture representation.
 		 */
 		private MessageMode messageMode = MessageMode.OPEN_TELEMETRY;
 

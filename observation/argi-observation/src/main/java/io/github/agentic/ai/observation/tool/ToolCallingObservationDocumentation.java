@@ -22,12 +22,12 @@ import io.micrometer.observation.ObservationConvention;
 import io.micrometer.observation.docs.ObservationDocumentation;
 import org.springframework.ai.observation.conventions.AiObservationAttributes;
 
-public enum ArmsToolCallingObservationDocumentation implements ObservationDocumentation {
+public enum ToolCallingObservationDocumentation implements ObservationDocumentation {
 
 	EXECUTE_TOOL_OPERATION {
 		@Override
 		public Class<? extends ObservationConvention<? extends Context>> getDefaultConvention() {
-			return ArmsToolCallingObservationConvention.class;
+			return ToolCallingObservationConvention.class;
 		}
 
 		@Override
@@ -52,7 +52,8 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 
 	public static final String GEN_AI_TOOL_NAME = "gen_ai.tool.name";
 
-	// ARMS semantic convention
+	// ARGI tool observation convention. ARMS exporters may continue mapping these
+	// keys to their existing dashboard and alert dimensions.
 
 	public static final String GEN_AI_SPAN_KIND = "gen_ai.span.kind";
 
@@ -91,7 +92,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		GEN_AI_SPAN_KIND {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.GEN_AI_SPAN_KIND;
+				return ToolCallingObservationDocumentation.GEN_AI_SPAN_KIND;
 			}
 		},
 
@@ -101,7 +102,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		GEN_AI_FRAMEWORK {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.GEN_AI_FRAMEWORK;
+				return ToolCallingObservationDocumentation.GEN_AI_FRAMEWORK;
 			}
 		}
 
@@ -118,7 +119,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		GEN_AI_TOOL_CALL_ID {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.GEN_AI_TOOL_CALL_ID;
+				return ToolCallingObservationDocumentation.GEN_AI_TOOL_CALL_ID;
 			}
 		},
 
@@ -128,17 +129,17 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		GEN_AI_TOOL_NAME {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.GEN_AI_TOOL_NAME;
+				return ToolCallingObservationDocumentation.GEN_AI_TOOL_NAME;
 			}
 		},
 
 		/**
-		 * The name of the executed tool in ARMS semantic convention.
+		 * The name of the executed tool in the ARGI tool observation convention.
 		 */
 		TOOL_NAME {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.TOOL_NAME;
+				return ToolCallingObservationDocumentation.TOOL_NAME;
 			}
 		},
 
@@ -148,7 +149,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		TOOL_DESCRIPTION {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.TOOL_DESCRIPTION;
+				return ToolCallingObservationDocumentation.TOOL_DESCRIPTION;
 			}
 		},
 
@@ -158,7 +159,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		TOOL_RETURN_DIRECT {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.TOOL_RETURN_DIRECT;
+				return ToolCallingObservationDocumentation.TOOL_RETURN_DIRECT;
 			}
 		},
 
@@ -170,7 +171,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		TOOL_PARAMETERS {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.TOOL_PARAMETERS;
+				return ToolCallingObservationDocumentation.TOOL_PARAMETERS;
 			}
 		},
 
@@ -180,7 +181,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		INPUT_VALUE {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.INPUT_VALUE;
+				return ToolCallingObservationDocumentation.INPUT_VALUE;
 			}
 		},
 
@@ -190,7 +191,7 @@ public enum ArmsToolCallingObservationDocumentation implements ObservationDocume
 		OUTPUT_VALUE {
 			@Override
 			public String asString() {
-				return ArmsToolCallingObservationDocumentation.OUTPUT_VALUE;
+				return ToolCallingObservationDocumentation.OUTPUT_VALUE;
 			}
 		}
 

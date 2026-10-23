@@ -20,6 +20,7 @@ import io.github.agentic.ai.observation.model.ChatModelInputObservationHandler;
 import io.github.agentic.ai.observation.model.ChatModelOutputObservationHandler;
 import io.github.agentic.ai.observation.model.PromptMetadataAwareChatModelObservationConvention;
 import io.github.agentic.ai.observation.tool.ObservableToolCallingManager;
+import io.github.agentic.ai.observation.tool.ToolCallingObservationConvention;
 import io.micrometer.observation.ObservationRegistry;
 import org.springframework.ai.chat.client.observation.ChatClientObservationConvention;
 import org.springframework.ai.chat.model.ChatModel;
@@ -48,20 +49,30 @@ public class ArmsAutoConfiguration {
 	@ConditionalOnProperty(prefix = ArmsCommonProperties.CONFIG_PREFIX, name = "tool.enabled", havingValue = "true")
 	ToolCallingManager toolCallingManager(ToolCallbackResolver toolCallbackResolver,
 			ToolExecutionExceptionProcessor toolExecutionExceptionProcessor,
-			ObjectProvider<ObservationRegistry> observationRegistry) {
+			ObjectProvider<ObservationRegistry> observationRegistry,
+			ObjectProvider<ToolCallingObservationConvention> observationConvention) {
 		return ObservableToolCallingManager.builder()
 			.observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
+			.observationConvention(observationConvention.getIfUnique(ToolCallingObservationConvention::new))
 			.toolCallbackResolver(toolCallbackResolver)
 			.toolExecutionExceptionProcessor(toolExecutionExceptionProcessor)
 			.build();
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	ToolCallingObservationConvention toolCallingObservationConvention() {
+		return new ToolCallingObservationConvention();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	ChatClientObservationConvention chatClientObservationConvention() {
 		return new PromptMetadataAwareChatClientObservationConvention();
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	ChatModelObservationConvention chatModelObservationConvention() {
 		return new PromptMetadataAwareChatModelObservationConvention();
 	}

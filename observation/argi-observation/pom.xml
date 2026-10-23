@@ -25,7 +25,7 @@
     <artifactId>argi-observation</artifactId>
     <packaging>jar</packaging>
     <name>ARGI Observation Extension</name>
-    <description>ARGI Observation Extension Module, ARMS Implementation</description>
+    <description>ARGI provider-neutral observation extension</description>
 
     <url>https://github.com/agentic-ai-java/argi-extensions</url>
 
