@@ -20,7 +20,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.messages.AssistantMessage.ToolCall;
 import org.springframework.util.Assert;
 
-public class ArmsToolCallingObservationContext extends Context {
+public class ToolCallingObservationContext extends Context {
 
 	private ToolCall toolCall;
 
@@ -54,7 +54,7 @@ public class ArmsToolCallingObservationContext extends Context {
 		return toolResult;
 	}
 
-	public ArmsToolCallingObservationContext(ToolCall toolCall, @Nullable String description, boolean returnDirect) {
+	public ToolCallingObservationContext(ToolCall toolCall, @Nullable String description, boolean returnDirect) {
 		Assert.notNull(toolCall, "toolCall cannot be null");
 		this.toolCall = toolCall;
 		this.description = description;
@@ -87,9 +87,9 @@ public class ArmsToolCallingObservationContext extends Context {
 			return this;
 		}
 
-		public ArmsToolCallingObservationContext build() {
+		public ToolCallingObservationContext build() {
 			Assert.notNull(this.toolCall, "toolCall cannot be null");
-			return new ArmsToolCallingObservationContext(this.toolCall, this.description, this.returnDirect);
+			return new ToolCallingObservationContext(this.toolCall, this.description, this.returnDirect);
 		}
 
 	}

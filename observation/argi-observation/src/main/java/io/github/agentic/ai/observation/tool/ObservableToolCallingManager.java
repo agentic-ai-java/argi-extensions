@@ -70,7 +70,7 @@ public class ObservableToolCallingManager implements ToolCallingManager {
 	private static final ToolExecutionExceptionProcessor DEFAULT_TOOL_EXECUTION_EXCEPTION_PROCESSOR
 			= DefaultToolExecutionExceptionProcessor.builder().build();
 
-	private static final ArmsToolCallingObservationConvention DEFAULT_OBSERVATION_CONVENTION = new ArmsToolCallingObservationConvention();
+	private static final ToolCallingObservationConvention DEFAULT_OBSERVATION_CONVENTION = new ToolCallingObservationConvention();
 
 	// @formatter:on
 
@@ -80,20 +80,27 @@ public class ObservableToolCallingManager implements ToolCallingManager {
 
 	private final ToolExecutionExceptionProcessor toolExecutionExceptionProcessor;
 
-	// TODO Mandatory Convention as ARMS implementation until the Spring AI project
-	// officially supports for observation
-	private final ArmsToolCallingObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
+	private final ToolCallingObservationConvention observationConvention;
 
 	public ObservableToolCallingManager(ObservationRegistry observationRegistry,
 			ToolCallbackResolver toolCallbackResolver,
 			ToolExecutionExceptionProcessor toolExecutionExceptionProcessor) {
+		this(observationRegistry, toolCallbackResolver, toolExecutionExceptionProcessor, DEFAULT_OBSERVATION_CONVENTION);
+	}
+
+	public ObservableToolCallingManager(ObservationRegistry observationRegistry,
+			ToolCallbackResolver toolCallbackResolver,
+			ToolExecutionExceptionProcessor toolExecutionExceptionProcessor,
+			ToolCallingObservationConvention observationConvention) {
 		Assert.notNull(observationRegistry, "observationRegistry cannot be null");
 		Assert.notNull(toolCallbackResolver, "toolCallbackResolver cannot be null");
 		Assert.notNull(toolExecutionExceptionProcessor, "toolCallExceptionConverter cannot be null");
+		Assert.notNull(observationConvention, "observationConvention cannot be null");
 
 		this.observationRegistry = observationRegistry;
 		this.toolCallbackResolver = toolCallbackResolver;
 		this.toolExecutionExceptionProcessor = toolExecutionExceptionProcessor;
+		this.observationConvention = observationConvention;
 	}
 
 	@Override
@@ -182,7 +189,7 @@ public class ObservableToolCallingManager implements ToolCallingManager {
 
 			returnDirect = returnDirect && toolCallback.getToolMetadata().returnDirect();
 
-			ArmsToolCallingObservationContext observationContext = ArmsToolCallingObservationContext.builder()
+			ToolCallingObservationContext observationContext = ToolCallingObservationContext.builder()
 				.toolCall(toolCall)
 				.description(toolCallback.getToolDefinition().description())
 				.returnDirect(returnDirect)
@@ -194,7 +201,7 @@ public class ObservableToolCallingManager implements ToolCallingManager {
 					.setParentObservation(contextView.getOrDefault(ObservationThreadLocalAccessor.KEY, null));
 			}
 
-			String toolResult = ArmsToolCallingObservationDocumentation.EXECUTE_TOOL_OPERATION
+			String toolResult = ToolCallingObservationDocumentation.EXECUTE_TOOL_OPERATION
 				.observation(this.observationConvention, DEFAULT_OBSERVATION_CONVENTION, () -> observationContext,
 						this.observationRegistry)
 				.observe(() -> {
@@ -280,6 +287,8 @@ public class ObservableToolCallingManager implements ToolCallingManager {
 
 		private ToolExecutionExceptionProcessor toolExecutionExceptionProcessor = DEFAULT_TOOL_EXECUTION_EXCEPTION_PROCESSOR;
 
+		private ToolCallingObservationConvention observationConvention = DEFAULT_OBSERVATION_CONVENTION;
+
 		private Builder() {
 		}
 
@@ -299,9 +308,15 @@ public class ObservableToolCallingManager implements ToolCallingManager {
 			return this;
 		}
 
+		public ObservableToolCallingManager.Builder observationConvention(
+			ToolCallingObservationConvention observationConvention) {
+			this.observationConvention = observationConvention;
+			return this;
+		}
+
 		public ObservableToolCallingManager build() {
 			return new ObservableToolCallingManager(observationRegistry, toolCallbackResolver,
-					toolExecutionExceptionProcessor);
+					toolExecutionExceptionProcessor, observationConvention);
 		}
 
 	}

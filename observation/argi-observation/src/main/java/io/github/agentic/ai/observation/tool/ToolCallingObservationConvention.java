@@ -15,25 +15,25 @@
  */
 package io.github.agentic.ai.observation.tool;
 
-import io.github.agentic.ai.observation.tool.ArmsToolCallingObservationDocumentation.HighCardinalityKeyNames;
-import io.github.agentic.ai.observation.tool.ArmsToolCallingObservationDocumentation.LowCardinalityKeyNames;
+import io.github.agentic.ai.observation.tool.ToolCallingObservationDocumentation.HighCardinalityKeyNames;
+import io.github.agentic.ai.observation.tool.ToolCallingObservationDocumentation.LowCardinalityKeyNames;
 import io.micrometer.common.KeyValue;
 import io.micrometer.common.KeyValues;
 import io.micrometer.observation.Observation.Context;
 import io.micrometer.observation.ObservationConvention;
 import org.springframework.util.StringUtils;
 
-public class ArmsToolCallingObservationConvention implements ObservationConvention<ArmsToolCallingObservationContext> {
+public class ToolCallingObservationConvention implements ObservationConvention<ToolCallingObservationContext> {
 
 	public static final String DEFAULT_OPERATION_NAME = "execute_tool";
 
 	public static final String SPAN_KIND = "TOOL";
 
-	public static final String FRAMEWORK = "agentic ai";
+	public static final String FRAMEWORK = "argi";
 
 	@Override
 	public boolean supportsContext(Context context) {
-		return context instanceof ArmsToolCallingObservationContext;
+		return context instanceof ToolCallingObservationContext;
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class ArmsToolCallingObservationConvention implements ObservationConventi
 	}
 
 	@Override
-	public String getContextualName(ArmsToolCallingObservationContext context) {
+	public String getContextualName(ToolCallingObservationContext context) {
 		if (StringUtils.hasText(context.getToolCall().name())) {
 			return "%s %s".formatted(DEFAULT_OPERATION_NAME, context.getToolCall().name());
 		}
@@ -50,24 +50,24 @@ public class ArmsToolCallingObservationConvention implements ObservationConventi
 	}
 
 	@Override
-	public KeyValues getLowCardinalityKeyValues(ArmsToolCallingObservationContext context) {
+	public KeyValues getLowCardinalityKeyValues(ToolCallingObservationContext context) {
 		return KeyValues.of(aiOperationType(context), spanKind(context), framework(context));
 	}
 
-	protected KeyValue aiOperationType(ArmsToolCallingObservationContext context) {
+	protected KeyValue aiOperationType(ToolCallingObservationContext context) {
 		return KeyValue.of(LowCardinalityKeyNames.AI_OPERATION_TYPE, DEFAULT_OPERATION_NAME);
 	}
 
-	protected KeyValue spanKind(ArmsToolCallingObservationContext context) {
+	protected KeyValue spanKind(ToolCallingObservationContext context) {
 		return KeyValue.of(LowCardinalityKeyNames.GEN_AI_SPAN_KIND, SPAN_KIND);
 	}
 
-	protected KeyValue framework(ArmsToolCallingObservationContext context) {
+	protected KeyValue framework(ToolCallingObservationContext context) {
 		return KeyValue.of(LowCardinalityKeyNames.GEN_AI_FRAMEWORK, FRAMEWORK);
 	}
 
 	@Override
-	public KeyValues getHighCardinalityKeyValues(ArmsToolCallingObservationContext context) {
+	public KeyValues getHighCardinalityKeyValues(ToolCallingObservationContext context) {
 		var keyValues = KeyValues.empty();
 		// Request
 		keyValues = toolCallId(keyValues, context);
@@ -82,7 +82,7 @@ public class ArmsToolCallingObservationConvention implements ObservationConventi
 
 	// Request
 
-	protected KeyValues toolCallId(KeyValues keyValues, ArmsToolCallingObservationContext context) {
+	protected KeyValues toolCallId(KeyValues keyValues, ToolCallingObservationContext context) {
 		if (context.getToolCall().id() != null) {
 			return keyValues.and(HighCardinalityKeyNames.GEN_AI_TOOL_CALL_ID.asString(),
 					String.valueOf(context.getToolCall().id()));
@@ -90,7 +90,7 @@ public class ArmsToolCallingObservationConvention implements ObservationConventi
 		return keyValues;
 	}
 
-	protected KeyValues toolCallName(KeyValues keyValues, ArmsToolCallingObservationContext context) {
+	protected KeyValues toolCallName(KeyValues keyValues, ToolCallingObservationContext context) {
 		if (context.getToolCall().name() != null) {
 			return keyValues
 				.and(HighCardinalityKeyNames.GEN_AI_TOOL_NAME.asString(), String.valueOf(context.getToolCall().name()))
@@ -99,14 +99,14 @@ public class ArmsToolCallingObservationConvention implements ObservationConventi
 		return keyValues;
 	}
 
-	protected KeyValues toolDescription(KeyValues keyValues, ArmsToolCallingObservationContext context) {
+	protected KeyValues toolDescription(KeyValues keyValues, ToolCallingObservationContext context) {
 		if (StringUtils.hasText(context.getDescription())) {
 			return keyValues.and(HighCardinalityKeyNames.TOOL_DESCRIPTION.asString(), context.getDescription());
 		}
 		return keyValues;
 	}
 
-	protected KeyValues toolParameters(KeyValues keyValues, ArmsToolCallingObservationContext context) {
+	protected KeyValues toolParameters(KeyValues keyValues, ToolCallingObservationContext context) {
 		if (context.getToolCall().arguments() != null) {
 			return keyValues.and(HighCardinalityKeyNames.TOOL_PARAMETERS.asString(), context.getToolCall().arguments())
 				.and(HighCardinalityKeyNames.INPUT_VALUE.asString(), context.getToolCall().arguments());
@@ -114,14 +114,14 @@ public class ArmsToolCallingObservationConvention implements ObservationConventi
 		return keyValues;
 	}
 
-	protected KeyValues returnDirect(KeyValues keyValues, ArmsToolCallingObservationContext context) {
+	protected KeyValues returnDirect(KeyValues keyValues, ToolCallingObservationContext context) {
 		return keyValues.and(HighCardinalityKeyNames.TOOL_RETURN_DIRECT.asString(),
 				String.valueOf(context.isReturnDirect()));
 	}
 
 	// Response
 
-	protected KeyValues outputValue(KeyValues keyValues, ArmsToolCallingObservationContext context) {
+	protected KeyValues outputValue(KeyValues keyValues, ToolCallingObservationContext context) {
 		if (StringUtils.hasText(context.getToolResult())) {
 			return keyValues.and(HighCardinalityKeyNames.OUTPUT_VALUE.asString(), context.getToolResult());
 		}
