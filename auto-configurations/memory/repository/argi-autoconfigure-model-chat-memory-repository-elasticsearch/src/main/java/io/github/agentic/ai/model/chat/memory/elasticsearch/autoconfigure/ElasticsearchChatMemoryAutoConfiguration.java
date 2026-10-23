@@ -22,7 +22,7 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
 import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
 import io.github.agentic.ai.model.chat.memory.autoconfigure.ChatMemoryAutoConfiguration;
-import io.github.agentic.ai.chat.memory.repository.elasticsearch.ElasticsearchChatMemoryRepository;
+import io.github.agentic.ai.memory.elasticsearch.ElasticsearchChatMemoryRepository;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;

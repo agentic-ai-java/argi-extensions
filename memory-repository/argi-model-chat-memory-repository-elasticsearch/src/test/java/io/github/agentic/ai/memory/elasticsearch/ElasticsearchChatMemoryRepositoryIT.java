@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.github.agentic.ai.chat.memory.repository.elasticsearch;
+package io.github.agentic.ai.memory.elasticsearch;
 
 import co.elastic.clients.transport.rest5_client.Rest5ClientTransport;
 import co.elastic.clients.transport.rest5_client.low_level.Rest5Client;
