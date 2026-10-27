@@ -15,9 +15,7 @@
 diff --git a/argi-loop-core/pom.xml b/argi-loop-core/pom.xml
 --- a/argi-loop-core/pom.xml
 +++ b/argi-loop-core/pom.xml
-@@ -36,6 +36,11 @@
-     </scm>
- 
+@@ -38,4 +38,9 @@
      <dependencies>
 +        <!-- SkillScanner uses SnakeYAML directly; keep it on the compile classpath. -->
 +        <dependency>
