@@ -34,6 +34,7 @@ import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuil
 import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.util.Timeout;
+import org.springframework.ai.document.Document;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -51,11 +52,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ScheduledFuture;
 
 /**
+ * Extracts text from each input file. Documents returned by a parser are joined in
+ * order with a single newline ({@code \n}) between their texts, without trimming.
+ * An empty document list produces an empty string. A null list, document or text
+ * is rejected; parser failures are propagated with the input file as context.
+ * Single-file output remains a string; array input produces one string per file.
+ *
  * @author HeYQ
  * @since 2025-05-02 17:03
  */
@@ -314,7 +322,14 @@ public class DocumentExtractorNode implements NodeAction {
 			throw new RuntimeException("Unsupported Extension Type: " + fileExtension);
 		}
 
-		return extractor.parse(fileContent).get(0).getText();
+		List<Document> documents = Objects.requireNonNull(extractor.parse(fileContent),
+				"Document parser returned null documents");
+		StringJoiner text = new StringJoiner("\n");
+		for (Document document : documents) {
+			Objects.requireNonNull(document, "Document parser returned a null document");
+			text.add(Objects.requireNonNull(document.getText(), "Document parser returned null text"));
+		}
+		return text.toString();
 	}
 
 	private String getFileExtension(String filePath) {
