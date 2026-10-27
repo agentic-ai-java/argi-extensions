@@ -36,8 +36,22 @@ Requirements: JDK 17 or later and Maven 3.9.1 or later. Install the local develo
 ```shell
 git clone --depth=1 https://github.com/agentic-ai-java/argi-extensions.git
 cd argi-extensions
+# Bootstrap the unpublished loop core and its test fixtures (also done by CI).
+git clone --no-checkout https://github.com/agentic-ai-java/argi.git target/argi-upstream
+git -C target/argi-upstream checkout --detach 62701a3c7709075aa389c3d5f8af8533a2081448
+git -C target/argi-upstream apply ../../tools/github-actions/setup-loop-core/snakeyaml.patch
+(cd target/argi-upstream && ./mvnw -B -ntp -pl :argi-loop-core -am -DskipTests install)
 mvn -DskipTests install
 ```
+
+The pinned upstream revision provides `argi-loop-core:2.1.0-RC2-SNAPSHOT`,
+which is required by the graph persistence modules and is not yet published,
+along with its runtime dependencies and their test fixtures.
+The build patch declares the direct SnakeYAML dependency missing from that revision.
+Use `-DskipTests` for this bootstrap: test compilation must remain enabled to
+produce the test JAR used by Redis persistence. Update the pin in
+`tools/github-actions/setup-loop-core/action.yml` and this example together
+when changing the loop core dependency.
 
 Import the Extensions BOM and add the starters you need to your project:
 

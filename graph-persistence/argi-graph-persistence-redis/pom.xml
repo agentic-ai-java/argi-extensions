@@ -49,9 +49,10 @@
             <version>${redisson.version}</version>
         </dependency>
 
+        <!-- RunStoreContractTest belongs to the engine-neutral runtime module. -->
         <dependency>
             <groupId>io.github.agentic-ai-java</groupId>
-            <artifactId>argi-loop-core</artifactId>
+            <artifactId>argi-runtime-core</artifactId>
             <version>${argi.loop.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
