@@ -240,6 +240,79 @@ Enable it only when all of the following hold:
 Fencing protects writes to this store only. External side effects (tool calls,
 messages) still need their own idempotency or receipt protocol.
 
+## RedisLeasedProgressStore
+
+`RedisLeasedProgressStore` is a new opt-in adapter implementing the
+engine-neutral `LeasedProgressStore` contract: one session lease
+(claim/renew/release) whose owner/fence guards run state, checkpoint, journal
+and outbox writes together. It removes the split state between an independent
+run lock and an independent checkpoint lock: after a takeover, the previous
+owner loses heartbeat, release and every progress write at once. The existing
+`RedisRunStore`, `RedisLeasedCheckpointSaver` and legacy savers are unchanged,
+and this adapter never reads or migrates their keys.
+
+```java
+import io.github.agentic.ai.graph.persistence.redis.RedisLeasedProgressStore;
+import io.github.agentic.ai.graph.persistence.redis.LeasedProgressStore.ProgressCommit;
+import io.github.agentic.ai.graph.persistence.redis.LeasedProgressStore.CheckpointWrite;
+
+RedisLeasedProgressStore store = RedisLeasedProgressStore.builder()
+    .redisson(redisson)               // required, caller-owned
+    .keyPrefix("argi:progress:v1")    // default; must not contain '{' or '}'
+    .build();                         // verifies single-slot layout at startup
+
+var lease = store.claim(sessionId, runId, ownerId, Duration.ofSeconds(30));
+store.commit(lease, new ProgressCommit("RUNNING", 0,
+    new CheckpointWrite(0, checkpointPayload), journalEntries, outboxEntries));
+```
+
+### Key layout and lease semantics
+
+All keys of one session share one cluster hash tag `T`, the Base64 URL SHA-256
+of the session id:
+
+```text
+<prefix>:{T}:ns                 reservation, retained fence, live owner/expiry
+<prefix>:{T}:run:<h>            run record (revision, state, checkpoint, cp_revision)
+<prefix>:{T}:run:<h>:journal    append-only journal
+<prefix>:{T}:run:<h>:outbox     append-only outbox
+```
+
+`<h>` is the Base64 URL SHA-256 of the run id. Keys never get a TTL; fences and
+progress are retained. Claiming bumps the retained fence, so fencing tokens
+increase monotonically per session. Lease expiry is measured only by Redis
+server `TIME` in the Lua scripts, so callers need no synchronized clocks.
+Two run ids of one session share the single live owner: a second claim is
+rejected with `LeaseBusyException` until the live lease expires or is released,
+after which the new claim fences the old owner out. An expired or superseded
+owner's `renew` throws `LeaseLostException`, `release` returns `false`, and
+`commit` is rejected. Releasing keeps the fence and run progress; a released
+owner cannot commit anymore.
+
+Every mutation is one Lua script routed to the primary and sent without
+client-side retries. A commit re-checks reservation, owner, fence, expiry, the
+run revision and, when a checkpoint is supplied, the checkpoint revision, plus
+journal/outbox entry id uniqueness, before its first write: any failed check
+aborts the whole commit, leaving no half checkpoint or half run progress. There
+is no ownerless write path and no fallback to unguarded writes. Revision and
+append-only conflicts throw `ProgressConflictException`; after a transport error
+or timeout the outcome is unknown and callers should re-read with `snapshot`
+before re-planning. Reads never require a lease.
+
+At startup the builder verifies that the key layout is single-slot and that the
+deployment accepts multi-key scripts over it; a cross-slot or unsupported
+deployment fails fast (`verifySlotsAtStartup(false)` skips this check and is
+intended for tests only).
+
+Asynchronous HA failover is not consensus fencing: a promoted replica that
+missed recent writes can re-issue a fencing token and lose acknowledged
+progress, so no RPO0 is promised. Use a single primary without automatic
+failover, or a synchronously replicated service, when progress durability
+matters. Durable worker polling, expired-run recovery and independent-JVM
+takeover verification are separate milestones (T11/T13) that build on this
+contract; the neutral interface carries only opaque payloads and state strings,
+leaving checkpoint serialization and run state machines to the caller.
+
 ## Boundaries
 
 This module does not change legacy in-memory Redis-like Store classes in Core,
