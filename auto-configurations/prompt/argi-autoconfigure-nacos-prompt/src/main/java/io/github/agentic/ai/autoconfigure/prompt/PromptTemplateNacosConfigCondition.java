@@ -24,9 +24,12 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
+ * Controls only Nacos prompt template auto-configuration. The independent
+ * {@code spring.nacos.config.enabled} setting is owned by the application and must not
+ * be changed while evaluating this condition.
+ *
  * @author yuluo
- * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a> Temporarily fixed the issue
- * of Nacos log error during startup.
+ * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
 
 public class PromptTemplateNacosConfigCondition implements Condition {
@@ -45,11 +48,6 @@ public class PromptTemplateNacosConfigCondition implements Condition {
 		// The default value is false, means that the nacos prompt template is not enabled.
 		Boolean enabled = context.getEnvironment().getProperty(tmplPrefix, Boolean.class, false);
 
-		// Setting NacosAutoConfiguration#enabled=false, avoid spring alibaba nacos related bean auto config.
-		// Causes an error to be reported in the ARGI Nacos startup log
-		if (!enabled) {
-			System.setProperty("spring.nacos.config.enabled", "false");
-		}
 		logger.debug("PromptTemplateNacosConfigCondition matches enabled: {}",enabled);
 		// @formatter:on
 
