@@ -383,3 +383,64 @@ public class ChatController {
     }
 }
 ```
+
+## Redis chat-memory key prefixes
+
+Jedis, Lettuce, and Redisson repositories capture the builder's `keyPrefix` when
+each repository is constructed. Creating another repository, reusing a builder,
+or a failed build does not change an existing repository's prefix. Builders are
+not intended to be shared concurrently; independent builders can be used concurrently.
+
+The default key format remains `argi_chat_memory:<conversationId>`. A null prefix
+selects that default; an explicitly empty prefix remains empty. Repositories with
+the same prefix and Redis database intentionally share the same key namespace.
+A prefix is not an authorization boundary.
+
+### Compatibility and migration
+
+This correction targets the next release from the `2.1.0-RC2-SNAPSHOT` line.
+The public builder methods and the default key format are unchanged. The former
+protected mutable static `CUSTOM_KEY_PREFIX` field is removed. Custom subclasses
+that used it must pass their prefix to `super(keyPrefix)` instead and recompile.
+The public no-argument base constructor still selects the default prefix, and
+the protected `getKeyPrefix()` method remains available.
+
+Previously, the last builder to run changed the prefix used by all repositories
+in that JVM, even if that build failed. Existing records may therefore be under
+another configured prefix or under the default prefix. The fix does not move or
+delete any existing records.
+
+Before upgrading an affected multi-repository application:
+
+1. Inventory the configured Redis databases and prefixes, including the default.
+   Take a backup and pause affected writers before any remediation.
+2. Use incremental `SCAN` against the known namespaces and compare conversation
+   IDs with an authoritative application-side ownership record. Do not log message
+   bodies during the audit or infer ownership solely from the current key prefix.
+3. If ownership can be established, plan an explicit, conflict-aware migration
+   with backups. If ownership is ambiguous, stop for manual review. Do not blindly
+   rename, copy over, or delete keys.
+4. Check that each application instance reads and writes the intended namespace
+   before resuming traffic. The old accidental sharing is no longer reproduced;
+   intentional sharing requires configuring the same prefix explicitly.
+
+Rolling back the library reintroduces the global-prefix behavior and does not undo
+any data migration. Roll back code and configuration only with writers paused and
+an explicit data-recovery plan; retain backups for any separately migrated data.
+
+### Verification
+
+`RedisKeyPrefixIsolationTest` runs without Redis and covers real builder execution
+with mocked client creation. `RedisKeyPrefixIntegrationTest` uses a real Redis
+container when Docker is available, or an explicitly supplied isolated Redis:
+
+```sh
+mvn -pl memory-repository/argi-model-chat-memory-repository-redis -am \
+  -Dtest=RedisKeyPrefixIsolationTest,RedisKeyPrefixIntegrationTest \
+  -Dredis.test.host=127.0.0.1 -Dredis.test.port=16379 test
+```
+
+The integration tests verify actual keys and read/write/list/delete behavior for
+all nine client pairings, default and shared prefixes, and concurrent construction.
+They use unique test keys and never flush a database. These standalone tests do
+not certify TLS, Redis Cluster, or high-availability behavior.

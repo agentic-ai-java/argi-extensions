@@ -49,8 +49,8 @@ public class RedissonRedisChatMemoryRepository extends BaseRedisChatMemoryReposi
 
 	private final RedissonClient redissonClient;
 
-	private RedissonRedisChatMemoryRepository(RedissonClient redissonClient) {
-		super();
+	private RedissonRedisChatMemoryRepository(RedissonClient redissonClient, @Nullable String keyPrefix) {
+		super(keyPrefix);
 		Assert.notNull(redissonClient, "redissonClient cannot be null");
 		this.redissonClient = redissonClient;
 	}
@@ -81,14 +81,13 @@ public class RedissonRedisChatMemoryRepository extends BaseRedisChatMemoryReposi
 		}
 
 		public RedissonRedisChatMemoryRepository build() {
-			CUSTOM_KEY_PREFIX = this.keyPrefix;
 			if (redissonConfig != null) {
 				// when the user does not set redisson serialization, maintain String
 				// serialization consistent with jedis and lettuce
 				if (redissonConfig.getCodec() == null) {
 					redissonConfig.setCodec(new StringCodec());
 				}
-				return new RedissonRedisChatMemoryRepository(Redisson.create(redissonConfig));
+				return new RedissonRedisChatMemoryRepository(Redisson.create(redissonConfig), this.keyPrefix);
 			}
 			Config config = new Config();
 			config.setCodec(new StringCodec());
@@ -137,7 +136,7 @@ public class RedissonRedisChatMemoryRepository extends BaseRedisChatMemoryReposi
 					config.useSingleServer().setPassword(password);
 				}
 			}
-			return new RedissonRedisChatMemoryRepository(Redisson.create(config));
+			return new RedissonRedisChatMemoryRepository(Redisson.create(config), this.keyPrefix);
 
 		}
 
