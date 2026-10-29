@@ -58,7 +58,9 @@ public abstract class BaseRedisChatMemoryRepository implements ChatMemoryReposit
 			return jsonMapper.readValue(messageStr, Message.class);
 		}
 		catch (JacksonException e) {
-			logger.error("Deserialization error for message: {}", messageStr, e);
+			// Parser messages and their cause chains can contain the stored message.
+			logger.error("Deserialization error for Redis message (length={}, errorType={})",
+					messageStr.length(), e.getClass().getSimpleName());
 			return null;
 		}
 	}

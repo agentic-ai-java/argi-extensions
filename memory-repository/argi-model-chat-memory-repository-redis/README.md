@@ -383,3 +383,42 @@ public class ChatController {
     }
 }
 ```
+
+## Deserialization logging and privacy
+
+Redis chat-memory deserialization diagnostics do not include stored message text,
+metadata, tool arguments/results, or unrecognized message-type values. This also
+applies when DEBUG logging is enabled for this module. Failed message parsing
+reports the input length in characters and the exception class; field-conversion
+warnings identify the affected field and exception class. Exception messages,
+causes, and stack traces are intentionally omitted because they may contain source
+content. Successful deserialization does not log the message body.
+
+Use the application's existing request/trace correlation for investigation. This
+module does not create content hashes, raw conversation-ID labels, or other
+high-cardinality identifiers for logging. There is no body-logging opt-in in this
+change. If deeper diagnostics are needed, use a sanitized reproduction in a
+controlled environment rather than enabling raw message or client wire logging.
+
+Applications parsing the former log templates should update their log queries.
+Existing log archives may still contain previously emitted message data and should
+be handled under the application's sensitive-data retention policy. Rolling back
+the change restores the unsafe logging behavior.
+
+This change does not alter serialization, stored records, or handling of damaged
+records. In particular, repositories retain their existing filtering of messages
+that fail to deserialize; changing that policy is a separate issue.
+
+`RedisDeserializationLoggingTest` checks synthetic sensitive markers at INFO and
+DEBUG, including exception arguments/causes and existing fallback behavior.
+`RedisDeserializationLoggingIntegrationTest` checks actual Redis reads with Jedis,
+Lettuce, and Redisson. It uses Docker, or an explicitly supplied isolated Redis:
+
+```sh
+mvn -pl memory-repository/argi-model-chat-memory-repository-redis -am \
+  -Dtest=RedisDeserializationLoggingTest,RedisDeserializationLoggingIntegrationTest \
+  -Dredis.test.port=16380 test
+```
+
+The tests delete only their unique keys, never flush a database, and do not certify
+TLS or Redis Cluster behavior.

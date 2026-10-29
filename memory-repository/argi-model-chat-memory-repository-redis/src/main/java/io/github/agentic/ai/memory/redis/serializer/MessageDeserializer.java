@@ -84,8 +84,6 @@ public class MessageDeserializer extends ValueDeserializer<Message> {
 	public Message deserialize(JsonParser p, DeserializationContext ctxt) {
 		JsonNode node = ctxt.readTree(p);
 
-		logger.debug("Deserializing message: {}", node);
-
 		// If node is plain text, create a UserMessage by default
 		if (node.isString()) {
 			return new UserMessage(node.asString());
@@ -112,7 +110,7 @@ public class MessageDeserializer extends ValueDeserializer<Message> {
 				logger.warn("Message type not found, defaulting to USER");
 			}
 			else {
-				logger.warn("Unknown message type: {}, defaulting to USER", type);
+				logger.warn("Unknown message type, defaulting to USER");
 			}
 			return MESSAGE_FACTORIES.get("USER");
 		}).create(content, metadata, toolCalls, toolResponses);
@@ -150,7 +148,7 @@ public class MessageDeserializer extends ValueDeserializer<Message> {
 				});
 			}
 			catch (IllegalArgumentException e) {
-				logger.warn("Failed to deserialize metadata: {}", e.getMessage());
+				logger.warn("Failed to deserialize metadata (errorType={})", e.getClass().getSimpleName());
 				return Collections.<String, Object>emptyMap();
 			}
 		}).orElseGet(Collections::emptyMap);
@@ -166,7 +164,7 @@ public class MessageDeserializer extends ValueDeserializer<Message> {
 				});
 			}
 			catch (IllegalArgumentException e) {
-				logger.warn("Failed to deserialize toolCalls: {}", e.getMessage());
+				logger.warn("Failed to deserialize toolCalls (errorType={})", e.getClass().getSimpleName());
 				return Collections.<AssistantMessage.ToolCall>emptyList();
 			}
 		}).orElseGet(Collections::emptyList);
@@ -182,7 +180,7 @@ public class MessageDeserializer extends ValueDeserializer<Message> {
 				});
 			}
 			catch (IllegalArgumentException e) {
-				logger.warn("Failed to deserialize toolResponses: {}", e.getMessage());
+				logger.warn("Failed to deserialize toolResponses (errorType={})", e.getClass().getSimpleName());
 				return Collections.<ToolResponseMessage.ToolResponse>emptyList();
 			}
 		}).orElseGet(Collections::emptyList);
