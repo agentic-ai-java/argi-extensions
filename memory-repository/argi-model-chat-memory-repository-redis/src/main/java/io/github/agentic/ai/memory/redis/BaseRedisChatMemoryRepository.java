@@ -38,11 +38,20 @@ public abstract class BaseRedisChatMemoryRepository implements ChatMemoryReposit
 
 	protected static final String DEFAULT_KEY_PREFIX = "argi_chat_memory:";
 
-	protected static @Nullable String CUSTOM_KEY_PREFIX;
+	private final String keyPrefix;
 
 	protected final JsonMapper jsonMapper;
 
 	public BaseRedisChatMemoryRepository() {
+		this(null);
+	}
+
+	/**
+	 * Capture this repository's namespace without changing other repository instances.
+	 * @param keyPrefix the key prefix, or null to use the default
+	 */
+	protected BaseRedisChatMemoryRepository(@Nullable String keyPrefix) {
+		this.keyPrefix = keyPrefix != null ? keyPrefix : DEFAULT_KEY_PREFIX;
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Message.class, new MessageDeserializer());
 		this.jsonMapper = JsonMapper.builder()
@@ -75,6 +84,6 @@ public abstract class BaseRedisChatMemoryRepository implements ChatMemoryReposit
 	}
 
 	protected String getKeyPrefix() {
-		return CUSTOM_KEY_PREFIX != null ? CUSTOM_KEY_PREFIX : DEFAULT_KEY_PREFIX;
+		return this.keyPrefix;
 	}
 }

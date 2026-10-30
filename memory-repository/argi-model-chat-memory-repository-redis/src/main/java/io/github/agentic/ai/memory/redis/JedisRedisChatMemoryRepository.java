@@ -57,8 +57,8 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 
 	private final RedisTemplate<String, String> redisTemplate;
 
-	private JedisRedisChatMemoryRepository(RedisConnectionFactory connectionFactory) {
-		super();
+	private JedisRedisChatMemoryRepository(RedisConnectionFactory connectionFactory, @Nullable String keyPrefix) {
+		super(keyPrefix);
 		Assert.notNull(connectionFactory, "ConnectionFactory cannot be null");
 		this.connectionFactory = connectionFactory;
 		this.redisTemplate = createRedisTemplate(connectionFactory);
@@ -98,7 +98,6 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 		}
 
 		public JedisRedisChatMemoryRepository build() {
-			CUSTOM_KEY_PREFIX = this.keyPrefix;
 			JedisConnectionFactory jedisConnectionFactory;
 			if (useCluster) {
 				RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration(
@@ -126,7 +125,7 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 				jedisConnectionFactory = new JedisConnectionFactory(standaloneConfig, applyConfiguration());
 			}
 			jedisConnectionFactory.afterPropertiesSet();
-			return new JedisRedisChatMemoryRepository(jedisConnectionFactory);
+			return new JedisRedisChatMemoryRepository(jedisConnectionFactory, this.keyPrefix);
 		}
 
 		private JedisPoolConfig getPoolConfigWithDefault() {
