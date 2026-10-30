@@ -57,8 +57,8 @@ public class LettuceRedisChatMemoryRepository extends BaseRedisChatMemoryReposit
 
   private final RedisTemplate<String, String> redisTemplate;
 
-  private LettuceRedisChatMemoryRepository(RedisConnectionFactory connectionFactory) {
-    super();
+  private LettuceRedisChatMemoryRepository(RedisConnectionFactory connectionFactory, @Nullable String keyPrefix) {
+    super(keyPrefix);
     Assert.notNull(connectionFactory, "ConnectionFactory cannot be null");
     this.connectionFactory = connectionFactory;
     this.redisTemplate = createRedisTemplate(connectionFactory);
@@ -99,7 +99,6 @@ public class LettuceRedisChatMemoryRepository extends BaseRedisChatMemoryReposit
     }
 
     public LettuceRedisChatMemoryRepository build() {
-      CUSTOM_KEY_PREFIX = this.keyPrefix;
       LettuceConnectionFactory lettuceConnectionFactory;
       if (useCluster) {
         RedisClusterConfiguration clusterConfig =
@@ -131,7 +130,7 @@ public class LettuceRedisChatMemoryRepository extends BaseRedisChatMemoryReposit
       }
       lettuceConnectionFactory.setShareNativeConnection(false);
       lettuceConnectionFactory.afterPropertiesSet();
-      return new LettuceRedisChatMemoryRepository(lettuceConnectionFactory);
+      return new LettuceRedisChatMemoryRepository(lettuceConnectionFactory, this.keyPrefix);
     }
 
     private LettuceClientConfiguration applyConfiguration() {
