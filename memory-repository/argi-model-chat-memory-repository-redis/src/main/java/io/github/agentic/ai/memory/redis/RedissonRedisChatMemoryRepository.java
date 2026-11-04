@@ -168,9 +168,9 @@ public class RedissonRedisChatMemoryRepository extends BaseRedisChatMemoryReposi
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		Assert.notNull(messages, "messages cannot be null");
 		Assert.noNullElements(messages, "messages cannot contain null elements");
+		List<String> serializedMessages = messages.stream().map(this::serializeMessage).toList();
 		RList<String> redisList = redissonClient.getList(getKeyPrefix() + conversationId);
 		redisList.delete();
-		List<String> serializedMessages = messages.stream().map(this::serializeMessage).toList();
 		redisList.addAll(serializedMessages);
 	}
 
