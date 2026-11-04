@@ -444,3 +444,48 @@ The integration tests verify actual keys and read/write/list/delete behavior for
 all nine client pairings, default and shared prefixes, and concurrent construction.
 They use unique test keys and never flush a database. These standalone tests do
 not certify TLS, Redis Cluster, or high-availability behavior.
+
+## Snapshot replacement with `saveAll`
+
+Jedis, Lettuce, and Redisson validate and serialize the entire replacement before
+sending it to Redis. A nonempty snapshot is built in a unique temporary list and
+published with `RENAME` inside one Lua invocation. Concurrent `saveAll` calls and
+reads therefore see complete snapshots, without a delete/write gap or mixed lists.
+The last publisher wins; an application's separate read-modify-write sequence is
+still not atomic.
+
+Conversation keys, prefixes, message order, and list encoding remain unchanged.
+The temporary key shares the destination's actual Cluster slot, including for
+untagged keys and names containing braces. Redisson keeps a configured value codec
+and destination name mapper. Successful replacement removes any previous TTL;
+an empty snapshot deletes the conversation key. Local validation/serialization
+failures and Redis command rejections before publication preserve the old values
+and expiration, subject to natural expiry.
+
+Redis scripts do not roll back earlier commands on error. This script checks
+cleanup permission before creating its temporary list, catches staging and
+publication command errors, and deletes its temporary list on failure. There is
+no client-side staging period, lease, or timeout retry in the repository. A
+transport error or timeout can leave the publication outcome unknown: a completed
+server-side publication is not promised to roll back.
+
+### Redis ACL compatibility
+
+In addition to the existing connection and read permissions, nonempty saves now
+need `EVAL`/`EVALSHA`, `EXISTS`, `DEL`, `RPUSH`, and `RENAME`, plus access to both the
+conversation namespace and temporary names matching `{argi-*}:snapshot:*`.
+Restricting access to only the conversation prefix is insufficient. Review these
+permissions before upgrading; a denied cleanup or script permission fails the
+save before staging, and a denied publication command retains the old snapshot.
+No conversation data migration is required.
+
+### Snapshot tests
+
+Run `RedisSnapshotIntegrationTest` against an isolated standalone Redis with
+`-Dredis.test.host=<host> -Dredis.test.port=<port>`, or against a real Cluster with
+`-Dredis.test.cluster=<host1:port1>,<host2:port2>,<host3:port3>`. Without an explicit
+endpoint it uses Testcontainers and skips when Docker is unavailable. The same
+contract covers all three clients, concurrent readers/writers, legacy records,
+TTL/empty snapshots, local failures, denied commands, staging collisions, and
+Redisson's configured codec/name mapping. The endpoint must be test-owned: these
+tests create and remove temporary ACL users on every supplied node.

@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.redisson.Redisson;
 import org.redisson.api.RList;
+import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
 import org.springframework.ai.chat.messages.Message;
@@ -36,6 +37,8 @@ import org.springframework.ai.chat.messages.UserMessage;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -70,6 +73,18 @@ class RedissonSaveAllFailureTest {
 			return existed;
 		});
 		doAnswer(invocation -> stored.addAll(invocation.getArgument(0))).when(redisList).addAll(any());
+		RScript script = mock(RScript.class);
+		when(client.getScript()).thenReturn(script);
+		when(client.getConfig()).thenReturn(new Config());
+		when(script.eval(eq(RScript.Mode.READ_WRITE), eq(RedisSnapshot.SCRIPT), eq(RScript.ReturnType.INTEGER),
+				anyList(), any(Object[].class)))
+			.thenAnswer(invocation -> {
+				stored.clear();
+				for (Object value : (Object[]) invocation.getRawArguments()[4]) {
+					stored.add((String) value);
+				}
+				return 1L;
+			});
 		stored.add(repository.serializeMessage(new UserMessage("old history")));
 	}
 
@@ -93,6 +108,7 @@ class RedissonSaveAllFailureTest {
 
 		assertThat(repository.findByConversationId("conversation")).extracting(Message::getText)
 			.containsExactly("old history");
+		verify(client, never()).getScript();
 		verify(redisList, never()).delete();
 		verify(redisList, never()).addAll(any());
 	}
