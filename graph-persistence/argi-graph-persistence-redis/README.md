@@ -313,6 +313,243 @@ takeover verification are separate milestones (T11/T13) that build on this
 contract; the neutral interface carries only opaque payloads and state strings,
 leaving checkpoint serialization and run state machines to the caller.
 
+## Opt-in single-primary advisory index repair (Refs #8)
+
+`RedisProgressIndexRepairer` is a small discovery/repair component, constructed
+explicitly with a single-server Redisson client, the existing progress prefix,
+an application state adapter, and a `RedisProgressAdvisoryIndex`. It does not
+change the store API, keys, record format, lease scripts or default behavior.
+It is independent of Core/Starter wiring and supplies no polling Worker.
+
+```java
+var index = new RedisProgressAdvisoryIndex(redisson, "my-app:progress-hints:v1");
+var repairer = new RedisProgressIndexRepairer(redisson,
+        RedisLeasedProgressStore.DEFAULT_KEY_PREFIX,
+        metadata -> "APP_READY".equals(metadata.state())
+                ? Optional.of(new RedisProgressAdvisoryIndex.Hint(metadata, 0))
+                : Optional.empty(),
+        index);
+var cursor = repairer.start();
+// Run one batch when the application's scheduler/capacity budget allows it.
+var batch = repairer.repair(cursor, 25, 100);
+cursor = batch.cursor(); // retain this entire continuation, including pending keys
+var candidates = index.due(25);
+```
+
+`APP_READY` is an example application policy, not a built-in runnable state.
+The adapter must explicitly interpret the application's opaque state and return
+an absolute due time in milliseconds (zero means immediately due), or empty.
+It must preserve the projected metadata and produce a deterministic decision/time
+for a given revision. There is no generic event adapter: outbox payloads remain
+opaque and are not read. Applications requiring event-only eligibility need a
+separate bounded, versioned event projection; they must not infer runnable from
+arbitrary state strings or the mere existence of an outbox. Due queries compare
+scores with Redis `TIME`; retries, execution and heartbeat are not supplied.
+
+Discovery scans the authoritative progress keyspace, derives each session hash
+key from the run key, and atomically projects the stored session/run IDs, schema
+versions, revision and state. It verifies that the recovered IDs hash back to
+the discovered key. It never relies on a prior global index and never reads
+checkpoint/journal/outbox payloads or calls `snapshot`. Before `HGET`, `HSTRLEN`
+checks enforce 1024 UTF-8 bytes per ID, 4096 bytes for state, one byte per schema
+version and 19 bytes for revision. Oversized, wrong-type or corrupt metadata
+stops the call with an error, leaving authority unchanged; applications need an
+alert/reconciliation policy for such records. These are limits of this opt-in
+reader, not new restrictions on the existing store. The projection also rejects
+state fields at revision zero and missing/empty state at a committed revision,
+matching the existing run-record format without interpreting application state.
+It validates only the projected fields, not checkpoint/journal/outbox integrity.
+No records are silently truncated or declared repaired.
+
+Each call processes at most `maxKeys` returned keys (1–1000), performs at most
+one `SCAN`, and reads at most one small metadata projection per matching run.
+`scanCount` (1–10000) is only Redis's work hint. **SCAN reply bytes, server CPU
+and pending-page memory have no hard bound**: even COUNT=1 may return a large
+page. The continuation retains that whole page with an offset; no same-page
+keys are dropped and no new SCAN is issued until it is drained. Restart from
+`start()` after a failed/unknown call; idempotent hints tolerate replay. Cursors
+are in-memory and must not be moved to another database/keyspace. A completed
+sweep covers retained keys in a quiescent keyspace; concurrent changes require
+repeated sweeps. A hard discovery budget needs a future authoritative bounded
+directory/protocol or server support and is not solved by this component.
+
+The reference sink is a separate durable ZSET, with a bounded encoded
+`(sessionId, runId, revision)` member and absolute due-time score. `ZADD NX` makes
+repeated/concurrent publication idempotent. Different revisions coexist, so a late
+old publication cannot overwrite a newer revision. The two-argument constructor
+preserves unbounded cardinality; the capacity overload and `poll`/`ack`/`retry`
+protocol below provide bounded admission and visibility delivery. `due(limit)`
+remains a diagnostic query and repeatedly returns unacknowledged candidates.
+Only this schema may write the dedicated index and its auxiliary keys.
+
+A candidate is always advisory. The reference consumer below claims a session
+lease and atomically revalidates authoritative metadata, reservation, owner/fence
+and Redis TIME before invoking the application's executor. Neither discovery nor
+the reference consumer is wired into Core/Starter or a production polling Worker.
+No exactly-once or HA RPO0 guarantee is made. Only single-server Redisson client
+configurations are accepted for discovery; the caller must supply a single
+primary without automatic failover. The component cannot detect server topology
+or failover policy. Cluster discovery and independent-JVM takeover are unverified.
+
+`RedisProgressIndexRepairerTest` uses real `valkey/valkey:8.1.2` with AOF and
+`appendfsync always`. The failure-window fixture commits run/outbox, deliberately
+never calls a publisher, shuts down the producing connection, and creates a new
+repairer/connection. It is a skipped-publisher/connection-boundary simulation,
+not an OS process kill, Redis crash/restart or two-JVM takeover test. The suite
+also covers concurrent/repeated repair, oversized SCAN-page continuation,
+explicit unknown/terminal-state policy, stale revisions, projection limits,
+large historical payload isolation, server-time due queries, and Redis
+wrong-type publication errors that preserve authoritative data. Testcontainers
+skips without Docker must be reported as skips, not backend success.
+
+## Opt-in bounded membership directory and reference consumption (Refs #8)
+
+The SCAN repairer above remains available with its original soft bounds. For a
+**new or explicitly migrated prefix**, all producers can instead opt into a
+retained membership directory:
+
+```java
+var store = RedisLeasedProgressStore.builder()
+        .redisson(redisson)
+        .keyPrefix("my-app:progress:v2")
+        .directoryCapacity(1000)
+        .build();
+var directory = new RedisProgressDirectory(redisson, "my-app:progress:v2", 1000);
+var hints = new RedisProgressAdvisoryIndex(redisson, "my-app:hints:v2", 1000);
+var projection = new RedisProgressIndexRepairer(redisson, "my-app:progress:v2",
+        m -> Optional.empty(), hints);
+var batch = directory.repair("", 25, projection,
+        m -> "APP_READY".equals(m.state())
+                ? Optional.of(new RedisProgressAdvisoryIndex.Hint(m, 0))
+                : Optional.empty(), hints);
+// Persist/report batch.issues(), then continue from batch.page().after().
+// Once page.done() is true, a later sweep starts again from "".
+```
+
+The directory is **authoritative for retained membership**, not for runnable
+state, progress or lease ownership. It adds two dedicated keys, outside the
+existing session hash tags: `<prefix>:directory:v1:config` (capacity) and
+`<prefix>:directory:v1:members` (ZSET, all scores zero). `claim` validates directory
+type/configuration/capacity before any authority write, runs the original claim
+script, then registers membership in that **same Lua invocation** on success.
+A process/connection loss after a successful claim cannot leave an accepted new
+run unregistered. Commit updates the already registered run; there is no second
+post-commit registration call. A full directory rejects a new identity before
+creating session/run authority. Existing registered identities can still reclaim
+leases. Busy/corrupt claims create no member. Redis errors/timeouts propagate;
+timeout outcomes remain unknown and need re-reading.
+
+Capacity is immutable per prefix, 1..10000 retained session/run identities,
+including terminal and revision-zero records. No directory GC/deletion is
+provided: it never drops authority to admit more work. Exhaustion stops new
+admission until the application explicitly provisions a new prefix or a future
+retention protocol is selected. IDs are nonblank and at most 1024 UTF-8 bytes;
+new commits through directory mode also require state <=4096 UTF-8 bytes. Default
+store builders retain their old acceptance and behavior. Existing progress keys,
+opaque state semantics, Redis TIME leases and exact int64 fences are unchanged.
+The cross-session directory script requires a single primary and is deliberately
+incompatible with Cluster/Sentinel/replicated client configurations.
+
+`page(after, limit)` uses exclusive lexicographic `ZRANGEBYLEX ... LIMIT 0 limit`,
+with limit 1..1000. It returns at most that many members and a single bounded
+cursor, with no overflow buffer. Immutable retained membership makes concurrent
+sweeps safe; inserts behind an active cursor are visited on the next sweep. A
+quiescent sweep covers all registered identities. There is no global snapshot
+of concurrent submissions.
+
+Resource claims are specific to directory discovery and hint operations:
+
+- Directory members contain two Base64 URL IDs, at most 2733 ASCII bytes. A RESP2
+  page response is at most `16 + 2742 * limit` bytes, excluding transport framing.
+  Retained member payload is at most `capacity * 2733` bytes. This is a payload
+  bound, not a bound on Redis allocator/index/client-object overhead.
+- Directory lookup/insert is a fixed number of commands over at most capacity
+  members. Sorted-set range work is conventionally O(log capacity + limit);
+  compact encodings may scan up to capacity entries. It never scans the unrelated
+  database. A repair call performs one page query, at most limit projections and
+  at most limit publications. Application adapters must themselves be bounded.
+- Each projection reads only the six length-checked fields described above;
+  its RESP2 metadata reply is below 6250 bytes. The leased variant additionally
+  length-checks owner/fence/expiry/reservation and validates them atomically with
+  metadata. Checkpoint, journal and outbox payloads are not projected.
+- Hint members are at most 2753 ASCII bytes. A due reply is at most
+  `16 + 2762 * limit` RESP2 bytes. A poll reply interleaves members and exact int64
+  delivery tokens, at most `16 + 2788 * limit` RESP2 bytes. At most capacity hint
+  members and their delivery-token fields are retained when the capacity overload
+  is used, plus fixed configuration and a retained sequence counter.
+
+These bounds require dedicated schema-owned keys, no eviction/TTL/deletion of
+protocol keys and no bypass writers. They do **not** certify host CPU milliseconds,
+RSS, Redis OOM/script failures or overall store claim/commit/snapshot cost. Existing
+store scripts still read checkpoint/progress history; that cost is not made
+bounded by enabling the directory. Lua isolates other clients but does not roll
+back an unexpected runtime/OOM error after a write. Provision memory and preserve
+the original single-primary durability assumptions; no performance or HA
+certification is claimed.
+
+For migration, quiesce legacy producers, obtain and retain an operator-controlled
+inventory of known `(sessionId, runId)` pairs, then call
+`directory.registerExisting(sessionId, runId)` for each pair before enabling
+polling. It validates the bounded stored identity and registers it atomically;
+it is duplicate-safe and capacity checked. Audit the inventory against the source
+of submissions, resolve any rejected identity, and require **every** future
+producer to use directory mode. This cannot prove completeness for an unknown
+legacy keyspace. Obtaining an inventory via SCAN is a separate, potentially
+unbounded offline migration; no automatic full-keyspace bounded compatibility is
+claimed. Oversized IDs require a migration decision rather than silent truncation.
+
+For registered records, bad/oversized/wrong-type metadata and missing authority
+become bounded `RepairBatch.issues()` entries while the page cursor advances.
+Persist or alert on these issues before persisting the new cursor; no record is
+removed or declared repaired. Retry on later sweeps after operator correction.
+A transport/publication exception aborts the call; retry the **input** cursor,
+since partial successful publications are idempotent. A full hint sink likewise
+requires consumption before retrying repair. Dedicated directory/index key
+corruption by unsupported writers is a protocol failure, not silently skipped.
+
+`poll(limit, visibilityMillis)` atomically moves delivered hints to Redis
+`TIME + visibilityMillis` and returns `(candidate, deliveryToken)`. Polling
+workers do not each get the same first page. `ack(delivery)` removes exactly that
+revision/delivery and its token; an old acknowledgement cannot delete a newer
+revision or a redelivery. `retry(delivery, backoffMillis)` compares the same token,
+postpones against Redis TIME and invalidates that token; repeated calls are no-ops.
+Delays must be 1..86400000 ms. A lost response/crashed consumer redelivers after
+visibility. Scores now encode visibility/retry, while initial publication remains
+NX. Delivery sequence overflow fails before mutations. Terminal/stale hints are
+pruned by ack; busy/error hints are deferred so existing due work can progress.
+This is bounded-page progress for finite retained work, not a scheduler QoS
+promise under unlimited competing publication. Repair may republish a pruned
+old revision; authority validation makes it harmless.
+
+`RedisProgressReferenceConsumer` takes an explicit application runnable predicate
+and an executor. Missing authority is not created from hints. For a present run
+it claims the session, **then** atomically validates metadata/reservation/live
+owner/fence/Redis TIME, rejects stale revisions and unknown/ineligible states,
+and validates again immediately before dispatch. `Execution.guard()` renews the
+lease and repeats that bounded metadata/lease validation; an executor should use
+it before each effect. A successful executor returns a revision-matching
+`ProgressCommit`; the store fences the commit, then the consumer acknowledges the
+hint. The owner UUID must be unique per attempt. Exceptions schedule retry and
+release the lease; an unknown commit result is reconciled by authority on
+redelivery. Busy/lease-lost/metadata-error results defer the hint. Metadata errors
+are returned for operator attention, not converted into runnable states.
+
+An external effect is outside the Lua transaction. A lease can expire after the
+last guard, or an effect can succeed before a crash/timeout prevents its commit.
+External fencing/idempotency/receipts and unsafe-recovery reconciliation remain
+application responsibilities. The fake-executor test deliberately observes the
+same effect twice across that boundary; this is not exactly-once execution or
+timeout rollback. No automatic heartbeat thread, Core/Starter integration,
+production Worker, event-only eligibility or independent-JVM takeover is supplied.
+
+`RedisProgressDirectoryTest` exercises real Valkey, concurrent capacity admission
+and cursors, exact UTF-8/RESP page boundaries, explicit backfill, corrupt/large
+records with unrelated progress, revision/delivery races, Redis-time visibility,
+capacity exhaustion, competing consumers, expired/superseded leases and fake
+execution failure windows. These tests run in one JVM. Graceful producer-client
+shutdown and direct corruption/expiry fixtures do not imply OS kill, backend
+restart, network-partition or independent-process takeover coverage.
+
 ## Boundaries
 
 This module does not change legacy in-memory Redis-like Store classes in Core,
