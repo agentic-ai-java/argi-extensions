@@ -18,7 +18,6 @@ package io.github.agentic.ai.memory.mem0.core;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.converter.AbstractFilterExpressionConverter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
  * Mem0 Filter Converter
  *
  * Converts Spring AI's Filter.Expression into a Map format supported by the Mem0 API.
- * Reference: https://docs.mem0.ai/api-reference/memory/v2-search-memories
+ * Reference: https://docs.mem0.ai/open-source/features/metadata-filtering
  */
 public class Mem0FilterExpressionConverter extends AbstractFilterExpressionConverter {
 
@@ -110,51 +109,46 @@ public class Mem0FilterExpressionConverter extends AbstractFilterExpressionConve
 
 	@Override
 	public String convertExpression(Filter.Expression expression) {
+		return mapToJson(convertToMap(expression));
+	}
+
+	private Map<String, Object> convertToMap(Filter.Expression expression) {
 		switch (expression.type()) {
-		case AND:
-		case OR:
-		case NOT:
-			return convertLogicalOperator(expression);
-		case EQ:
-		case NE:
-		case GT:
-		case GTE:
-		case LT:
-		case LTE:
-		case IN:
-		case NIN:
-			return convertComparisonOperator(expression);
-		default:
-			throw new IllegalArgumentException("Unsupported operator: " + expression.type());
+			case AND:
+			case OR:
+			case NOT:
+				return convertLogicalOperator(expression);
+			case EQ:
+			case NE:
+			case GT:
+			case GTE:
+			case LT:
+			case LTE:
+			case IN:
+			case NIN:
+				return convertComparisonOperator(expression);
+			default:
+				throw new IllegalArgumentException("Unsupported operator: " + expression.type());
 		}
 	}
 
-	private String convertLogicalOperator(Filter.Expression expression) {
-		Map<String, Object> result = new HashMap<>();
-		switch (expression.type()) {
-		case AND:
-		case OR: {
-			List<Object> expressionsList = new ArrayList<>();
-			if (expression.left() instanceof Filter.Expression) {
-				expressionsList.add(convertExpression((Filter.Expression) expression.left()));
-			}
-			if (expression.right() instanceof Filter.Expression) {
-				expressionsList.add(convertExpression((Filter.Expression) expression.right()));
-			}
-			result.put(expression.type().name(), expressionsList);
-			break;
+	private Map<String, Object> convertLogicalOperator(Filter.Expression expression) {
+		if (!(expression.left() instanceof Filter.Expression left)) {
+			throw new IllegalArgumentException("Invalid expression structure for logical operator");
 		}
-		case NOT: {
-			if (expression.left() instanceof Filter.Expression) {
-				result.put("NOT", convertExpression((Filter.Expression) expression.left()));
+		if (expression.type() == Filter.ExpressionType.NOT) {
+			if (expression.right() != null) {
+				throw new IllegalArgumentException("NOT requires exactly one expression operand");
 			}
-			break;
+			return Map.of("NOT", List.of(convertToMap(left)));
 		}
+		if (!(expression.right() instanceof Filter.Expression right)) {
+			throw new IllegalArgumentException("Invalid expression structure for logical operator");
 		}
-		return mapToJson(result);
+		return Map.of(expression.type().name(), List.of(convertToMap(left), convertToMap(right)));
 	}
 
-	private String convertComparisonOperator(Filter.Expression expression) {
+	private Map<String, Object> convertComparisonOperator(Filter.Expression expression) {
 		Map<String, Object> result = new HashMap<>();
 		String fieldName = null;
 		Object value = null;
@@ -168,34 +162,34 @@ public class Mem0FilterExpressionConverter extends AbstractFilterExpressionConve
 			throw new IllegalArgumentException("Invalid expression structure for comparison operator");
 		}
 		switch (expression.type()) {
-		case EQ:
-			result.put(fieldName, value);
-			break;
-		case NE:
-			result.put(fieldName, Map.of("ne", value));
-			break;
-		case GT:
-			result.put(fieldName, Map.of("gt", value));
-			break;
-		case GTE:
-			result.put(fieldName, Map.of("gte", value));
-			break;
-		case LT:
-			result.put(fieldName, Map.of("lt", value));
-			break;
-		case LTE:
-			result.put(fieldName, Map.of("lte", value));
-			break;
-		case IN:
-			result.put(fieldName, Map.of("in", value));
-			break;
-		case NIN:
-			result.put(fieldName, Map.of("nin", value));
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported comparison operator: " + expression.type());
+			case EQ:
+				result.put(fieldName, value);
+				break;
+			case NE:
+				result.put(fieldName, Map.of("ne", value));
+				break;
+			case GT:
+				result.put(fieldName, Map.of("gt", value));
+				break;
+			case GTE:
+				result.put(fieldName, Map.of("gte", value));
+				break;
+			case LT:
+				result.put(fieldName, Map.of("lt", value));
+				break;
+			case LTE:
+				result.put(fieldName, Map.of("lte", value));
+				break;
+			case IN:
+				result.put(fieldName, Map.of("in", value));
+				break;
+			case NIN:
+				result.put(fieldName, Map.of("nin", value));
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported comparison operator: " + expression.type());
 		}
-		return mapToJson(result);
+		return result;
 	}
 
 	private String mapToJson(Map<String, Object> map) {
@@ -217,13 +211,14 @@ public class Mem0FilterExpressionConverter extends AbstractFilterExpressionConve
 		// Optional: Implement key-to-string conversion
 	}
 
-    @Override
-    protected void doSingleValue(Object value, StringBuilder context) {
-        if (value instanceof String) {
-            context.append(String.format("\"%s\"", value));
-        } else {
-            context.append(value);
-        }
-    }
+	@Override
+	protected void doSingleValue(Object value, StringBuilder context) {
+		if (value instanceof String) {
+			context.append(String.format("\"%s\"", value));
+		}
+		else {
+			context.append(value);
+		}
+	}
 
 }
