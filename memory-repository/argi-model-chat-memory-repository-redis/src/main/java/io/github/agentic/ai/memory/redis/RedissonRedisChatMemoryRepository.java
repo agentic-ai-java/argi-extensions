@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import org.redisson.Redisson;
 import org.redisson.api.RKeys;
 import org.redisson.api.RList;
+import org.redisson.api.RScript;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.options.KeysScanOptions;
 import org.redisson.client.codec.StringCodec;
@@ -32,6 +33,7 @@ import org.springframework.boot.ssl.SslManagerBundle;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -168,10 +170,22 @@ public class RedissonRedisChatMemoryRepository extends BaseRedisChatMemoryReposi
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		Assert.notNull(messages, "messages cannot be null");
 		Assert.noNullElements(messages, "messages cannot contain null elements");
-		RList<String> redisList = redissonClient.getList(getKeyPrefix() + conversationId);
-		redisList.delete();
 		List<String> serializedMessages = messages.stream().map(this::serializeMessage).toList();
-		redisList.addAll(serializedMessages);
+		String key = getKeyPrefix() + conversationId;
+		if (serializedMessages.isEmpty()) {
+			redissonClient.getList(key).delete();
+			return;
+		}
+		String slotKey = key;
+		Config config = redissonClient.getConfig();
+		if (config.isClusterConfig()) {
+			slotKey = config.useClusterServers().getNameMapper().map(key);
+		}
+		// RScript maps String keys. Pass the already slot-matched temporary name as
+		// bytes so a custom NameMapper cannot change its hash tag a second time.
+		byte[] stagingKey = RedisSnapshot.stagingKey(slotKey).getBytes(StandardCharsets.UTF_8);
+		redissonClient.getScript().eval(RScript.Mode.READ_WRITE, RedisSnapshot.SCRIPT,
+				RScript.ReturnType.INTEGER, List.of(key, stagingKey), serializedMessages.toArray());
 	}
 
 	@Override

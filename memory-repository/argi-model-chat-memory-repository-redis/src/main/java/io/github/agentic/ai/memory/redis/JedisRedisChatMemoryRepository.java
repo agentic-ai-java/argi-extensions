@@ -183,18 +183,7 @@ public class JedisRedisChatMemoryRepository extends BaseRedisChatMemoryRepositor
 		Assert.noNullElements(messages, "messages cannot contain null elements");
 		String key = getKeyPrefix() + conversationId;
 		List<String> messageJsons = messages.stream().map(this::serializeMessage).toList();
-		RedisConnectionFactory redisConnectionFactory = Objects.requireNonNull(redisTemplate.getConnectionFactory(),
-				"RedisConnectionFactory cannot be null");
-		try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-			connection.keyCommands().del(key.getBytes());
-			if (!messageJsons.isEmpty()) {
-				byte[][] values = new byte[messageJsons.size()][];
-				for (int i = 0; i < messageJsons.size(); i++) {
-					values[i] = messageJsons.get(i).getBytes();
-				}
-				connection.listCommands().rPush(key.getBytes(), values);
-			}
-		}
+		RedisSnapshot.save(redisTemplate, key, messageJsons);
 	}
 
 	@Override
