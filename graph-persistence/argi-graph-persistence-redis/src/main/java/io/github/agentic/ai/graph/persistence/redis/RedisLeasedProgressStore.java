@@ -39,26 +39,26 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Redis/Valkey implementation of {@link LeasedProgressStore}: one session lease
- * (claim/renew/release) whose owner/fence guards run state, checkpoint, journal
- * and outbox writes, so an independent run lock and checkpoint lock cannot drift
- * apart. This is a new opt-in keyspace; {@link RedisRunStore},
- * {@link RedisLeasedCheckpointSaver} and the older savers are untouched.
+ * (claim/renew/release) whose owner/fence guards run state, checkpoint, journal and
+ * outbox writes, so an independent run lock and checkpoint lock cannot drift apart. This
+ * is a new opt-in keyspace; {@link RedisRunStore}, {@link RedisLeasedCheckpointSaver} and
+ * the older savers are untouched.
  * <p>
- * Each session owns one hash (reservation, retained fence, live owner/expiry)
- * plus three hashes per run (run record, journal, outbox), all sharing one cluster
- * hash tag. Every mutation is a single primary-routed Lua script that re-checks
- * reservation, owner, fence, Redis server {@code TIME} and run/checkpoint revision
- * before its first write, so a rejected commit leaves no partial checkpoint or run
- * progress. Scripts are sent without client-side retries, so a script runs at most
- * once per call; after a transport error or timeout the outcome is unknown and the
- * caller should re-read with {@link #snapshot(String, String)} before re-planning.
+ * Each session owns one hash (reservation, retained fence, live owner/expiry) plus three
+ * hashes per run (run record, journal, outbox), all sharing one cluster hash tag. Every
+ * mutation is a single primary-routed Lua script that re-checks reservation, owner,
+ * fence, Redis server {@code TIME} and run/checkpoint revision before its first write, so
+ * a rejected commit leaves no partial checkpoint or run progress. Scripts are sent
+ * without client-side retries, so a script runs at most once per call; after a transport
+ * error or timeout the outcome is unknown and the caller should re-read with
+ * {@link #snapshot(String, String)} before re-planning.
  * <p>
  * Lease expiry is measured only by the Redis server clock, so callers need no
- * synchronized clocks. Keys never expire; fences, progress and checkpoints are
- * retained. Asynchronous HA failover is not consensus fencing: a promoted replica
- * that missed recent writes can re-issue a fencing token and lose acknowledged
- * progress, and no RPO0 is promised. Same-slot layout and deployment support are
- * verified at startup; a cross-slot or unsupported deployment fails fast.
+ * synchronized clocks. Keys never expire; fences, progress and checkpoints are retained.
+ * Asynchronous HA failover is not consensus fencing: a promoted replica that missed
+ * recent writes can re-issue a fencing token and lose acknowledged progress, and no RPO0
+ * is promised. Same-slot layout and deployment support are verified at startup; a
+ * cross-slot or unsupported deployment fails fast.
  */
 public final class RedisLeasedProgressStore implements LeasedProgressStore {
 
@@ -70,9 +70,13 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 
 	private final RedissonClient redisson;
 
+	private final String keyPrefix;
+
 	private final RedisProgressKeys keys;
 
 	private final RScript script;
+
+	private final RedisProgressDirectory directory;
 
 	private RedisLeasedProgressStore(Builder builder) {
 		this.redisson = requireNonNull(builder.redisson, "redisson cannot be null");
@@ -81,16 +85,29 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 			throw new IllegalArgumentException("keyPrefix must not be blank");
 		}
 		if (builder.keyPrefix.indexOf('{') >= 0 || builder.keyPrefix.indexOf('}') >= 0) {
-			// The store owns the cluster hash tag; a brace in the prefix would change the slot.
+			// The store owns the cluster hash tag; a brace in the prefix would change the
+			// slot.
 			throw new IllegalArgumentException("keyPrefix must not contain '{' or '}'");
 		}
+		this.keyPrefix = builder.keyPrefix;
 		this.keys = new RedisProgressKeys(builder.keyPrefix);
-		// Redisson resends a command whose reply is late; a resent script would run twice and
+		// Redisson resends a command whose reply is late; a resent script would run twice
+		// and
 		// could double-claim or double-commit, so retries are disabled.
 		this.script = redisson.getScript(OptionalOptions.defaults().codec(StringCodec.INSTANCE).retryAttempts(0));
+		this.directory = builder.directoryCapacity == 0 ? null
+				: new RedisProgressDirectory(redisson, builder.keyPrefix, builder.directoryCapacity);
 		if (builder.verifySlotsAtStartup) {
 			verifyDeployment();
 		}
+	}
+
+	String keyPrefix() {
+		return keyPrefix;
+	}
+
+	RedissonClient client() {
+		return redisson;
 	}
 
 	public static Builder builder() {
@@ -104,8 +121,9 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 		requireNonNull(ownerId, "ownerId cannot be null");
 		long ttlMillis = ttlMillis(ttl);
 		List<Object> sessionKeys = keys.keys(sessionId, runId);
-		List<Object> result = eval(RedisProgressScripts.CLAIM, sessionKeys.subList(0, 2), sessionId, runId,
-				ownerId.toString(), Long.toString(ttlMillis));
+		List<Object> result = directory == null ? eval(RedisProgressScripts.CLAIM, sessionKeys.subList(0, 2), sessionId,
+				runId, ownerId.toString(), Long.toString(ttlMillis))
+				: directory.claim(sessionId, runId, ownerId.toString(), ttlMillis);
 		switch (status(result)) {
 			case RedisProgressScripts.OK:
 				return new SessionLease(sessionId, runId, ownerId, parseLong(result, 1), parseLong(result, 2));
@@ -171,6 +189,9 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 	public ProgressSnapshot commit(SessionLease lease, ProgressCommit commit) throws LeaseLostException {
 		requireNonNull(lease, "lease cannot be null");
 		requireNonNull(commit, "commit cannot be null");
+		if (directory != null && commit.state().getBytes(StandardCharsets.UTF_8).length > 4096) {
+			throw new IllegalArgumentException("Directory mode state must be <=4096 UTF-8 bytes");
+		}
 		requireNoDuplicateIds(commit.journal(), "journal");
 		requireNoDuplicateIds(commit.outbox(), "outbox");
 		long nextRevision = Math.addExact(commit.expectedRunRevision(), 1);
@@ -202,7 +223,8 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 				args.toArray());
 		switch (status(result)) {
 			case RedisProgressScripts.OK:
-				// Only the live owner can write, so the follow-up read observes exactly this commit.
+				// Only the live owner can write, so the follow-up read observes exactly
+				// this commit.
 				return snapshot(lease.sessionId(), lease.runId())
 					.orElseThrow(() -> new IllegalStateException("Committed run progress is missing"));
 			case RedisProgressScripts.C_NOT_RESERVED:
@@ -213,8 +235,8 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 				throw new ProgressConflictException("Run revision does not match: expected "
 						+ commit.expectedRunRevision() + " but was " + string(result, 1));
 			case RedisProgressScripts.C_CP_REVISION:
-				throw new ProgressConflictException("Checkpoint revision does not match: stored revision is "
-						+ string(result, 1));
+				throw new ProgressConflictException(
+						"Checkpoint revision does not match: stored revision is " + string(result, 1));
 			case RedisProgressScripts.C_ENTRY:
 				throw new ProgressConflictException("Append-only entry id already exists: " + string(result, 1));
 			default:
@@ -223,9 +245,9 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 	}
 
 	/**
-	 * Verifies the session key layout is single-slot and that the deployment
-	 * accepts a multi-key script over it. A cross-slot layout, a cluster that
-	 * splits the keys, or a proxy that cannot route the script fails at startup.
+	 * Verifies the session key layout is single-slot and that the deployment accepts a
+	 * multi-key script over it. A cross-slot layout, a cluster that splits the keys, or a
+	 * proxy that cannot route the script fails at startup.
 	 */
 	private void verifyDeployment() {
 		List<Object> probeKeys = keys.keys("argi:slot-probe:session", "argi:slot-probe:run");
@@ -257,7 +279,10 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 		return CRC16.crc16(hashTag(key).getBytes(StandardCharsets.UTF_8)) % 16384;
 	}
 
-	/** Redis cluster hash-tag rule: the first non-empty {...} section, otherwise the whole key. */
+	/**
+	 * Redis cluster hash-tag rule: the first non-empty {...} section, otherwise the whole
+	 * key.
+	 */
 	private static String hashTag(String key) {
 		int start = key.indexOf('{');
 		if (start >= 0) {
@@ -301,8 +326,7 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 	}
 
 	private List<Object> eval(String source, List<Object> scriptKeys, Object... args) {
-		List<Object> result = script.eval(RScript.Mode.READ_WRITE, source, RScript.ReturnType.MULTI, scriptKeys,
-				args);
+		List<Object> result = script.eval(RScript.Mode.READ_WRITE, source, RScript.ReturnType.MULTI, scriptKeys, args);
 		if (result == null || result.isEmpty()) {
 			throw new IllegalStateException("Redis progress store script returned no result");
 		}
@@ -366,6 +390,17 @@ public final class RedisLeasedProgressStore implements LeasedProgressStore {
 		private String keyPrefix = DEFAULT_KEY_PREFIX;
 
 		private boolean verifySlotsAtStartup = true;
+
+		private int directoryCapacity;
+
+		/** Opt into the single-primary retained directory. All writers must opt in. */
+		public Builder directoryCapacity(int capacity) {
+			if (capacity < 1 || capacity > 10000) {
+				throw new IllegalArgumentException("Directory capacity must be 1..10000");
+			}
+			this.directoryCapacity = capacity;
+			return this;
+		}
 
 		private Builder() {
 		}
