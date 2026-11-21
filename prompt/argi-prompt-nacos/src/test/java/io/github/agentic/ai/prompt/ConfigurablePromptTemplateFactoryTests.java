@@ -17,14 +17,20 @@ package io.github.agentic.ai.prompt;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.template.st.StTemplateRenderer;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 /**
  * Test cases for ConfigurablePromptTemplateFactory. Tests template creation, retrieval,
@@ -181,6 +187,53 @@ class ConfigurablePromptTemplateFactoryTests {
 
 		// Verify no changes are made for invalid config
 		assertThat(factory.getTemplate("")).isNull();
+	}
+
+	@Test
+	void updateDiagnosticsDoNotExposeConfigOnSuccessOrPartialFailure() {
+		String body = "template-marker {value}";
+		var variables = Map.<String, Object>of("value", "variable-marker");
+		var configure = new PromptTemplateBuilderConfigure();
+		var count = new AtomicInteger();
+		configure.setPromptTemplateBuilderCustomizers(List.of(builder -> {
+			if (count.incrementAndGet() == 2) {
+				throw new IllegalArgumentException("exception-marker", new RuntimeException("cause-marker"));
+			}
+		}));
+		factory = new ConfigurablePromptTemplateFactory(configure);
+		var first = new ConfigurablePromptTemplateFactory.ConfigurablePromptTemplateModel("first", body, variables);
+		var second = new ConfigurablePromptTemplateFactory.ConfigurablePromptTemplateModel("second", body, variables);
+		var third = new ConfigurablePromptTemplateFactory.ConfigurablePromptTemplateModel("third", body, variables);
+
+		Logger logger = (Logger) LoggerFactory.getLogger(ConfigurablePromptTemplateFactory.class);
+		ListAppender<ILoggingEvent> logs = new ListAppender<>();
+		logs.start();
+		logger.addAppender(logs);
+		Throwable failure;
+		try {
+			failure = catchThrowable(() -> factory.onConfigChange(List.of(first, second, third)));
+		}
+		finally {
+			logger.detachAppender(logs);
+			logs.stop();
+		}
+		assertThat(logs.list).isNotEmpty().allSatisfy(event -> {
+			assertThat(event.getFormattedMessage() + Arrays.deepToString(event.getArgumentArray()))
+				.doesNotContain("template-marker", "variable-marker", "exception-marker", "cause-marker");
+			assertThat(event.getThrowableProxy()).isNull();
+		});
+		assertThat(logs.list).extracting(ILoggingEvent::getFormattedMessage)
+			.anySatisfy(line -> assertThat(line).contains("templateName:first,result:applied"))
+			.anySatisfy(line -> assertThat(line).contains("templateName:second,result:failed",
+					"IllegalArgumentException"));
+		assertThat(failure).isInstanceOf(IllegalStateException.class)
+			.hasMessageContaining("second")
+			.hasMessageContaining("IllegalArgumentException")
+			.hasMessageNotContaining("exception-marker")
+			.hasNoCause();
+		assertThat(factory.getTemplate("first").render()).isEqualTo("template-marker variable-marker");
+		assertThat(factory.getTemplate("second")).isNull();
+		assertThat(factory.getTemplate("third")).isNull();
 	}
 
 	@Test
