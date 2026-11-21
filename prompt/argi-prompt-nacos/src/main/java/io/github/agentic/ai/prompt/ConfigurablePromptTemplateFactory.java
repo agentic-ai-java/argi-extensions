@@ -73,16 +73,21 @@ public class ConfigurablePromptTemplateFactory {
 			if (!StringUtils.hasText(configuration.name()) || !StringUtils.hasText(configuration.template())) {
 				continue;
 			}
-			PromptTemplate.Builder promptTemplateBuilder = promptTemplateBuilderConfigure
-				.configure(PromptTemplate.builder()
-					.template(configuration.template())
-					.variables(configuration.model() == null ? new HashMap<>() : configuration.model()));
-
-			templates.put(configuration.name(),
-					new ConfigurablePromptTemplate(configuration.name(), promptTemplateBuilder.build()));
-
-			logger.info("OnPromptTemplateConfigChange,templateName:{},template:{},model:{}", configuration.name(),
-					configuration.template(), configuration.model());
+			String name = configuration.name();
+			try {
+				PromptTemplate.Builder promptTemplateBuilder = promptTemplateBuilderConfigure
+					.configure(PromptTemplate.builder()
+						.template(configuration.template())
+						.variables(configuration.model() == null ? new HashMap<>() : configuration.model()));
+				templates.put(name, new ConfigurablePromptTemplate(name, promptTemplateBuilder.build()));
+			}
+			catch (RuntimeException ex) {
+				// Builders and customizers can include prompt content in exception messages or causes.
+				String errorType = ex.getClass().getSimpleName();
+				logger.warn("OnPromptTemplateConfigChange,templateName:{},result:failed,errorType:{}", name, errorType);
+				throw new IllegalStateException("Failed to update prompt template " + name + " (" + errorType + ")");
+			}
+			logger.info("OnPromptTemplateConfigChange,templateName:{},result:applied", name);
 		}
 	}
 

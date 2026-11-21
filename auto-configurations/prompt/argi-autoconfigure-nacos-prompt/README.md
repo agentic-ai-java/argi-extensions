@@ -22,3 +22,13 @@ must not hide Nacos Config configuration or connection failures.
 
 The regression tests cover the Prompt auto-configuration offline. They do not
 verify connections to a live Nacos server.
+
+### Dynamic prompt update logs
+
+Queries for `OnPromptTemplateConfigChange` can still filter on `templateName`.
+Use `result:applied` (INFO) or `result:failed` (WARN) instead of the former
+`template` and `model` fields. Neither prompt text nor variable values are logged
+by the factory. A failure identifies the exception type, without forwarding its
+message or cause. Each result refers to one template: if a later update fails,
+processing stops and earlier updates remain applied. An applied entry does not
+indicate that the whole batch succeeded.
