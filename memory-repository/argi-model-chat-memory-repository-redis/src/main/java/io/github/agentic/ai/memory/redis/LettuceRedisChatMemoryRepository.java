@@ -203,7 +203,7 @@ public class LettuceRedisChatMemoryRepository extends BaseRedisChatMemoryReposit
     if (CollectionUtils.isEmpty(messageStrings)) {
       return Collections.emptyList();
     }
-    return messageStrings.stream().map(this::deserializeMessage).filter(Objects::nonNull).collect(Collectors.toList());
+    return deserializeHistory(messageStrings);
   }
 
   @Override

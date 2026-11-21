@@ -15,7 +15,7 @@
  */
 package io.github.agentic.ai.memory.redis;
 
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -26,12 +26,16 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
 import redis.clients.jedis.Jedis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ResourceLock("redis-deserialization-loggers")
@@ -83,21 +87,51 @@ class RedisDeserializationLoggingIntegrationTest {
 
 	@ParameterizedTest
 	@MethodSource("clientsAndLogLevels")
-	void readingMixedRecordsKeepsExistingBehaviorWithoutLoggingContents(String client, Level level) throws Exception {
+	void corruptMiddleRecordFailsWithoutExposingOrChangingHistory(String client, Level level) throws Exception {
 		String conversationId = "logging-test-" + UUID.randomUUID();
 		String key = "argi_chat_memory:" + conversationId;
 		String secret = RedisDeserializationLoggingTest.SECRET;
-		UserMessage message = UserMessage.builder().text(secret).metadata(Map.of("private", secret)).build();
+		var call = AssistantMessage.builder().content("")
+			.toolCalls(List.of(new AssistantMessage.ToolCall("id", "function", "tool", secret))).build();
+		var reply = ToolResponseMessage.builder()
+			.responses(List.of(new ToolResponseMessage.ToolResponse("id", "tool", secret))).build();
 		try (BaseRedisChatMemoryRepository repository = create(client); Jedis connection = new Jedis(host, port)) {
 			try {
-				connection.rpush(key, repository.serializeMessage(message), "{\"content\":" + secret + "}");
+				String[] records = { repository.serializeMessage(call), "{\"content\":" + secret + "}",
+						repository.serializeMessage(reply) };
+				connection.rpush(key, records);
 				try (var logs = new RedisDeserializationLoggingTest.CapturedLogs(level)) {
-					assertThat(repository.findByConversationId(conversationId)).containsExactly(message);
+					assertThatIllegalStateException().isThrownBy(() -> repository.findByConversationId(conversationId))
+						.withMessage("Unreadable Redis chat memory record at index 1").withNoCause();
 					logs.assertDiagnostic("Deserialization error");
 					logs.assertSafe();
 				}
-				// Reading still leaves both stored records untouched, including the damaged one.
-				assertThat(connection.llen(key)).isEqualTo(2);
+				assertThat(connection.lrange(key, 0, -1)).containsExactly(records);
+				connection.lrem(key, 1, records[1]);
+				assertThat(repository.findByConversationId(conversationId)).containsExactly(call, reply);
+			}
+			finally {
+				connection.del(key);
+			}
+		}
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "jedis", "lettuce", "redisson" })
+	void distinguishesEmptyAndLegacyHistoryFromAllUnreadableRecords(String client) throws Exception {
+		String id = "history-test-" + UUID.randomUUID();
+		String key = "argi_chat_memory:" + id;
+		try (BaseRedisChatMemoryRepository repository = create(client); Jedis connection = new Jedis(host, port)) {
+			try {
+				assertThat(repository.findByConversationId(id)).isEmpty();
+				connection.rpush(key, "\"legacy text\"", "{\"role\":\"user\",\"content\":\"second\"}");
+				assertThat(repository.findByConversationId(id))
+					.containsExactly(new UserMessage("legacy text"), new UserMessage("second"));
+				connection.del(key);
+				connection.rpush(key, "null", "{invalid");
+				assertThatIllegalStateException().isThrownBy(() -> repository.findByConversationId(id))
+					.withMessage("Unreadable Redis chat memory record at index 0").withNoCause();
+				assertThat(connection.lrange(key, 0, -1)).containsExactly("null", "{invalid");
 			}
 			finally {
 				connection.del(key);
