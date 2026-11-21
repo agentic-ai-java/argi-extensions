@@ -158,11 +158,7 @@ public class RedissonRedisChatMemoryRepository extends BaseRedisChatMemoryReposi
 	public List<Message> findByConversationId(String conversationId) {
 		Assert.hasText(conversationId, "conversationId cannot be null or empty");
 		RList<String> redisList = redissonClient.getList(getKeyPrefix() + conversationId);
-		return redisList.readAll()
-			.parallelStream()
-			.map(this::deserializeMessage)
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+		return deserializeHistory(redisList.readAll());
 	}
 
 	@Override

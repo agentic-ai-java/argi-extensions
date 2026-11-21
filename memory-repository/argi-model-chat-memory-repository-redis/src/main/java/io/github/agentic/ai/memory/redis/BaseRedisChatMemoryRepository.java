@@ -15,6 +15,9 @@
  */
 package io.github.agentic.ai.memory.redis;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.github.agentic.ai.memory.redis.serializer.MessageDeserializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import tools.jackson.core.JacksonException;
@@ -72,6 +75,18 @@ public abstract class BaseRedisChatMemoryRepository implements ChatMemoryReposit
 					messageStr.length(), e.getClass().getSimpleName());
 			return null;
 		}
+	}
+
+	List<Message> deserializeHistory(List<String> records) {
+		List<Message> history = new ArrayList<>(records.size());
+		for (String record : records) {
+			Message message = record == null ? null : deserializeMessage(record);
+			if (message == null) {
+				throw new IllegalStateException("Unreadable Redis chat memory record at index " + history.size());
+			}
+			history.add(message);
+		}
+		return history;
 	}
 
 	protected String serializeMessage(Message message) {

@@ -445,6 +445,20 @@ all nine client pairings, default and shared prefixes, and concurrent constructi
 They use unique test keys and never flush a database. These standalone tests do
 not certify TLS, Redis Cluster, or high-availability behavior.
 
+## Reading an existing history after upgrading
+
+`findByConversationId` no longer silently skips unreadable records. Jedis, Lettuce,
+and Redisson throw `IllegalStateException` with the zero-based list index of the
+first record that cannot be decoded as a message (including JSON `null`). No
+partial history is returned and no data is changed. If this happens, inspect a
+backup and repair or restore the affected record before retrying; do not handle
+the exception by saving an empty history.
+
+No key or format migration is required. An absent conversation still returns an
+empty list. The message decoder is unchanged: it still accepts legacy JSON strings
+and the existing type aliases and retains its compatibility fallback for unknown
+message types. This change does not introduce stricter message-schema validation.
+
 ## Snapshot replacement with `saveAll`
 
 Jedis, Lettuce, and Redisson validate and serialize the entire replacement before
