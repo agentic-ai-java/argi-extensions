@@ -15,115 +15,115 @@
  */
 package io.github.agentic.ai.vectorstore.analyticdb;
 
-import org.springframework.ai.vectorstore.filter.Filter;
-import org.springframework.ai.vectorstore.filter.Filter.Expression;
-import org.springframework.ai.vectorstore.filter.Filter.Group;
-import org.springframework.ai.vectorstore.filter.Filter.Key;
-import org.springframework.ai.vectorstore.filter.converter.AbstractFilterExpressionConverter;
-import org.springframework.util.Assert;
-
 import java.util.List;
 
+import org.springframework.ai.vectorstore.filter.Filter.Expression;
+import org.springframework.ai.vectorstore.filter.Filter.ExpressionType;
+import org.springframework.ai.vectorstore.filter.Filter.Key;
+import org.springframework.ai.vectorstore.filter.Filter.Value;
+import org.springframework.ai.vectorstore.filter.converter.AbstractFilterExpressionConverter;
+import tools.jackson.databind.json.JsonMapper;
+
 /**
+ * Renders SQL WHERE predicates for
+ * <a href="https://help.aliyun.com/zh/analyticdb/analyticdb-for-postgresql/developer-reference/api-gpdb-2016-05-03-querycollectiondata">QueryCollectionData</a>
+ * and
+ * <a href="https://help.aliyun.com/zh/analyticdb/analyticdb-for-postgresql/developer-reference/api-gpdb-2016-05-03-deletecollectiondata">DeleteCollectionData</a>.
+ * Document attributes live in one JSONB column, not in individual collection columns.
+ *
  * @author HeYQ
  */
 public class AdVectorFilterExpressionConverter extends AbstractFilterExpressionConverter {
 
+	private static final JsonMapper JSON = JsonMapper.builder().build();
+
 	@Override
 	protected void doExpression(Expression expression, StringBuilder context) {
-		if (expression.type() == Filter.ExpressionType.IN) {
-			handleIn(expression, context);
-		}
-		else if (expression.type() == Filter.ExpressionType.NIN) {
-			handleNotIn(expression, context);
-		}
-		else {
-			this.convertOperand(expression.left(), context);
-            context.append(getOperationSymbol(expression));
-            Assert.state(expression.right() != null, "expected an expression with a right operand");
-            this.convertOperand(expression.right(), context);
-		}
-	}
-
-	private void handleIn(Expression expression, StringBuilder context) {
-		context.append("(");
-		convertToConditions(expression, context);
-		context.append(")");
-	}
-
-	private void convertToConditions(Expression expression, StringBuilder context) {
-        Assert.state(expression.right() != null, "expected an expression with a right operand");
-		Filter.Value right = (Filter.Value) expression.right();
-		Object value = right.value();
-		if (!(value instanceof List)) {
-			throw new IllegalArgumentException("Expected a List, but got: " + value.getClass().getSimpleName());
-		}
-		List<Object> values = (List) value;
-		for (int i = 0; i < values.size(); i++) {
-			this.convertOperand(expression.left(), context);
-			context.append(" == ");
-			this.doSingleValue(values.get(i), context);
-			if (i < values.size() - 1) {
-				context.append(" || ");
+		ExpressionType type = expression.type();
+		if (type == ExpressionType.AND || type == ExpressionType.OR) {
+			if (expression.right() == null) {
+				throw new IllegalArgumentException("Expected two predicates for " + type);
 			}
+			context.append("(");
+			convertOperand(expression.left(), context);
+			context.append(type == ExpressionType.AND ? " AND " : " OR ");
+			convertOperand(expression.right(), context);
+			context.append(")");
+			return;
 		}
-	}
 
-	private void handleNotIn(Expression expression, StringBuilder context) {
-		context.append("!(");
-		convertToConditions(expression, context);
-		context.append(")");
-	}
+		if (!(expression.left() instanceof Key key) || !(expression.right() instanceof Value value)) {
+			throw new IllegalArgumentException("Expected a metadata key and filter value for " + type);
+		}
+		String field = convertOperand(key);
+		if (type == ExpressionType.IN || type == ExpressionType.NIN) {
+			if (!(value.value() instanceof List<?> values) || values.isEmpty()) {
+				throw new IllegalArgumentException("Expected a non-empty list for " + type);
+			}
+			context.append("(").append(field).append(type == ExpressionType.IN ? ") IN (" : ") NOT IN (");
+			for (int i = 0; i < values.size(); i++) {
+				if (i > 0) {
+					context.append(", ");
+				}
+				doSingleValue(values.get(i), context);
+			}
+			context.append(")");
+			return;
+		}
 
-	private String getOperationSymbol(Expression exp) {
-		switch (exp.type()) {
-			case AND:
-				return " && ";
-			case OR:
-				return " || ";
-			case EQ:
-				return " = ";
-			case NE:
-				return " != ";
-			case LT:
-				return " < ";
-			case LTE:
-				return " <= ";
-			case GT:
-				return " > ";
-			case GTE:
-				return " >= ";
-			// case IN:
-			// return "IN";
-			// case NIN:
-			// return " NOT IN";
-			default:
-				throw new RuntimeException("Not supported expression type: " + exp.type());
+		String operator = switch (type) {
+			case EQ -> " = ";
+			case NE -> " <> ";
+			case LT -> " < ";
+			case LTE -> " <= ";
+			case GT -> " > ";
+			case GTE -> " >= ";
+			default -> throw new IllegalArgumentException("Unsupported metadata comparison: " + type);
+		};
+		boolean ordered = type != ExpressionType.EQ && type != ExpressionType.NE;
+		if (ordered) {
+			// JSONB has a total order across types. Compare only like scalars, without
+			// casting arbitrary stored metadata (a row can have "unknown" for a score).
+			context.append("(jsonb_typeof(").append(field).append(") = '")
+				.append(scalarType(value.value())).append("' AND ");
+		}
+		context.append("(").append(field).append(")").append(operator);
+		doSingleValue(value.value(), context);
+		if (ordered) {
+			context.append(")");
 		}
 	}
 
 	@Override
 	protected void doKey(Key key, StringBuilder context) {
-		context.append("$." + key.key());
+		context.append("metadata -> ").append(literal(key.key()));
 	}
 
 	@Override
-	protected void doStartGroup(Group group, StringBuilder context) {
-		context.append("(");
+	protected void doSingleValue(Object value, StringBuilder context) {
+		scalarType(value);
+		context.append(literal(JSON.writeValueAsString(value))).append("::jsonb");
 	}
 
-	@Override
-	protected void doEndGroup(Group group, StringBuilder context) {
-		context.append(")");
+	private static String scalarType(Object value) {
+		if (value instanceof String text && text.indexOf('\0') < 0) {
+			return "string";
+		}
+		if (value instanceof Boolean) {
+			return "boolean";
+		}
+		if (value instanceof Number && !(value instanceof Double d && !Double.isFinite(d))
+				&& !(value instanceof Float f && !Float.isFinite(f))) {
+			return "number";
+		}
+		throw new IllegalArgumentException("Expected a string, finite number or boolean in metadata filter");
 	}
 
-    @Override
-    protected void doSingleValue(Object value, StringBuilder context) {
-        if (value instanceof String) {
-            context.append(String.format("\"%s\"", value));
-        } else {
-            context.append(value);
-        }
-    }
+	private static String literal(String text) {
+		if (text.indexOf('\0') >= 0) {
+			throw new IllegalArgumentException("PostgreSQL text cannot contain a NUL character");
+		}
+		return "E'" + text.replace("\\", "\\\\").replace("'", "''") + "'";
+	}
 
 }
